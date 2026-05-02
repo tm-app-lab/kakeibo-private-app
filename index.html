@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>家計管理</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta name="theme-color" content="#17352e" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="家計管理" />
+  </head>
+  <body class="auth-locked">
+    <section id="authScreen" class="auth-screen" aria-labelledby="authTitle">
+      <form id="authForm" class="auth-card">
+        <p class="eyebrow">Household Maintenance</p>
+        <h1 id="authTitle">家計管理</h1>
+        <p>収入と支出設計を確認するための個人用アプリです。共通パスワードを入力してください。</p>
+        <label>
+          パスワード
+          <input id="authPassword" type="password" autocomplete="current-password" inputmode="text" />
+        </label>
+        <button class="primary-button" type="submit">ログイン</button>
+        <p id="authError" class="auth-error" role="alert" aria-live="polite"></p>
+      </form>
+    </section>
+    <button id="mobileNavToggle" class="mobile-nav-toggle" type="button" aria-controls="appNav" aria-expanded="false" aria-label="メニューを開く">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <div id="mobileNavBackdrop" class="mobile-nav-backdrop hidden" aria-hidden="true"></div>
+    <main class="app">
+      <aside class="nav" id="appNav">
+        <div class="nav-head">
+          <p class="eyebrow">Household Maintenance</p>
+          <h1 id="navTitle">収入管理</h1>
+          <p class="nav-copy" id="navCopy">POSITIVEで撮影した写真を登録し、給与データを管理します。</p>
+          <p class="nav-updated">最終更新 <strong id="navUpdatedLabel">-</strong></p>
+        </div>
+        <section id="householdBalanceCard" class="nav-balance-card" aria-live="polite"></section>
+        <nav class="mode-switch" aria-label="管理対象の切替">
+          <button class="mode-button active" type="button" data-app-mode="income">
+            <span>収入管理</span>
+          </button>
+          <button class="mode-button" type="button" data-app-mode="expense">
+            <span>支出管理</span>
+          </button>
+        </nav>
+        <div class="nav-tools">
+          <button id="openSettings" class="nav-tool-button nav-tool-settings" type="button"><span aria-hidden="true"></span>設定</button>
+          <button id="openHelp" class="nav-tool-button nav-tool-help" type="button"><span aria-hidden="true"></span>ヘルプ</button>
+          <button id="logoutApp" class="nav-tool-button nav-tool-logout" type="button"><span aria-hidden="true"></span>ログアウト</button>
+        </div>
+      </aside>
+
+      <section class="workspace">
+        <section class="income-panel hidden" id="panel-income"></section>
+
+        <article class="panel income-native expense-shell expense-view hidden">
+          <div class="income-topbar">
+            <div>
+              <h3>支出管理</h3>
+              <p>支出項目の入力、更新候補、外部データ、分析、データ管理をまとめて扱います。</p>
+            </div>
+          </div>
+
+        <div class="tab-strip expense-view hidden" role="tablist" aria-label="支出管理の表示切替">
+          <button class="tab active" id="tab-master" type="button" role="tab" aria-selected="true" data-tab="master">入力</button>
+          <button class="tab" id="tab-candidates" type="button" role="tab" aria-selected="false" data-tab="candidates">更新候補</button>
+          <button class="tab" id="tab-import" type="button" role="tab" aria-selected="false" data-tab="import">外部データ</button>
+          <button class="tab" id="tab-expense-analysis" type="button" role="tab" aria-selected="false" data-tab="expense-analysis">分析</button>
+          <button class="tab" id="tab-expense-data" type="button" role="tab" aria-selected="false" data-tab="expense-data">データ管理</button>
+        </div>
+
+        <section class="tab-panel expense-view active hidden" id="panel-master" role="tabpanel" aria-labelledby="tab-master">
+          <article class="panel">
+            <div id="pendingApplyPanel" class="pending-apply hidden"></div>
+            <div class="toolbar expense-input-toolbar">
+              <div class="expense-person-switch">
+                <label>支払者<select id="expensePersonSelect"></select></label>
+              </div>
+              <button id="addMasterItem" type="button">新規</button>
+              <label>
+                検索
+                <input id="masterSearch" type="search" placeholder="保険、住宅ローン、通信など" />
+              </label>
+              <select id="masterFilter" class="hidden" aria-hidden="true">
+                <option value="all" selected>すべて</option>
+              </select>
+              <div class="view-icon-toggle" role="group" aria-label="支出項目の表示形式">
+                <button class="active" type="button" data-master-view="cards" aria-label="カード表示" title="カード表示"><span class="view-icon view-icon-cards" aria-hidden="true"></span></button>
+                <button type="button" data-master-view="list" aria-label="リスト表示" title="リスト表示"><span class="view-icon view-icon-list" aria-hidden="true"></span></button>
+              </div>
+            </div>
+            <p class="status-help">状態: 通常=閲覧中の項目、編集中=右側の詳細カードで変更中の項目。</p>
+            <div class="master-layout">
+              <section class="master-cards" id="masterCards"></section>
+              <section class="master-list hidden" id="masterList">
+                <table class="master-table">
+                  <thead>
+                    <tr>
+                      <th><button class="sort-button" data-sort="status" type="button">状態</button></th>
+                      <th><button class="sort-button" data-sort="name" type="button">内容1</button></th>
+                      <th><button class="sort-button" data-sort="category" type="button">種別</button></th>
+                      <th><button class="sort-button" data-sort="nature" type="button">固定/変動</button></th>
+                      <th><button class="sort-button amount" data-sort="monthlyAmount" type="button">費用</button></th>
+                    </tr>
+                    <tr class="filter-row">
+                      <th><select class="column-filter" data-filter="status"></select></th>
+                      <th><select class="column-filter" data-filter="name"></select></th>
+                      <th><select class="column-filter" data-filter="category"></select></th>
+                      <th><select class="column-filter" data-filter="nature"></select></th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="masterRows"></tbody>
+                </table>
+              </section>
+              <aside id="detailPanel" class="detail-panel"></aside>
+            </div>
+          </article>
+        </section>
+
+        <section class="tab-panel expense-view hidden" id="panel-candidates" role="tabpanel" aria-labelledby="tab-candidates">
+        </section>
+
+        <section class="tab-panel expense-view hidden" id="panel-import" role="tabpanel" aria-labelledby="tab-import">
+          <article class="panel">
+            <div class="toolbar external-toolbar">
+              <label class="file-button">
+                CSVを選択
+                <input id="externalCsvInput" type="file" accept=".csv,.txt" multiple />
+              </label>
+              <div class="subtab-strip" role="tablist" aria-label="外部取り込み表示切替">
+                <button class="subtab active" type="button" data-external-tab="mf">マネーフォワード</button>
+                <button class="subtab" type="button" data-external-tab="rakuten">楽天カード</button>
+              </div>
+              <div class="subtab-controls">
+                <div id="externalLinkBack" class="link-back-slot"></div>
+                <button id="prevImportMonth" class="icon-button" type="button" aria-label="前月へ移動" title="前月へ移動">‹</button>
+                <label class="month-select-wrap" aria-label="年月">
+                  <select id="importMonthSelect"></select>
+                </label>
+                <button id="nextImportMonth" class="icon-button" type="button" aria-label="翌月へ移動" title="翌月へ移動">›</button>
+                <button id="toggleImportEdit" type="button">編集</button>
+                <button id="bulkDeleteImportedRows" class="danger-button hidden" type="button">一括削除</button>
+              </div>
+              <span id="importSummary" class="muted-text">未取り込み</span>
+            </div>
+            <div id="externalMfPanel">
+              <div class="external-heading">
+                <h4>マネーフォワード詳細</h4>
+                <div class="external-totals">
+                  <span id="mfIncomeTotal">収入 -</span>
+                  <span id="mfPaymentTotal">支払い -</span>
+                  <span id="mfBalanceTotal">収支 -</span>
+                </div>
+              </div>
+              <div class="table-wrap imported-table-wrap">
+                <table class="imported-table">
+                  <thead>
+                  <tr>
+                      <th>紐づけ</th>
+                      <th>日付</th>
+                      <th>内容</th>
+                      <th>金額</th>
+                      <th>分類</th>
+                      <th>詳細</th>
+                    </tr>
+                  </thead>
+                  <tbody id="mfImportedRows"></tbody>
+                </table>
+              </div>
+            </div>
+            <div id="externalRakutenPanel" class="hidden">
+              <div class="external-heading">
+                <h4>楽天カード利用実績</h4>
+                <div class="external-totals">
+                  <span id="rakutenPaymentTotal">支払い総計 -</span>
+                </div>
+              </div>
+              <div class="table-wrap imported-table-wrap">
+                <table class="imported-table rakuten-table">
+                  <thead>
+                    <tr>
+                      <th>利用日</th>
+                      <th>利用店名・商品名</th>
+                      <th>利用者</th>
+                      <th>支払方法</th>
+                      <th>利用金額</th>
+                      <th>手数料/利息</th>
+                      <th>支払総額</th>
+                      <th>支払金額</th>
+                      <th>詳細</th>
+                    </tr>
+                  </thead>
+                  <tbody id="rakutenImportedRows"></tbody>
+                </table>
+              </div>
+              <div id="rakutenSummary" class="card-list"></div>
+            </div>
+          </article>
+        </section>
+
+        <section class="tab-panel expense-view hidden" id="panel-expense-analysis" role="tabpanel" aria-labelledby="tab-expense-analysis">
+        </section>
+
+        <section class="tab-panel expense-view hidden" id="panel-expense-data" role="tabpanel" aria-labelledby="tab-expense-data">
+        </section>
+        </article>
+
+      </section>
+    </main>
+
+    <div id="settingsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="modal-card">
+        <div class="panel-head">
+          <h3 id="settingsTitle">設定</h3>
+          <button id="closeSettings" type="button">閉じる</button>
+        </div>
+        <section class="settings-section">
+          <h4>収入表示名</h4>
+          <p>対象ユーザーを選び、現在の名称を確認してから編集します。</p>
+          <div class="settings-row settings-row-strong">
+            <label>ユーザー<select id="payrollSettingsProfile"><option value="primary"></option><option value="secondary"></option></select></label>
+            <label>表示名<input id="payrollProfileName" type="text" maxlength="20" /></label>
+            <button id="payrollSaveProfileName" type="button">保存</button>
+          </div>
+        </section>
+        <section class="settings-section">
+          <h4>支出種別</h4>
+          <p>支出項目で使う種別だけを編集します。</p>
+        <div class="list-editor">
+          <label>種別<textarea id="categoryOptions"></textarea></label>
+        </div>
+          <div class="modal-actions settings-list-actions">
+            <button id="saveListOptions" type="button">保存</button>
+            <button id="resetMaster" type="button">初期値へ戻す</button>
+          </div>
+        </section>
+        <section class="settings-section link-group-section">
+          <h4>紐づけ管理</h4>
+          <p>収入項目、支出項目、外部データを同じ実体として関連付けます。金額は自動反映しません。</p>
+          <div id="linkGroupList" class="link-group-list"></div>
+          <div class="link-equation-preview" id="linkEquationPreview"></div>
+          <div class="link-group-editor">
+            <label>グループ名<input id="linkGroupName" type="text" maxlength="40" /></label>
+            <label>説明<input id="linkGroupDescription" type="text" maxlength="80" /></label>
+            <div class="link-source-panel">
+              <h5>収入項目</h5>
+              <div class="link-add-row">
+                <select id="linkGroupIncome"></select>
+                <button id="addLinkIncome" type="button">追加</button>
+              </div>
+              <div id="linkIncomeChips" class="link-chip-list"></div>
+            </div>
+            <div class="link-source-panel">
+              <h5>支出項目</h5>
+              <div class="link-add-row">
+                <select id="linkGroupExpense"></select>
+                <button id="addLinkExpense" type="button">追加</button>
+              </div>
+              <div id="linkExpenseChips" class="link-chip-list"></div>
+            </div>
+            <div class="link-source-panel">
+              <h5>外部データ</h5>
+              <div class="link-add-row">
+                <select id="linkGroupExternalSource"><option value="moneyforward">マネーフォワード</option><option value="rakuten">楽天カード</option></select>
+                <input id="linkGroupExternalSearch" type="search" placeholder="内容・店名で検索" />
+              </div>
+              <div class="link-add-row">
+                <select id="linkGroupExternalItem"></select>
+                <button id="addLinkExternal" type="button">追加</button>
+              </div>
+              <div id="linkGroupExternalMeta" class="link-external-meta"></div>
+              <div id="linkExternalChips" class="link-chip-list"></div>
+            </div>
+            <div class="modal-actions">
+              <button id="addLinkGroup" type="button">保存</button>
+              <button id="clearLinkDraft" type="button">クリア</button>
+            </div>
+          </div>
+        </section>
+        <section class="settings-section backup-section">
+          <h4>バックアップ</h4>
+          <p>収入管理、支出管理、外部取り込み、設定をまとめて保全します。復元は現在データへ影響するため確認して実行します。</p>
+          <div class="settings-row">
+            <button id="exportFullBackup" class="primary-button" type="button">バックアップ</button>
+            <label class="file-button danger-file-button">
+              復元
+              <input id="importFullBackup" type="file" accept=".json" />
+            </label>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div id="toastHost" class="toast-host" aria-live="polite" aria-atomic="true"></div>
+
+    <div id="helpModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+      <div class="modal-card help-modal-card">
+        <div class="panel-head">
+          <h3 id="helpTitle">ヘルプ</h3>
+          <button id="closeHelp" type="button">閉じる</button>
+        </div>
+        <div id="helpContent" class="help-content"></div>
+      </div>
+    </div>
+
+    <script src="data/household-data.js"></script>
+    <script src="data/payroll-data.js"></script>
+    <script src="storage.js"></script>
+    <script src="ui.js"></script>
+    <script src="household.js"></script>
+    <script src="import-utils.js"></script>
+    <script src="import.js"></script>
+    <script src="payroll.js"></script>
+    <script src="auth.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

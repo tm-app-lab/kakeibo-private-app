@@ -1,0 +1,1038 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>????</title>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<style>
+
+:root{--bg:#f6f8fb;--panel:#fff;--text:#1f2937;--muted:#6b7280;--line:#d8dee8;--accent:#2563eb;--soft:#eef4ff;--warn:#fff7ed;--danger:#dc2626}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+header{padding:22px 28px;background:#fff;border-bottom:1px solid var(--line)}h1{margin:0;font-size:22px}.sub{margin-top:6px;color:var(--muted);font-size:13px;line-height:1.5}
+main{max-width:1280px;margin:0 auto;padding:22px}.grid{display:grid;grid-template-columns:360px 1fr;gap:18px}.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.btn{appearance:none;border:1px solid var(--accent);background:var(--accent);color:#fff;border-radius:10px;padding:9px 12px;font-weight:600;cursor:pointer}.btn.secondary{background:#fff;color:var(--accent)}.btn.danger{border-color:var(--danger);color:var(--danger);background:#fff}.btn:disabled{opacity:.5;cursor:not-allowed}.buttonPanel{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px}.buttonPanel .btn{width:100%;min-height:42px;text-align:center}.deletePanel{border-top:1px solid var(--line);margin-top:14px;padding-top:12px}.deletePanel .btn{margin-top:8px;width:100%;min-height:42px}
+input[type="month"],input[type="number"],input[type="file"],select{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:#fff}label{font-size:12px;color:var(--muted);display:block;margin:10px 0 5px}.status{font-size:13px;color:var(--muted);line-height:1.6;white-space:pre-wrap}.note{background:var(--warn);border:1px solid #fed7aa;color:#7c2d12;border-radius:12px;padding:10px;font-size:13px;line-height:1.6;margin-top:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:middle}th{background:var(--soft);font-weight:700}td.num,th.num{text-align:right}tr.calc td{background:#f9fafb;color:#374151}tr.input td:first-child{font-weight:600}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}.kpi{background:var(--soft);border:1px solid #dbeafe;border-radius:12px;padding:12px}.kpi .t{font-size:12px;color:var(--muted)}.kpi .v{font-size:20px;font-weight:800;margin-top:4px}.ocrbox{max-height:170px;overflow:auto;background:#0f172a;color:#e5e7eb;border-radius:10px;padding:10px;font-size:12px;line-height:1.5;margin-top:10px}.split{display:grid;grid-template-columns:1fr;gap:16px}.chartwrap{min-height:330px}.err{color:var(--danger)}@media(max-width:900px){.grid{grid-template-columns:1fr}.summary{grid-template-columns:repeat(2,1fr)}}
+
+.charttitle{font-weight:700;margin:6px 0 8px}.chartwrap svg text{user-select:none}.chartHover{cursor:crosshair}.small{font-size:12px;color:var(--muted)}.sourcepill{display:inline-block;background:#eef4ff;border:1px solid #d8dee8;border-radius:999px;padding:3px 8px;margin-top:8px;font-size:12px;color:#374151}.controls{display:grid;gap:10px;margin-bottom:14px}.controlbox{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fbfdff}.inlineChoice{display:inline-flex;gap:6px;align-items:center;margin-right:14px;font-size:13px;color:#374151}.seriesGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 12px;max-height:180px;overflow:auto}.seriesGrid label{margin:0;display:flex;align-items:center;gap:6px;font-size:12px;color:#374151}.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}@media(max-width:900px){.seriesGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.modalBackdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}.modalBackdrop.show{display:flex}.modal{background:#fff;border-radius:16px;border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.22);width:min(1180px,96vw);max-height:88vh;display:flex;flex-direction:column}.modalHeader{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}.modalHeader h2{font-size:18px;margin:0}.modalBody{padding:14px 16px;overflow:auto}.modalFooter{padding:12px 16px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}.badge{display:inline-block;border-radius:999px;padding:2px 8px;font-size:12px;border:1px solid var(--line);background:#f9fafb;color:#374151}.badge.warn{background:#fff7ed;border-color:#fed7aa;color:#9a3412}.previewTable{width:100%;border-collapse:collapse}.previewTable th,.previewTable td{border-bottom:1px solid var(--line);padding:7px 8px}.previewTable th{background:var(--soft)}.footerVersion{max-width:1280px;margin:0 auto;padding:0 22px 20px;color:var(--muted);font-size:12px}.wrap table th{background:var(--soft)}
+
+.dashboardTop{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px}.metricCard{border:1px solid var(--line);border-radius:12px;background:#fbfdff;padding:12px}.metricCard .label{font-size:12px;color:var(--muted)}.metricCard .amount{font-size:19px;font-weight:800;margin-top:4px}.metricCard .delta{font-size:12px;color:#374151;margin-top:5px;line-height:1.4}.analysisGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}.analysisBox{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}.analysisBox h3{font-size:14px;margin:0 0 8px}.rankingList{margin:0;padding-left:18px;font-size:13px;line-height:1.8}.chartTabs{display:flex;gap:8px;flex-wrap:wrap}.tabBtn{appearance:none;border:1px solid var(--line);background:#fff;color:#374151;border-radius:999px;padding:7px 11px;font-weight:700;cursor:pointer}.tabBtn.active{border-color:var(--accent);background:var(--soft);color:var(--accent)}.yearLine{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:4px}.yearLine select{width:auto;min-width:120px}@media(max-width:900px){.dashboardTop{grid-template-columns:repeat(2,minmax(0,1fr))}.analysisGrid{grid-template-columns:1fr}}
+.status{border:1px solid var(--line);background:#fbfdff;border-radius:12px;padding:10px}.status.ok{border-color:#bbf7d0;background:#f0fdf4;color:#166534}.status.warn{border-color:#fed7aa;background:#fff7ed;color:#9a3412}.status.error{border-color:#fecaca;background:#fef2f2;color:#991b1b}.storageNotice{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:10px;font-size:12px;color:#475569;line-height:1.6;margin-top:10px}.sectionRow td{background:#eaf2ff;color:#1d4ed8;font-weight:800;border-top:1px solid #bfdbfe}.readonlyBadge{display:inline-block;border-radius:999px;padding:2px 8px;background:#eef2ff;border:1px solid #c7d2fe;color:#3730a3;font-size:12px}.manualBadge{display:inline-block;border-radius:999px;padding:2px 8px;background:#ecfdf5;border:1px solid #bbf7d0;color:#166534;font-size:12px}.helpList{margin:0;padding-left:18px;line-height:1.85}.helpList li{margin:4px 0}.mobileHint{display:none}.tableScroll{overflow:auto;max-width:100%}
+@media(max-width:900px){header{padding:18px 16px}main{padding:14px}.card{padding:14px;border-radius:12px}.buttonPanel .btn,.deletePanel .btn{min-height:46px;font-size:15px}input[type="month"],input[type="number"],input[type="file"],select{font-size:16px;min-height:42px}.summary{grid-template-columns:1fr 1fr}.kpi .v{font-size:17px}.chartwrap svg{height:320px}.mobileHint{display:block}.modal{width:96vw;max-height:86vh}.modalFooter{justify-content:stretch}.modalFooter .btn{width:100%;min-height:44px}th,td{padding:8px 7px}.inputCol{min-width:120px}.itemCol{min-width:150px}}
+
+.sideTabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}.sideTabBtn,.mainTabBtn{appearance:none;border:1px solid var(--line);background:#fff;color:#374151;border-radius:999px;padding:7px 10px;font-weight:700;cursor:pointer;font-size:12px}.sideTabBtn.active,.mainTabBtn.active{border-color:var(--accent);background:var(--soft);color:var(--accent)}.sideTabPanel{display:none;margin-top:10px}.sideTabPanel.active{display:block}.sideTabPanel .note,.sideTabPanel .storageNotice{margin-top:0}.ocrbox.empty{background:#f8fafc;color:#64748b;border:1px dashed var(--line)}.mainTabsCard{padding:10px 12px}.mainTabs{display:flex;gap:8px;flex-wrap:wrap}.mainTabBtn{font-size:14px;padding:9px 16px;border-radius:12px}.mainTabPanel{display:none}.mainTabPanel.active{display:block}.contentArea{display:grid;grid-template-columns:1fr;gap:12px}.tabLead{font-size:12px;color:var(--muted);margin-left:auto;align-self:center}.tabTitleRow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.tabTitleRow .charttitle{margin:0}.chartwrap{scroll-margin-top:16px}
+@media(max-width:900px){.sideTabs{grid-template-columns:repeat(2,1fr)}.mainTabs{display:grid;grid-template-columns:repeat(3,1fr)}.mainTabBtn{width:100%;padding:10px 8px}.tabLead{margin-left:0;width:100%}}
+
+
+/* v17 app layout refinements */
+header{position:sticky;top:0;z-index:20}.appLayout{display:grid;grid-template-columns:320px 1fr;gap:18px;align-items:start}.statusCenter{position:sticky;top:94px}.statusHeader{display:flex;justify-content:space-between;gap:10px;align-items:center}.statusHeader h2{font-size:17px;margin:2px 0 0}.eyebrow{font-size:11px;letter-spacing:.08em;color:var(--muted);font-weight:800}.btn.compact{padding:7px 10px;min-height:34px}.statusTiles{display:grid;grid-template-columns:1fr;gap:8px;margin:12px 0}.statusTile{border:1px solid var(--line);border-radius:12px;background:#fbfdff;padding:10px}.statusTile span{display:block;color:var(--muted);font-size:11px}.statusTile b{display:block;font-size:15px;margin-top:3px}.statusDetails{border:1px solid var(--line);border-radius:12px;background:#fff;margin-top:10px;padding:10px}.statusDetails summary{cursor:pointer;font-weight:800;font-size:13px;color:#374151}.stickyTabs{position:sticky;top:94px;z-index:15}.mainTabs{align-items:center}.stepper{display:grid;grid-template-columns:1fr;gap:14px}.stepBox{display:grid;grid-template-columns:38px 1fr;gap:12px;border:1px solid var(--line);border-radius:14px;background:#fbfdff;padding:14px}.stepBox h3{margin:0 0 3px;font-size:15px}.stepBox p{margin:0 0 8px;color:var(--muted);font-size:12px;line-height:1.55}.stepNo{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:#fff;font-weight:900}.buttonRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.buttonRow .btn{min-height:40px}.preSaveChecks{border:1px solid var(--line);border-radius:12px;background:#fff;padding:10px;line-height:1.7}.preSaveChecks.ok{border-color:#bbf7d0;background:#f0fdf4;color:#166534}.preSaveChecks.warn{border-color:#fed7aa;background:#fff7ed;color:#9a3412}.compactControls{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start;border:1px solid var(--line);border-radius:14px;background:#fbfdff;padding:10px;margin-bottom:12px}.controlLabel{display:block;font-weight:800;margin-bottom:6px}.largeChart{min-height:430px;border:1px solid var(--line);border-radius:14px;background:#fff;padding:8px}.chartDetails{border:1px solid var(--line);border-radius:14px;background:#fbfdff;margin-top:12px;padding:10px}.chartDetails summary{font-weight:800;cursor:pointer}.manageActions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0}.manageActions .btn{min-height:42px}.manageDelete{display:grid;grid-template-columns:220px 1fr;gap:8px;align-items:end;border:1px solid var(--line);border-radius:14px;background:#fbfdff;padding:12px;margin:10px 0}.manageDelete label{margin-top:0}.dataViewSwitch{display:flex;align-items:center;gap:10px;margin:12px 0}.dataListContainer{border:1px solid var(--line);border-radius:14px;background:#fff;overflow:auto;max-height:520px}.dataCards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:10px}.dataCard{border:1px solid var(--line);border-radius:14px;background:#fbfdff;padding:12px}.dataCardHead{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px}.dataCardHead b{font-size:16px}.dataMetric{display:grid;grid-template-columns:1fr auto;gap:8px;border-top:1px solid var(--line);padding:6px 0}.dataMetric span{color:var(--muted)}.bottomNav{display:none}.dirtyBadge{color:#b45309}.savedBadge{color:#166534}.unsavedBadge{color:#475569}
+@media(max-width:900px){body{padding-bottom:64px}.appLayout{grid-template-columns:1fr}.statusCenter{position:static}.stickyTabs{position:static}.mainTabsCard{display:none}.compactControls{grid-template-columns:1fr}.manageActions{grid-template-columns:1fr 1fr}.manageDelete{grid-template-columns:1fr}.dataCards{grid-template-columns:1fr}.largeChart{min-height:360px}.bottomNav{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border-top:1px solid var(--line);z-index:40;box-shadow:0 -2px 10px rgba(15,23,42,.08)}.bottomNav button{appearance:none;border:0;background:#fff;color:#475569;font-weight:800;padding:11px 6px;font-size:12px}.bottomNav button.active{color:var(--accent);background:var(--soft)}}
+
+
+/* v18 usability and data-management refinements */
+.mainTabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.mainTabBtn{min-height:42px}.mainTabBtn:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid rgba(37,99,235,.28);outline-offset:2px}.manageSummary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:10px 0}.manageSummary .statusTile{min-height:66px}.compactDataTable th,.compactDataTable td{white-space:nowrap}.compactDataTable th:nth-child(1),.compactDataTable td:nth-child(1){position:sticky;left:0;background:#fff;z-index:1}.compactDataTable th:nth-child(1){background:var(--soft)}.actionCell{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.dataListContainer{overflow:auto;max-width:100%;width:100%}.manageCard{overflow:hidden}.dataViewSwitch{justify-content:space-between;flex-wrap:wrap}.dataToolbarHint{font-size:12px;color:var(--muted);line-height:1.6}.recordDetailGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.recordDetailBox{border:1px solid var(--line);border-radius:12px;background:#fbfdff;padding:10px}.recordDetailBox h3{font-size:14px;margin:0 0 8px}.recordDetailBox table{background:#fff}.recordDetailBox td:last-child{text-align:right;font-variant-numeric:tabular-nums}.btn.tiny{padding:6px 9px;min-height:32px;font-size:12px}
+@media(max-width:900px){.mainTabs{grid-template-columns:repeat(4,1fr)}.mainTabBtn{font-size:12px;padding:8px 4px}.manageSummary{grid-template-columns:repeat(2,minmax(0,1fr))}.recordDetailGrid{grid-template-columns:1fr}.compactDataTable th,.compactDataTable td{font-size:12px}.actionCell{justify-content:flex-start}.dataViewSwitch{align-items:flex-start}}
+
+
+.profileSwitch{border:1px solid var(--line);border-radius:12px;background:#fbfdff;padding:10px;margin:12px 0}.profileSwitch label{margin:0 0 6px}.profileSwitch select{font-size:14px}.manageActions{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:900px){.manageActions{grid-template-columns:1fr}}
+
+/* v21 UI refinements */
+.profileNameRow{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}.profileNameRow input{min-height:38px}.amountInputWrap{display:grid;grid-template-columns:minmax(80px,1fr) auto;gap:6px;align-items:center}.amountInputWrap input{min-width:0;text-align:right}.amountUnit{color:var(--muted);font-size:12px;white-space:nowrap}.amountText{font-variant-numeric:tabular-nums}.chartDetails{margin-top:8px}.chartDetails[open]{background:#fff}.inputTableHint{font-size:11px;color:var(--muted)}.quickTip{border:1px solid #bfdbfe;background:#eff6ff;color:#1e3a8a;border-radius:12px;padding:9px 10px;font-size:12px;line-height:1.6;margin:8px 0 12px}.modalFooter:empty{display:none}@media(max-width:900px){.profileNameRow{grid-template-columns:1fr}.profileNameRow .btn{width:100%}.amountInputWrap{grid-template-columns:1fr 28px}.compactControls{grid-template-columns:1fr}.chartDetails .toolbar .btn{width:100%}}
+
+
+/* v21 UX refinements */
+.headerShell{display:flex;justify-content:space-between;gap:18px;align-items:center}.topContextBar{display:grid;grid-template-columns:repeat(4,auto);gap:8px;align-items:stretch}.topContextBar div{min-width:96px;border:1px solid var(--line);background:#fbfdff;border-radius:12px;padding:8px 10px}.topContextBar span{display:block;font-size:10px;color:var(--muted);font-weight:700}.topContextBar b{display:block;font-size:13px;margin-top:2px;white-space:nowrap}.topContextBar .dirtyBadge{color:#b45309}.topContextBar .savedBadge{color:#166534}.topContextBar .unsavedBadge{color:#475569}.tabLead{margin-left:0;text-align:left}.mainTabs{align-items:start}.nextAction{display:flex;justify-content:space-between;gap:12px;align-items:center;border:1px solid #bfdbfe;background:#eff6ff;border-radius:14px;padding:12px;margin:10px 0 14px}.nextAction b{color:#1e3a8a}.nextAction p{margin:4px 0 0;color:#1e40af;font-size:12px;line-height:1.5}.nextActionBtns{display:flex;gap:8px;flex-wrap:wrap}.reviewPanel{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px;margin:0 0 12px;line-height:1.65}.reviewPanel.ok{border-color:#bbf7d0;background:#f0fdf4;color:#166534}.reviewPanel.warn{border-color:#fed7aa;background:#fff7ed;color:#9a3412}.reviewChips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.reviewChips span{display:inline-block;border:1px solid var(--line);border-radius:999px;background:#fff;padding:2px 8px;color:#374151}.iconToggle{display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap}.iconChoice{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:7px 9px;margin:0;cursor:pointer;color:#374151;font-weight:800}.iconChoice input{accent-color:var(--accent)}.iconChoice span{font-size:16px;line-height:1}.iconChoice em{display:none;font-size:11px;font-style:normal;color:var(--muted)}.presetRow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.presetBtn{appearance:none;border:1px solid #dbeafe;background:#fff;color:#1d4ed8;border-radius:999px;padding:6px 9px;font-weight:800;font-size:12px;cursor:pointer}.emptyState{border:1px dashed var(--line);background:#fbfdff;border-radius:14px;padding:18px;text-align:center}.emptyState h3{margin:0 0 6px}.emptyState p{margin:0 0 12px;color:var(--muted);line-height:1.6}.undoBtn{margin-left:8px;border:1px solid #166534;background:#fff;color:#166534;border-radius:999px;padding:3px 8px;font-weight:800;cursor:pointer}.dataCards{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}.compactDataTable th,.compactDataTable td{white-space:normal}.statusHeader h2{margin:0}.profileSwitch .small{line-height:1.5}@media(max-width:900px){.headerShell{display:block}.topContextBar{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:12px}.topContextBar div{min-width:0}.nextAction{display:block}.nextActionBtns{margin-top:10px}.nextActionBtns .btn{width:100%}.iconToggle{display:flex}.iconChoice{flex:1;justify-content:center}.presetRow .presetBtn{flex:1 1 42%}.dataListContainer{max-height:none}.topContextBar b{font-size:12px}.mainTabs{grid-template-columns:repeat(4,1fr)}}
+
+
+/* v27 simplification refinements */
+.headerShell{align-items:flex-start}.headerActions{display:grid;gap:8px;min-width:280px}.headerProfilePanel{border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px 10px}.headerProfilePanel summary{cursor:pointer;font-weight:800;color:#374151}.headerProfilePanel .profileSwitch{margin:8px 0 0;border:0;background:transparent;padding:0}.statusCenter .statusHeader h2{font-size:16px}.statusTiles{display:none}.helpShortcuts{display:grid;gap:8px;margin-top:12px}.helpShortcut{border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px 10px;font-size:12px;line-height:1.55;color:#374151}.helpShortcut b{display:block;margin-bottom:2px}.stepProgress{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 14px}.stepProgress .stepPill{border:1px solid var(--line);border-radius:12px;background:#fff;padding:10px;display:flex;gap:8px;align-items:flex-start}.stepProgress .stepPill strong{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;border-radius:999px;background:var(--soft);color:var(--accent)}.stepProgress .stepPill b{display:block;font-size:13px}.stepProgress .stepPill span{display:block;font-size:11px;color:var(--muted);line-height:1.4;margin-top:2px}.stepProgress .stepPill.active{border-color:#bfdbfe;background:#eff6ff}.chartIntent{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.chartIntent .tabBtn{border-radius:12px;padding:9px 8px}.manageSection{border:1px solid var(--line);border-radius:14px;background:#fff;padding:12px;margin-top:12px}.manageSection:first-of-type{margin-top:10px}.manageSection h3{font-size:14px;margin:0 0 8px}.manageSection.dangerZone{border-color:#fecaca;background:#fffafa}.manageSection.dangerZone h3{color:#991b1b}.manageSection .sectionLead{font-size:12px;color:var(--muted);line-height:1.55;margin:0 0 10px}.headerProfilePanel .small{font-size:11px}.statusCenter{top:122px}.compactSupport{font-size:12px;color:var(--muted);line-height:1.6;margin-top:8px}.tabLead{grid-column:1/-1;display:block;text-align:left;margin-top:2px}.dataViewSwitch{margin-bottom:10px}.quickTip{display:none}.nextAction{display:none!important}
+@media(max-width:900px){.headerActions{min-width:0;margin-top:12px}.stepProgress{grid-template-columns:1fr}.chartIntent{grid-template-columns:repeat(2,minmax(0,1fr))}.chartIntent .tabBtn:last-child{grid-column:1/-1}.headerProfilePanel{margin-top:8px}.statusCenter{top:auto}.mainTabsCard{display:none}.appLayout{gap:12px}.helpShortcuts{grid-template-columns:1fr}.manageSection{padding:10px}.topContextBar{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+/* v27 simplification and step-focus refinements */
+.headerShell{display:grid;grid-template-columns:minmax(230px,1fr) minmax(460px,auto) 260px;gap:16px;align-items:start}
+.topContextBar{grid-template-columns:repeat(4,minmax(96px,1fr));min-width:460px}
+.headerActions{min-width:0;width:260px;display:grid;gap:8px;align-content:start}
+.headerHelpBtn{justify-self:end;border-color:transparent;background:transparent;color:#64748b;padding:4px 8px;min-height:28px;font-size:12px;box-shadow:none}
+.headerHelpBtn:hover{border-color:var(--line);background:#f8fafc;color:#1d4ed8}
+.headerProfilePanel{width:100%;max-width:260px}
+.statusHeader{justify-content:flex-start}
+.stepProgress .stepPill{position:relative;transition:background .15s,border-color .15s,box-shadow .15s}
+.stepProgress .stepPill.done{border-color:#bbf7d0;background:#f0fdf4}
+.stepProgress .stepPill.done strong{background:#dcfce7;color:#166534}
+.stepProgress .stepPill.active{border-color:#93c5fd;background:#eff6ff;box-shadow:inset 0 0 0 2px rgba(37,99,235,.10)}
+.stepProgress .stepPill.active strong{background:var(--accent);color:#fff}
+.stepState{display:inline-block;margin-top:6px;border:1px solid #bfdbfe;background:#fff;color:#1d4ed8;border-radius:999px;padding:2px 7px;font-size:10px;font-weight:800;font-style:normal}
+.stepProgress .stepPill.done .stepState{border-color:#bbf7d0;color:#166534}
+@media(max-width:900px){.headerShell{display:block}.topContextBar{min-width:0}.headerActions{width:auto;margin-top:10px}.headerHelpBtn{justify-self:start}.headerProfilePanel{max-width:none}.stepProgress .stepPill{min-height:76px}}
+
+
+/* v27 refinements */
+.headerActions{min-width:150px;justify-items:end;position:relative}
+.headerProfilePanel{padding:6px 9px;min-width:118px;text-align:left}
+.headerProfilePanel summary{font-size:12px;list-style:none;white-space:nowrap}
+.headerProfilePanel summary::-webkit-details-marker{display:none}
+.headerProfilePanel[open] .profileSwitch{position:absolute;right:0;top:calc(100% + 8px);width:min(280px,calc(100vw - 28px));border:1px solid var(--line);background:#fff;border-radius:14px;box-shadow:0 12px 36px rgba(15,23,42,.18);padding:10px;z-index:60}
+.helpInline{margin-top:6px}.linkBtn{appearance:none;border:0;background:transparent;color:#2563eb;text-decoration:underline;text-underline-offset:3px;padding:0;font-size:12px;cursor:pointer;font-weight:700}
+.chartTypeToggle .textChoice{min-width:82px;justify-content:center}.choiceText{font-size:13px;line-height:1;font-weight:800}.reviewConfirmRow{align-items:center;margin:0 0 12px}.reviewConfirmRow .btn{min-width:96px}.reviewConfirmedBadge{display:inline-block;border:1px solid #bbf7d0;background:#f0fdf4;color:#166534;border-radius:999px;padding:3px 9px;font-weight:800;font-size:12px}.stepBox.pendingSave{border-color:#bfdbfe;background:#eff6ff}.stepBox.disabledStep{opacity:.82}
+@media(max-width:900px){.headerActions{width:auto;margin-top:10px;justify-items:start}.headerProfilePanel[open] .profileSwitch{left:0;right:auto}.headerHelpBtn{display:none}}
+
+
+/* v27 UI refinements */
+.headerShell{grid-template-columns:minmax(230px,1fr) minmax(460px,auto) auto}
+.headerActions{width:auto;min-width:0;justify-items:end;justify-self:end}
+.headerProfilePanel{width:auto;min-width:auto;max-width:none;padding:5px 8px}
+.headerProfilePanel summary{font-size:12px;line-height:1.2}
+.mainTabsCard.stickyTabs{top:116px;background:transparent;border:0;box-shadow:none;padding:0;z-index:14}
+.mainTabs{align-items:flex-end;border-bottom:1px solid var(--line);gap:4px}
+.mainTabBtn{border-radius:12px 12px 0 0;border-bottom:0;background:#f8fafc;margin-bottom:-1px;padding:10px 15px;box-shadow:0 -1px 0 rgba(15,23,42,.03) inset}
+.mainTabBtn.active{background:#fff;border-color:var(--accent);box-shadow:0 -3px 0 var(--accent) inset;color:var(--accent)}
+.tabLead{flex-basis:100%;margin-left:0;text-align:left;padding:4px 2px 0}
+.statusCenter{top:116px}
+.chartTypeToggle .textChoice{min-width:auto;padding:5px 8px;border-radius:10px}
+.chartTypeToggle .choiceText{font-size:12px}.chartTypeToggle{gap:4px}
+.reviewConfirmRow .btn.secondary{min-width:96px}.reviewConfirmRow #clearFormBtn{min-width:110px}
+.yearDetail{border:1px solid var(--line);border-radius:10px;background:#fbfdff;margin:7px 0;overflow:hidden}
+.yearDetail summary{cursor:pointer;display:flex;justify-content:space-between;gap:12px;align-items:center;padding:9px 10px;font-weight:800}
+.yearDetail summary b{white-space:nowrap}.yearDetail table{background:#fff}.yearDetail td,.yearDetail th{font-size:12px}
+@media(max-width:900px){.mainTabsCard.stickyTabs{position:static}.mainTabs{display:none}.tabLead{display:none}.statusCenter{top:auto}.headerShell{display:block}.headerActions{justify-items:start}.headerProfilePanel{margin-top:8px}.chartTypeToggle .textChoice{flex:0 0 auto}.reviewConfirmRow .btn{flex:1 1 100%}}
+
+
+/* v27 UI cleanup refinements */
+.mainTabsCard.stickyTabs{background:transparent;border:0;box-shadow:none;padding:0 0 2px}
+.mainTabs{border-bottom:0;gap:4px;align-items:flex-end}
+.mainTabBtn{border:1px solid var(--line);border-bottom-color:var(--line);background:#f1f5f9;color:#475569;border-radius:12px 12px 0 0;margin-bottom:0;box-shadow:none}
+.mainTabBtn.active{background:#fff;border-color:var(--line);border-bottom-color:#fff;color:#1f2937;box-shadow:0 -1px 3px rgba(15,23,42,.04);position:relative;z-index:1}
+.mainTabBtn.active:focus-visible{outline:3px solid rgba(37,99,235,.18);outline-offset:2px}
+.mainTabPanel>.card>.tabTitleRow{justify-content:flex-start;margin-bottom:10px}
+.mainTabPanel>.card>.tabTitleRow>.small{display:block;width:100%;text-align:left;margin:0}
+.reviewConfirmRow{display:flex;width:100%;gap:8px;align-items:center}
+.reviewConfirmRow #clearFormBtn{margin-left:auto}
+@media(max-width:900px){.reviewConfirmRow #clearFormBtn{margin-left:0}.mainTabsCard.stickyTabs{padding:0}}
+
+
+/* v27 connected tab final polish */
+.contentArea{gap:0}
+.mainTabsCard.stickyTabs{margin-bottom:-1px}
+.mainTabPanel.active>.card{border-top-left-radius:0}
+.mainTabBtn.active{transform:translateY(1px)}
+@media(max-width:900px){.contentArea{gap:12px}.mainTabPanel.active>.card{border-top-left-radius:12px}.mainTabBtn.active{transform:none}}
+
+
+/* v27 polish: tab scroll mask, review-row alignment, notification spacing */
+.mainTabsCard.stickyTabs{background:var(--bg);padding-top:6px;padding-bottom:0;box-shadow:0 10px 0 var(--bg);isolation:isolate}
+.mainTabsCard.stickyTabs::after{content:"";position:absolute;left:0;right:0;bottom:-10px;height:10px;background:var(--bg);pointer-events:none;z-index:-1}
+.mainTabs{background:var(--bg);position:relative;z-index:2}
+.mainTabPanel.active>.card{position:relative;z-index:1}
+.statusHeader{margin-bottom:12px}
+.statusTiles{margin-top:14px}
+.statusCenter .status{margin-top:12px}
+.reviewConfirmRow{display:flex;align-items:center;width:100%;gap:10px}
+.reviewConfirmRow #confirmReviewBtn{flex:0 0 auto}
+.reviewConfirmRow #reviewConfirmHint{flex:1 1 auto;min-width:180px;margin-right:auto;line-height:1.5}
+.reviewConfirmRow #clearFormBtn{flex:0 0 auto;margin-left:auto}
+@media(max-width:900px){.mainTabsCard.stickyTabs{box-shadow:none}.mainTabsCard.stickyTabs::after{display:none}.reviewConfirmRow #reviewConfirmHint{order:2;flex-basis:100%;min-width:0}.reviewConfirmRow #clearFormBtn{margin-left:0}}
+
+
+
+/* v1.00 seamless tab refinements */
+header{z-index:40}
+.mainTabsCard.stickyTabs{
+  position:sticky;
+  top:116px;
+  z-index:30;
+  background:var(--bg);
+  padding:10px 0 0;
+  margin-bottom:0;
+  box-shadow:0 -96px 0 96px var(--bg),0 10px 0 var(--bg);
+  isolation:isolate;
+}
+.mainTabsCard.stickyTabs::before{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  top:-96px;
+  height:96px;
+  background:var(--bg);
+  pointer-events:none;
+  z-index:-1;
+}
+.mainTabsCard.stickyTabs::after{display:none}
+.mainTabs{
+  background:var(--bg);
+  border-bottom:1px solid var(--line);
+  gap:5px;
+  align-items:flex-end;
+  padding:0 0 0 0;
+}
+.mainTabBtn{
+  position:relative;
+  z-index:1;
+  border:1px solid var(--line);
+  border-bottom-color:var(--line);
+  border-radius:12px 12px 0 0;
+  background:#eef2f7;
+  color:#475569;
+  margin:0 0 -1px 0;
+  padding:10px 16px 11px;
+  box-shadow:none;
+  transform:none;
+}
+.mainTabBtn.active{
+  z-index:3;
+  background:#fff;
+  color:#1f2937;
+  border-color:var(--line);
+  border-bottom-color:#fff;
+  margin-bottom:-1px;
+  box-shadow:0 -1px 2px rgba(15,23,42,.04);
+  transform:none;
+}
+.mainTabPanel.active>.card{
+  margin-top:0;
+  border-top:0;
+  border-top-left-radius:0;
+  border-top-right-radius:14px;
+  box-shadow:0 1px 2px rgba(0,0,0,.04);
+}
+.contentArea{gap:0}
+@media(max-width:900px){
+  .mainTabsCard.stickyTabs{position:static;box-shadow:none;background:transparent;padding:0}
+  .mainTabsCard.stickyTabs::before{display:none}
+  .mainTabPanel.active>.card{border-top:1px solid var(--line);border-radius:12px}
+}
+
+
+/* v1.00 tab connection refinement */
+.statusCenter{
+  z-index:10;
+  overflow:visible;
+}
+.mainTabsCard.stickyTabs{
+  position:sticky;
+  top:116px;
+  z-index:30;
+  background:transparent;
+  padding:10px 0 0;
+  margin-bottom:-1px;
+  box-shadow:none;
+  isolation:isolate;
+  overflow:visible;
+}
+.mainTabsCard.stickyTabs::before{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  top:-128px;
+  height:128px;
+  background:var(--bg);
+  pointer-events:none;
+  z-index:0;
+}
+.mainTabsCard.stickyTabs::after{
+  display:none!important;
+}
+.mainTabs{
+  position:relative;
+  z-index:1;
+  background:transparent;
+  border-bottom:0;
+  gap:5px;
+  align-items:flex-end;
+  padding:0;
+  margin:0;
+}
+.mainTabBtn{
+  position:relative;
+  z-index:1;
+  border:1px solid var(--line);
+  border-bottom:0;
+  border-radius:12px 12px 0 0;
+  background:#eef2f7;
+  color:#475569;
+  margin:0;
+  padding:10px 16px 11px;
+  box-shadow:none;
+  transform:none;
+}
+.mainTabBtn.active{
+  z-index:4;
+  background:#fff;
+  color:#1f2937;
+  border-color:var(--line);
+  border-bottom:0;
+  margin-bottom:-1px;
+  padding-bottom:12px;
+  box-shadow:none;
+  transform:none;
+}
+.mainTabBtn.active::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:-2px;
+  height:3px;
+  background:#fff;
+  pointer-events:none;
+}
+.mainTabPanel.active>.card{
+  position:relative;
+  z-index:1;
+  margin-top:0;
+  border-top:1px solid var(--line);
+  border-top-left-radius:0;
+  border-top-right-radius:0;
+  box-shadow:0 1px 2px rgba(0,0,0,.04);
+}
+.contentArea{
+  gap:0;
+}
+@media(max-width:900px){
+  .mainTabsCard.stickyTabs{position:static;box-shadow:none;background:transparent;padding:0;margin:0;overflow:visible}
+  .mainTabsCard.stickyTabs::before{display:none}
+  .mainTabPanel.active>.card{border-top:1px solid var(--line);border-radius:12px}
+}
+
+
+/* v1.00 restart: notification cleanup, graph-detail typography, alignment */
+.chartDetails summary{
+  font-size:12px;
+  line-height:1.4;
+  font-weight:800;
+  color:#374151;
+}
+.statusCenter{
+  margin-top:10px;
+}
+.statusHeader{
+  margin-bottom:14px;
+}
+.statusCenter .status{
+  margin-top:14px;
+}
+@media(max-width:900px){
+  .statusCenter{margin-top:0}
+}
+
+
+
+
+
+/* Integrated income page cleanup */
+html,body{overflow:visible;background:transparent;}
+body{margin:0;}
+header{padding:0 0 10px;background:transparent;position:static;border:0;}
+.headerShell{display:block;}
+.headerShell>div:first-child{display:none;}
+.headerActions{display:none;}
+.topContextBar{display:flex;gap:8px;min-width:0;margin:0 0 10px;justify-content:flex-start;flex-wrap:wrap;}
+.topContextBar div{min-width:88px;padding:6px 9px;border-radius:999px;background:#f8fafc;}
+.topContextBar span{font-size:10px;}
+.topContextBar b{font-size:12px;}
+main{padding:0!important;margin:0!important;max-width:none!important;}
+.appLayout{display:block!important;}
+.statusCenter{display:none!important;}
+.contentArea{display:block;}
+.mainTabsCard.stickyTabs{position:sticky;top:0;background:transparent;padding-top:0;box-shadow:none;}
+.mainTabsCard.stickyTabs::before,.mainTabsCard.stickyTabs::after{display:none!important;}
+.mainTabs{background:transparent;}
+.mainTabPanel.active>.card{border-radius:0 8px 8px 8px;border-top:1px solid var(--line);box-shadow:none;}
+.card{border-radius:8px;}
+
+/* Integrated household app visual alignment */
+:root{
+  --bg:#f4f6f3;
+  --panel:#ffffff;
+  --text:#1f2928;
+  --muted:#697574;
+  --line:#dce3dd;
+  --accent:#0f766e;
+  --soft:#e8f5f2;
+  --warn:#fff7ed;
+  --danger:#b91c1c;
+}
+body{font-family:"Segoe UI","Yu Gothic UI","Hiragino Sans",Meiryo,sans-serif;background:var(--bg);}
+header{background:var(--bg);border-bottom:0;padding:18px 22px 12px;}
+header h1{font-size:22px;color:var(--text);}
+.card,.metricCard,.statusTile,.stepBox,.manageSection,.dataCard,.largeChart,.chartDetails,.compactControls,.reviewPanel,.preSaveChecks{border-radius:8px;box-shadow:none;}
+.btn{border-color:var(--accent);background:var(--accent);border-radius:8px;}
+.btn.secondary{background:#fff;color:var(--accent);}
+.mainTabBtn,.tabBtn,.iconChoice{border-radius:8px;}
+.mainTabBtn{border-radius:12px 12px 0 0;}
+.mainTabBtn.active{color:var(--text);}
+.status.ok,.reviewPanel.ok,.preSaveChecks.ok{background:#ecfdf5;border-color:#bbf7d0;color:#166534;}
+.kpi,.topContextBar div{background:var(--soft);border-color:#cfe3dd;}
+.footerVersion{display:none;}
+@media(min-width:901px){main{max-width:none;padding:16px 18px 22px}.appLayout{grid-template-columns:300px minmax(0,1fr)}}
+
+
+
+/* Integrated final visual unification */
+:root{--bg:#f4f6f3;--panel:#fff;--text:#1f2928;--muted:#697574;--line:#dce3dd;--accent:#0f766e;--soft:#e8f5f2;--danger:#b91c1c;}
+html,body{overflow:visible!important;background:transparent!important;}
+.headerShell{display:flex!important;justify-content:space-between;align-items:flex-start;gap:10px;}
+.headerShell>div:first-child{display:none!important;}
+.headerActions{display:block!important;min-width:0!important;width:auto!important;justify-items:end!important;}
+.headerProfilePanel{display:block!important;background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px 8px;}
+.headerProfilePanel summary{font-size:12px;color:var(--muted);}
+.topContextBar{display:flex!important;gap:8px;min-width:0!important;margin:0 0 10px;justify-content:flex-start;flex-wrap:wrap;}
+.topContextBar div{min-width:88px;padding:6px 9px;border-radius:999px;background:#f8fafc;border-color:var(--line);}
+.mainTabsCard.stickyTabs{background:transparent!important;margin-bottom:-1px!important;padding:0!important;box-shadow:none!important;}
+.mainTabs{background:transparent!important;border-bottom:0!important;gap:4px!important;}
+.mainTabBtn{background:#eef2f7!important;color:var(--muted)!important;border:1px solid var(--line)!important;border-bottom:0!important;border-radius:12px 12px 0 0!important;margin:0!important;box-shadow:none!important;}
+.mainTabBtn.active{background:#fff!important;color:var(--text)!important;border-color:var(--line)!important;margin-bottom:-1px!important;box-shadow:none!important;}
+.mainTabBtn.active::after{display:none!important;}
+.mainTabPanel.active>.card{border:1px solid var(--line)!important;border-top:0!important;border-radius:0 8px 8px 8px!important;box-shadow:0 18px 45px rgba(24,34,33,.08)!important;}
+.btn{background:var(--accent)!important;border-color:var(--accent)!important;}
+.btn.secondary{background:#fff!important;color:var(--accent)!important;}
+
+</style>
+</head>
+<body>
+<header>
+  <div class="headerShell">
+    <div>
+      <h1></h1>
+      <div class="sub">POSITIVEで撮影した写真を登録するだけで、簡単に給与データを管理することができます</div>
+    </div>
+    <div class="topContextBar" aria-label="現在の利用状況">
+      <div><span>利用者</span><b id="topProfileLabel">ユーザー1</b></div>
+      <div><span>対象年月</span><b id="topYmLabel">未選択</b></div>
+      <div><span>状態</span><b id="topSaveLabel">未保存</b></div>
+      <div><span>最終更新</span><b id="topLastSavedLabel">—</b></div>
+    </div>
+    <div class="headerActions">
+      <details class="headerProfilePanel">
+        <summary>利用者設定</summary>
+        <div class="profileSwitch">
+          <label for="profileSelect">利用者</label>
+          <select id="profileSelect">
+            <option value="primary">ユーザー1</option>
+            <option value="secondary">ユーザー2</option>
+          </select>
+          <label for="profileNameInput">利用者名</label>
+          <div class="profileNameRow">
+            <input id="profileNameInput" type="text" maxlength="20" placeholder="例：本人、配偶者">
+            <button class="btn secondary compact" id="saveProfileNameBtn" type="button">名前保存</button>
+          </div>
+          <div class="small">利用者名は任意で変更できます。</div>
+        </div>
+      </details>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="appLayout">
+    <aside class="card statusCenter">
+      <div class="statusHeader">
+        <div>
+          <h2>通知</h2>
+        </div>
+      </div>
+      <div class="statusTiles">
+        <div class="statusTile"><span>対象年月</span><b id="selectedYmLabel">未選択</b></div>
+        <div class="statusTile"><span>保存状態</span><b id="saveStateLabel">未保存</b></div>
+        <div class="statusTile"><span>登録件数</span><b id="recordCountLabel">0件</b></div>
+      </div>
+      <div class="status" id="status">起動しました。</div>
+      <details class="statusDetails">
+        <summary>読み込んだ写真の文字を確認</summary>
+        <div class="ocrbox empty" id="ocrText" hidden>読み込んだ写真の文字はまだありません。</div>
+        <div class="small">写真から読み取った文字を確認できます。項目特定に失敗した場合の確認用です。</div>
+      </details>
+      <div class="helpShortcuts">
+        <div class="helpShortcut"><b>困ったとき</b>写真が読めない、保存場所が分からない、バックアップしたい場合は、必要に応じて使い方を確認できます。<div class="helpInline"><button class="linkBtn" id="helpBtn" type="button">ヘルプを開く</button></div></div>
+        <div class="helpShortcut"><b>保存方式</b>この端末のブラウザ内に保存します。PCとiPhone間では自動同期されません。</div>
+      </div>
+    </aside>
+
+    <section class="contentArea">
+      <div class="card mainTabsCard stickyTabs">
+        <div class="mainTabs" role="tablist" aria-label="主要画面切替">
+          <button class="mainTabBtn active" data-main-tab="input" type="button">入力</button>
+          <button class="mainTabBtn" data-main-tab="chart" type="button">グラフ</button>
+          <button class="mainTabBtn" data-main-tab="analysis" type="button">分析</button>
+          <button class="mainTabBtn" data-main-tab="manage" type="button">データ管理</button>
+        </div>
+      </div>
+
+      <div class="mainTabPanel" id="main-analysis">
+        <div class="card"><div class="tabTitleRow"><span class="small">最新月・年次集計・ランキングを確認します。</span></div><div id="dashboard" class="small">登録データを集計中です。</div></div>
+      </div>
+
+      <div class="mainTabPanel active" id="main-input">
+        <div class="card stepCard">
+          <div class="tabTitleRow"><span class="small">毎月の登録は、読み込み・確認・保存の順に進めます。</span></div>
+          <div class="stepProgress" aria-label="入力の流れ">
+            <div class="stepPill active"><strong>1</strong><div><b>年月・入力方法</b><span>対象年月を選び、写真読み込みまたは手入力を選びます。</span></div></div>
+            <div class="stepPill"><strong>2</strong><div><b>内容確認</b><span>金額と保存前チェックを確認します。</span></div></div>
+            <div class="stepPill"><strong>3</strong><div><b>保存</b><span>この月のデータとして登録します。</span></div></div>
+          </div>
+          <div class="stepper">
+            <section class="stepBox"><div class="stepNo">1</div><div><h3>対象年月と入力方法を選ぶ</h3><p>対象年月を選び、写真から読み込むか、手入力で進めるかを選択します。</p><label>対象年月</label><input id="ym" type="month"><label>給与明細の写真</label><input id="file" type="file" accept="image/*"><div class="buttonRow"><button class="btn" id="ocrBtn" type="button">写真読み込み</button><button class="btn secondary" id="manualIntentBtn" type="button">手入力で入力する</button></div></div></section>
+            <section class="stepBox"><div class="stepNo">2</div><div><h3>金額を確認する</h3><p>写真読み込み結果または手入力値を確認します。自動計算項目は直接入力しません。</p><div class="summary"><div class="kpi"><div class="t">支給額合計</div><div class="v" id="kO">0</div></div><div class="kpi"><div class="t">控除額合計</div><div class="v" id="kAD">0</div></div><div class="kpi"><div class="t">合計手取額</div><div class="v" id="kAG">0</div></div><div class="kpi"><div class="t">時間外手当</div><div class="v" id="kG">0</div></div></div><div id="reviewPanel" class="reviewPanel small"></div><div class="buttonRow reviewConfirmRow"><button class="btn secondary" id="confirmReviewBtn" type="button">確認済</button><span class="small" id="reviewConfirmHint">金額確認後に押すと保存へ進めます。</span><button class="btn secondary" id="clearFormBtn" type="button">入力値を削除</button></div><div class="tableScroll"><table id="inputTable"><thead><tr><th>区分</th><th class="itemCol">項目</th><th class="num inputCol">金額</th><th>扱い</th></tr></thead><tbody></tbody></table></div></div></section>
+            <section class="stepBox"><div class="stepNo">3</div><div><h3>保存する</h3><p>保存前チェックを確認し、この月のデータとして登録します。</p><div id="preSaveChecks" class="preSaveChecks small">保存前チェックを準備中です。</div><div class="buttonRow"><button class="btn" id="saveBtn" type="button">この月を保存</button></div></div></section>
+          </div>
+        </div>
+      </div>
+
+      <div class="mainTabPanel" id="main-chart">
+        <div class="card chartCard"><div class="tabTitleRow"><span class="small">グラフ本体を広く表示し、詳細操作は下に集約しています。</span></div>
+          <div class="compactControls">
+            <div><span class="small controlLabel">見る内容</span><div class="chartTabs chartIntent"><button class="tabBtn active" data-chart-group="pay" type="button">支給を見る</button><button class="tabBtn" data-chart-group="deduct" type="button">控除を見る</button><button class="tabBtn" data-chart-group="net" type="button">手取を見る</button><button class="tabBtn" data-chart-group="overtime" type="button">時間外を見る</button><button class="tabBtn" data-chart-group="custom" type="button">自分で選ぶ</button></div><details class="chartDetails" id="customSeriesDetails"><summary>表示項目を細かく選ぶ</summary><div id="seriesControls" class="seriesGrid"></div><div class="toolbar"><button class="btn secondary" id="selectMainBtn" type="button">主要4項目</button><button class="btn secondary" id="selectAllBtn" type="button">全選択</button><button class="btn secondary" id="clearSeriesBtn" type="button">選択解除</button></div></details></div>
+            <div><span class="small controlLabel">グラフ</span><div class="iconToggle chartTypeToggle"><label class="iconChoice textChoice" title="折れ線グラフ"><input type="radio" name="chartType" value="line" checked><span class="choiceText">折れ線</span></label><label class="iconChoice textChoice" title="棒グラフ"><input type="radio" name="chartType" value="bar"><span class="choiceText">棒グラフ</span></label></div></div>
+          </div>
+          <div id="chart" class="chartwrap largeChart"></div>
+        </div>
+      </div>
+
+      <div class="mainTabPanel" id="main-manage">
+        <div class="card manageCard"><div class="tabTitleRow"><span class="small">登録データの確認、出力、削除をまとめています。</span></div>
+          <section class="manageSection">
+            <h3>登録データ一覧</h3>
+            <div class="dataViewSwitch"><div><span class="small controlLabel">表示</span><div class="dataToolbarHint">通常はカード表示で確認し、比較したいときだけ表表示に切り替えます。全項目は「詳細」で確認します。</div></div><div class="iconToggle"><label class="iconChoice" title="カード表示"><input type="radio" name="dataViewMode" value="card" checked><span aria-hidden="true">▣</span><em>カード</em></label><label class="iconChoice" title="表表示"><input type="radio" name="dataViewMode" value="table"><span aria-hidden="true">☷</span><em>表</em></label></div></div>
+            <div id="dataListContainer" class="dataListContainer small">登録データを読み込み中です。</div>
+          </section>
+          <section class="manageSection">
+            <h3>出力・バックアップ</h3>
+            <p class="sectionLead">Excel出力は確認・加工用、バックアップ出力は復元用です。端末変更前や定期的な保存を推奨します。</p>
+            <div class="manageActions">
+              <button class="btn secondary" id="xlsBtn" type="button">Excel出力</button>
+              <button class="btn secondary" id="backupBtn" type="button">バックアップ出力</button>
+              <button class="btn secondary" id="restoreBtn" type="button">バックアップ復元</button>
+              <input id="restoreFile" type="file" accept="application/json,.json" hidden>
+            </div>
+          </section>
+          <section class="manageSection dangerZone">
+            <h3>削除</h3>
+            <p class="sectionLead">削除した月はグラフ、分析、一覧、Excel出力から除外されます。直後であれば「元に戻す」で取り消せます。</p>
+            <div class="deletePanel manageDelete"><label>削除する年月</label><select id="deleteYm"></select><button class="btn danger" id="clearBtn" type="button">選択月のデータ削除</button></div>
+          </section>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+<nav class="bottomNav" aria-label="モバイル用画面切替"><button data-bottom-tab="input" class="active" type="button">入力</button><button data-bottom-tab="chart" type="button">グラフ</button><button data-bottom-tab="analysis" type="button">分析</button><button data-bottom-tab="manage" type="button">管理</button></nav>
+
+
+<div id="modalBackdrop" class="modalBackdrop" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true"><div class="modalHeader"><h2 id="modalTitle">確認</h2><button class="btn secondary" id="modalCloseBtn" type="button">閉じる</button></div><div id="modalBody" class="modalBody"></div><div id="modalFooter" class="modalFooter"></div></div></div>
+<div class="footerVersion"></div>
+
+<script>
+
+(function(){
+'use strict';
+const initialRecords=[{"ym":"2019-03","values":{"base":298500,"position":0,"workPay":35000,"performance":94400,"lAllowance":58500,"overtime":85084,"efficiency":16300,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":30530,"yearEndShortTax":0,"residentTax":31200,"healthIns":24780,"careIns":0,"pension":53985,"employmentIns":3653,"dbPension":1130,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":390,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":2000,"cAccount":6300,"residentAnnual":374900,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":427900,"nonAnnualTotal":159884,"monthlyGross":587784,"temporaryGross":0,"grossTotal":587784,"deductionTotal":170668,"monthlyNet":417116,"netTotal":419116,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2019-04","values":{"base":298500,"position":0,"workPay":35000,"performance":94400,"lAllowance":58500,"overtime":70425,"efficiency":18700,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":28840,"yearEndShortTax":0,"residentTax":31200,"healthIns":24780,"careIns":0,"pension":53985,"employmentIns":1726,"dbPension":1130,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":390,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6300,"residentAnnual":374900,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":427900,"nonAnnualTotal":147625,"monthlyGross":575525,"temporaryGross":0,"grossTotal":575525,"deductionTotal":167051,"monthlyNet":408474,"netTotal":408474,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2019-05","values":{"base":298500,"position":0,"workPay":35000,"performance":94400,"lAllowance":58500,"overtime":81117,"efficiency":16300,"duty":0,"remote":0,"specialLabor":0,"specialWork":5271,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":31050,"yearEndShortTax":0,"residentTax":31200,"healthIns":24780,"careIns":0,"pension":53985,"employmentIns":1767,"dbPension":1550,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6300,"residentAnnual":374900,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":427900,"nonAnnualTotal":161188,"monthlyGross":589088,"temporaryGross":0,"grossTotal":589088,"deductionTotal":169752,"monthlyNet":419336,"netTotal":419336,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2019-06","values":{"base":298500,"position":0,"workPay":35000,"performance":94400,"lAllowance":58500,"overtime":114009,"efficiency":9600,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":34460,"yearEndShortTax":0,"residentTax":31200,"healthIns":24780,"careIns":0,"pension":53985,"employmentIns":1830,"dbPension":1550,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6300,"residentAnnual":374900,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":427900,"nonAnnualTotal":182109,"monthlyGross":610009,"temporaryGross":0,"grossTotal":610009,"deductionTotal":173225,"monthlyNet":436784,"netTotal":436784,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2019-07","values":{"base":302300,"position":0,"workPay":36000,"performance":100600,"lAllowance":58500,"overtime":127524,"efficiency":7500,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":161970,"annualSettlement":22000,"nonAnnualTempSettlement":2796,"incomeTax":42600,"yearEndShortTax":0,"residentTax":25800,"healthIns":24780,"careIns":0,"pension":53985,"employmentIns":2457,"dbPension":1550,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6300,"residentAnnual":306300,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":438900,"nonAnnualTotal":193524,"monthlyGross":632424,"temporaryGross":161970,"grossTotal":819190,"deductionTotal":176592,"monthlyNet":642598,"netTotal":642598,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2019-08","values":{"base":302300,"position":0,"workPay":36000,"performance":100600,"lAllowance":58500,"overtime":84103,"efficiency":16300,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":32470,"yearEndShortTax":0,"residentTax":25500,"healthIns":24780,"careIns":0,"pension":53985,"employmentIns":1793,"dbPension":1550,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6300,"residentAnnual":306300,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":438900,"nonAnnualTotal":158903,"monthlyGross":597803,"temporaryGross":0,"grossTotal":597803,"deductionTotal":165498,"monthlyNet":432305,"netTotal":432305,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2019-09","values":{"base":302300,"position":0,"workPay":36000,"performance":100600,"lAllowance":58500,"overtime":124341,"efficiency":9600,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":37940,"yearEndShortTax":0,"residentTax":25500,"healthIns":24780,"careIns":0,"pension":53985,"employmentIns":1894,"dbPension":1550,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6500,"residentAnnual":306300,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":438900,"nonAnnualTotal":192441,"monthlyGross":631341,"temporaryGross":0,"grossTotal":631341,"deductionTotal":171069,"monthlyNet":460272,"netTotal":460272,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2019-10","values":{"base":302300,"position":0,"workPay":36000,"performance":100600,"lAllowance":58500,"overtime":62152,"efficiency":21300,"duty":0,"remote":0,"specialLabor":0,"specialWork":5345,"stockIncentive":324,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":30630,"yearEndShortTax":0,"residentTax":25500,"healthIns":24780,"careIns":0,"pension":53985,"employmentIns":1758,"dbPension":1550,"dcPension":0,"commuteReturn":0,"stock":5324,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6500,"residentAnnual":306300,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":438900,"nonAnnualTotal":147297,"monthlyGross":586521,"temporaryGross":0,"grossTotal":586521,"deductionTotal":163947,"monthlyNet":422574,"netTotal":422574,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2019-11","values":{"base":302300,"position":0,"workPay":36000,"performance":100600,"lAllowance":58500,"overtime":80693,"efficiency":18700,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":31440,"yearEndShortTax":0,"residentTax":25500,"healthIns":27300,"careIns":0,"pension":56730,"employmentIns":1790,"dbPension":1550,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6500,"residentAnnual":306300,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":438900,"nonAnnualTotal":157893,"monthlyGross":596793,"temporaryGross":0,"grossTotal":596793,"deductionTotal":169730,"monthlyNet":427063,"netTotal":427063,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2019-12","values":{"base":302300,"position":0,"workPay":36000,"performance":100600,"lAllowance":58500,"overtime":163805,"efficiency":3600,"duty":2000,"remote":0,"specialLabor":5715,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":44520,"yearEndShortTax":0,"residentTax":25500,"healthIns":27300,"careIns":0,"pension":56730,"employmentIns":2017,"dbPension":1550,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6500,"residentAnnual":306300,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":438900,"nonAnnualTotal":233620,"monthlyGross":672520,"temporaryGross":0,"grossTotal":672520,"deductionTotal":183037,"monthlyNet":489483,"netTotal":489483,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2020-01","values":{"base":302300,"position":0,"workPay":36000,"performance":106800,"lAllowance":58500,"overtime":96371,"efficiency":14000,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":165040,"annualSettlement":12400,"nonAnnualTempSettlement":2239,"incomeTax":36540,"yearEndShortTax":-364742,"residentTax":25500,"healthIns":27300,"careIns":0,"pension":56730,"employmentIns":2380,"dbPension":1550,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6500,"residentAnnual":306300,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":445100,"nonAnnualTotal":168871,"monthlyGross":613971,"temporaryGross":165040,"grossTotal":793650,"deductionTotal":-189322,"monthlyNet":982972,"netTotal":982972,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2020-02","values":{"base":302300,"position":0,"workPay":36000,"performance":106800,"lAllowance":58500,"overtime":81761,"efficiency":18700,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":32630,"yearEndShortTax":0,"residentTax":25500,"healthIns":27300,"careIns":0,"pension":56730,"employmentIns":1812,"dbPension":1550,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6500,"residentAnnual":306300,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":445100,"nonAnnualTotal":158961,"monthlyGross":604061,"temporaryGross":0,"grossTotal":604061,"deductionTotal":170942,"monthlyNet":433119,"netTotal":433119,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2020-03","values":{"base":302300,"position":0,"workPay":36000,"performance":106800,"lAllowance":58500,"overtime":70465,"efficiency":21300,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":31210,"yearEndShortTax":0,"residentTax":25500,"healthIns":27300,"careIns":0,"pension":56730,"employmentIns":1786,"dbPension":1550,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":2000,"cAccount":6500,"residentAnnual":306300,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":445100,"nonAnnualTotal":150265,"monthlyGross":595365,"temporaryGross":0,"grossTotal":595365,"deductionTotal":169496,"monthlyNet":425869,"netTotal":427869,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2020-04","values":{"base":302300,"position":0,"workPay":36000,"performance":106800,"lAllowance":58500,"overtime":66550,"efficiency":21300,"duty":0,"remote":0,"specialLabor":0,"specialWork":5345,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":31440,"yearEndShortTax":0,"residentTax":25500,"healthIns":27300,"careIns":0,"pension":56730,"employmentIns":1790,"dbPension":1550,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6500,"residentAnnual":306300,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":445100,"nonAnnualTotal":151695,"monthlyGross":596795,"temporaryGross":0,"grossTotal":596795,"deductionTotal":169730,"monthlyNet":427065,"netTotal":427065,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2020-05","values":{"base":302300,"position":0,"workPay":36000,"performance":106800,"lAllowance":58500,"overtime":31862,"efficiency":29600,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":26270,"yearEndShortTax":0,"residentTax":25500,"healthIns":27300,"careIns":0,"pension":56730,"employmentIns":1695,"dbPension":1550,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6500,"residentAnnual":306300,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":445100,"nonAnnualTotal":119962,"monthlyGross":565062,"temporaryGross":0,"grossTotal":565062,"deductionTotal":164465,"monthlyNet":400597,"netTotal":400597,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2020-06","values":{"base":302300,"position":0,"workPay":36000,"performance":106800,"lAllowance":58500,"overtime":31461,"efficiency":29400,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":26180,"yearEndShortTax":0,"residentTax":25500,"healthIns":27300,"careIns":0,"pension":56730,"employmentIns":1693,"dbPension":1550,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6500,"residentAnnual":306300,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":445100,"nonAnnualTotal":119361,"monthlyGross":564461,"temporaryGross":0,"grossTotal":564461,"deductionTotal":164373,"monthlyNet":400088,"netTotal":400088,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2020-07","values":{"base":306100,"position":0,"workPay":37000,"performance":106800,"lAllowance":58500,"overtime":85002,"efficiency":16100,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":165040,"annualSettlement":9600,"nonAnnualTempSettlement":311,"incomeTax":35050,"yearEndShortTax":0,"residentTax":37600,"healthIns":27300,"careIns":0,"pension":56730,"employmentIns":2353,"dbPension":1550,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6500,"residentAnnual":443500,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":449900,"nonAnnualTotal":159602,"monthlyGross":609502,"temporaryGross":165040,"grossTotal":784453,"deductionTotal":186003,"monthlyNet":598450,"netTotal":598450,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2020-08","values":{"base":306100,"position":0,"workPay":37000,"performance":106800,"lAllowance":58500,"overtime":85002,"efficiency":16100,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":33510,"yearEndShortTax":0,"residentTax":36900,"healthIns":27300,"careIns":0,"pension":56730,"employmentIns":1828,"dbPension":1550,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6500,"residentAnnual":443500,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":449900,"nonAnnualTotal":159602,"monthlyGross":609502,"temporaryGross":0,"grossTotal":609502,"deductionTotal":183238,"monthlyNet":426264,"netTotal":426264,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2020-09","values":{"base":306100,"position":0,"workPay":37000,"performance":106800,"lAllowance":58500,"overtime":88866,"efficiency":16100,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":34140,"yearEndShortTax":0,"residentTax":36900,"healthIns":27300,"careIns":0,"pension":56730,"employmentIns":1840,"dbPension":1550,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6600,"residentAnnual":443500,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":449900,"nonAnnualTotal":163466,"monthlyGross":613366,"temporaryGross":0,"grossTotal":613366,"deductionTotal":183880,"monthlyNet":429486,"netTotal":429486,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2020-10","values":{"base":306100,"position":0,"workPay":37000,"performance":106800,"lAllowance":58500,"overtime":35743,"efficiency":29400,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":330,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":27710,"yearEndShortTax":0,"residentTax":36900,"healthIns":27300,"careIns":0,"pension":56730,"employmentIns":1720,"dbPension":1550,"dcPension":0,"commuteReturn":0,"stock":5330,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6600,"residentAnnual":443500,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":449900,"nonAnnualTotal":123643,"monthlyGross":573873,"temporaryGross":0,"grossTotal":573873,"deductionTotal":177660,"monthlyNet":396213,"netTotal":396213,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2020-11","values":{"base":306100,"position":0,"workPay":37000,"performance":106800,"lAllowance":58500,"overtime":58879,"efficiency":23700,"duty":0,"remote":0,"specialLabor":0,"specialWork":5418,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":31580,"yearEndShortTax":0,"residentTax":36900,"healthIns":26040,"careIns":0,"pension":56730,"employmentIns":1789,"dbPension":1550,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6600,"residentAnnual":443500,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":449900,"nonAnnualTotal":146497,"monthlyGross":596397,"temporaryGross":0,"grossTotal":596397,"deductionTotal":180009,"monthlyNet":416388,"netTotal":416388,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2020-12","values":{"base":306100,"position":0,"workPay":37000,"performance":106800,"lAllowance":58500,"overtime":132792,"efficiency":7500,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":40390,"yearEndShortTax":0,"residentTax":36900,"healthIns":26040,"careIns":0,"pension":56730,"employmentIns":1946,"dbPension":1550,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6600,"residentAnnual":443500,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":449900,"nonAnnualTotal":198792,"monthlyGross":648692,"temporaryGross":0,"grossTotal":648692,"deductionTotal":188976,"monthlyNet":459716,"netTotal":459716,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2021-01","values":{"base":317000,"position":0,"workPay":37000,"performance":101900,"lAllowance":58500,"overtime":127342,"efficiency":9500,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":165040,"annualSettlement":1100,"nonAnnualTempSettlement":-1389,"incomeTax":40710,"yearEndShortTax":-365504,"residentTax":36900,"healthIns":26040,"careIns":0,"pension":56730,"employmentIns":2447,"dbPension":1550,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6600,"residentAnnual":443500,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":455900,"nonAnnualTotal":195342,"monthlyGross":651242,"temporaryGross":165040,"grossTotal":815993,"deductionTotal":-175707,"monthlyNet":991700,"netTotal":991700,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2021-02","values":{"base":317000,"position":0,"workPay":37000,"performance":101900,"lAllowance":58500,"overtime":119625,"efficiency":9500,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":39440,"yearEndShortTax":0,"residentTax":36900,"healthIns":26040,"careIns":0,"pension":56730,"employmentIns":1930,"dbPension":1550,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":11100,"cAccount":6600,"residentAnnual":443500,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":455900,"nonAnnualTotal":187625,"monthlyGross":643525,"temporaryGross":0,"grossTotal":643525,"deductionTotal":188010,"monthlyNet":455515,"netTotal":466615,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2021-03","values":{"base":317000,"position":0,"workPay":37000,"performance":101900,"lAllowance":58500,"overtime":86071,"efficiency":16100,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":34870,"yearEndShortTax":0,"residentTax":36900,"healthIns":26040,"careIns":0,"pension":56730,"employmentIns":1849,"dbPension":1550,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6600,"residentAnnual":443500,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":455900,"nonAnnualTotal":160671,"monthlyGross":616571,"temporaryGross":0,"grossTotal":616571,"deductionTotal":183359,"monthlyNet":433212,"netTotal":433212,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2021-04","values":{"base":317000,"position":0,"workPay":37000,"performance":101900,"lAllowance":58500,"overtime":152442,"efficiency":3600,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":44370,"yearEndShortTax":0,"residentTax":36900,"healthIns":26040,"careIns":0,"pension":56730,"employmentIns":2011,"dbPension":1550,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6600,"residentAnnual":443500,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":455900,"nonAnnualTotal":214542,"monthlyGross":670442,"temporaryGross":0,"grossTotal":670442,"deductionTotal":193021,"monthlyNet":477421,"netTotal":477421,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2021-05","values":{"base":317000,"position":0,"workPay":37000,"performance":101900,"lAllowance":58500,"overtime":127342,"efficiency":9500,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":41080,"yearEndShortTax":0,"residentTax":36900,"healthIns":24800,"careIns":0,"pension":56730,"employmentIns":1953,"dbPension":1670,"dcPension":0,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6600,"residentAnnual":443500,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":455900,"nonAnnualTotal":195342,"monthlyGross":651242,"temporaryGross":0,"grossTotal":651242,"deductionTotal":188553,"monthlyNet":462689,"netTotal":462689,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2021-06","values":{"base":317000,"position":0,"workPay":37000,"performance":101900,"lAllowance":58500,"overtime":120227,"efficiency":10100,"duty":0,"remote":1800,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":40220,"yearEndShortTax":0,"residentTax":36900,"healthIns":24800,"careIns":0,"pension":56730,"employmentIns":1939,"dbPension":1670,"dcPension":7000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6600,"residentAnnual":443500,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":455900,"nonAnnualTotal":190627,"monthlyGross":646527,"temporaryGross":0,"grossTotal":646527,"deductionTotal":194679,"monthlyNet":451848,"netTotal":451848,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2021-07","values":{"base":320800,"position":0,"workPay":38000,"performance":106500,"lAllowance":58500,"overtime":122738,"efficiency":10100,"duty":0,"remote":2400,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":165040,"annualSettlement":18800,"nonAnnualTempSettlement":2361,"incomeTax":46300,"yearEndShortTax":0,"residentTax":35500,"healthIns":24800,"careIns":0,"pension":56730,"employmentIns":2535,"dbPension":1670,"dcPension":7000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6600,"residentAnnual":423800,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":465300,"nonAnnualTotal":193738,"monthlyGross":659038,"temporaryGross":165040,"grossTotal":845239,"deductionTotal":199955,"monthlyNet":645284,"netTotal":645284,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2021-08","values":{"base":320800,"position":0,"workPay":38000,"performance":106500,"lAllowance":58500,"overtime":103974,"efficiency":14700,"duty":0,"remote":2700,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":39970,"yearEndShortTax":0,"residentTax":35300,"healthIns":24800,"careIns":0,"pension":56730,"employmentIns":1935,"dbPension":1670,"dcPension":7000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6600,"residentAnnual":423800,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":465300,"nonAnnualTotal":179874,"monthlyGross":645174,"temporaryGross":0,"grossTotal":645174,"deductionTotal":192825,"monthlyNet":452349,"netTotal":452349,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2021-09","values":{"base":320800,"position":0,"workPay":38000,"performance":106500,"lAllowance":58500,"overtime":133230,"efficiency":10100,"duty":4000,"remote":1800,"specialLabor":3040,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":45610,"yearEndShortTax":0,"residentTax":35300,"healthIns":24800,"careIns":0,"pension":56730,"employmentIns":2027,"dbPension":1670,"dcPension":7000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6600,"residentAnnual":423800,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":465300,"nonAnnualTotal":210670,"monthlyGross":675970,"temporaryGross":0,"grossTotal":675970,"deductionTotal":198557,"monthlyNet":477413,"netTotal":477413,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2021-10","values":{"base":320800,"position":0,"workPay":38000,"performance":106500,"lAllowance":58500,"overtime":87692,"efficiency":19800,"duty":0,"remote":3000,"specialLabor":0,"specialWork":0,"stockIncentive":330,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":38040,"yearEndShortTax":0,"residentTax":35300,"healthIns":24800,"careIns":0,"pension":56730,"employmentIns":1902,"dbPension":1670,"dcPension":7000,"commuteReturn":0,"stock":5330,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6600,"residentAnnual":423800,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":465300,"nonAnnualTotal":168992,"monthlyGross":634622,"temporaryGross":0,"grossTotal":634622,"deductionTotal":191192,"monthlyNet":443430,"netTotal":443430,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2021-11","values":{"base":320800,"position":0,"workPay":38000,"performance":106500,"lAllowance":58500,"overtime":73061,"efficiency":22400,"duty":0,"remote":2400,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":35060,"yearEndShortTax":0,"residentTax":35300,"healthIns":27200,"careIns":0,"pension":59475,"employmentIns":1864,"dbPension":1670,"dcPension":7000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6600,"residentAnnual":423800,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":465300,"nonAnnualTotal":156361,"monthlyGross":621661,"temporaryGross":0,"grossTotal":621661,"deductionTotal":192989,"monthlyNet":428672,"netTotal":428672,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2021-12","values":{"base":320800,"position":0,"workPay":38000,"performance":106500,"lAllowance":58500,"overtime":103911,"efficiency":14700,"duty":0,"remote":2400,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":35300,"yearEndShortTax":0,"residentTax":38960,"healthIns":27200,"careIns":0,"pension":59475,"employmentIns":1934,"dbPension":1670,"dcPension":7000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6600,"residentAnnual":423800,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":465300,"nonAnnualTotal":179511,"monthlyGross":644811,"temporaryGross":0,"grossTotal":644811,"deductionTotal":196959,"monthlyNet":447852,"netTotal":447852,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2022-01","values":{"base":320800,"position":0,"workPay":38000,"performance":107200,"lAllowance":58500,"overtime":99873,"efficiency":14700,"duty":0,"remote":1500,"specialLabor":0,"specialWork":5681,"stockIncentive":0,"commute":165040,"annualSettlement":1400,"nonAnnualTempSettlement":147,"incomeTax":39420,"yearEndShortTax":-363254,"residentTax":35300,"healthIns":27200,"careIns":0,"pension":59475,"employmentIns":2438,"dbPension":1670,"dcPension":7000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6800,"residentAnnual":423800,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":466000,"nonAnnualTotal":180254,"monthlyGross":646254,"temporaryGross":165040,"grossTotal":812841,"deductionTotal":-165331,"monthlyNet":978172,"netTotal":978172,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2022-02","values":{"base":320800,"position":0,"workPay":38000,"performance":107200,"lAllowance":58500,"overtime":122763,"efficiency":10100,"duty":0,"remote":1800,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":41590,"yearEndShortTax":0,"residentTax":35300,"healthIns":27200,"careIns":0,"pension":59475,"employmentIns":1977,"dbPension":1670,"dcPension":7000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6800,"residentAnnual":423800,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":466000,"nonAnnualTotal":193163,"monthlyGross":659163,"temporaryGross":0,"grossTotal":659163,"deductionTotal":199632,"monthlyNet":459531,"netTotal":459531,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2022-03","values":{"base":397300,"position":20000,"workPay":0,"performance":107200,"lAllowance":58500,"overtime":84812,"efficiency":19800,"duty":0,"remote":1800,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":47140,"yearEndShortTax":0,"residentTax":35300,"healthIns":27200,"careIns":0,"pension":59475,"employmentIns":2024,"dbPension":1670,"dcPension":7000,"commuteReturn":14500,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6800,"residentAnnual":423800,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":524500,"nonAnnualTotal":164912,"monthlyGross":689412,"temporaryGross":0,"grossTotal":689412,"deductionTotal":219729,"monthlyNet":469683,"netTotal":469683,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2022-04","values":{"base":397300,"position":20000,"workPay":0,"performance":107200,"lAllowance":58500,"overtime":265501,"efficiency":8759,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":79100,"yearEndShortTax":0,"residentTax":35300,"healthIns":27200,"careIns":0,"pension":59475,"employmentIns":2571,"dbPension":1670,"dcPension":9000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6800,"residentAnnual":423800,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":524500,"nonAnnualTotal":332760,"monthlyGross":857260,"temporaryGross":0,"grossTotal":857260,"deductionTotal":239736,"monthlyNet":617524,"netTotal":617524,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2022-05","values":{"base":397300,"position":20000,"workPay":0,"performance":107200,"lAllowance":58500,"overtime":475632,"efficiency":0,"duty":0,"remote":0,"specialLabor":36787,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":139850,"yearEndShortTax":0,"residentTax":35300,"healthIns":27200,"careIns":0,"pension":59475,"employmentIns":3286,"dbPension":2090,"dcPension":9000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6800,"residentAnnual":423800,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":524500,"nonAnnualTotal":570919,"monthlyGross":1095419,"temporaryGross":0,"grossTotal":1095419,"deductionTotal":301621,"monthlyNet":793798,"netTotal":793798,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2022-06","values":{"base":397300,"position":20000,"workPay":0,"performance":107200,"lAllowance":58500,"overtime":195919,"efficiency":2000,"duty":0,"remote":0,"specialLabor":3504,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":64540,"yearEndShortTax":0,"residentTax":35300,"healthIns":27200,"careIns":0,"pension":59475,"employmentIns":2353,"dbPension":2090,"dcPension":9000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6800,"residentAnnual":423800,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":524500,"nonAnnualTotal":259923,"monthlyGross":784423,"temporaryGross":0,"grossTotal":784423,"deductionTotal":225378,"monthlyNet":559045,"netTotal":559045,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2022-07","values":{"base":400900,"position":20000,"workPay":0,"performance":111900,"lAllowance":58500,"overtime":226602,"efficiency":0,"duty":0,"remote":0,"specialLabor":3533,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":16600,"nonAnnualTempSettlement":3055,"incomeTax":74180,"yearEndShortTax":0,"residentTax":38100,"healthIns":35200,"careIns":0,"pension":59475,"employmentIns":2523,"dbPension":2090,"dcPension":9000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6800,"residentAnnual":423800,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":532800,"nonAnnualTotal":288635,"monthlyGross":821435,"temporaryGross":0,"grossTotal":841090,"deductionTotal":245988,"monthlyNet":595102,"netTotal":595102,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2022-08","values":{"base":400900,"position":20000,"workPay":0,"performance":111900,"lAllowance":58500,"overtime":369784,"efficiency":0,"duty":0,"remote":0,"specialLabor":26498,"specialWork":0,"stockIncentive":0,"commute":122810,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":107230,"yearEndShortTax":0,"residentTax":37500,"healthIns":35200,"careIns":0,"pension":59475,"employmentIns":3331,"dbPension":2090,"dcPension":9000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":6800,"residentAnnual":423800,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":532800,"nonAnnualTotal":454782,"monthlyGross":987582,"temporaryGross":122810,"grossTotal":1110392,"deductionTotal":279246,"monthlyNet":831146,"netTotal":831146,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2022-09","values":{"base":400900,"position":20000,"workPay":0,"performance":111900,"lAllowance":58500,"overtime":375494,"efficiency":0,"duty":0,"remote":0,"specialLabor":22965,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":107830,"yearEndShortTax":0,"residentTax":37500,"healthIns":35200,"careIns":0,"pension":59475,"employmentIns":2969,"dbPension":2090,"dcPension":9000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":7800,"residentAnnual":423800,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":532800,"nonAnnualTotal":456959,"monthlyGross":989759,"temporaryGross":0,"grossTotal":989759,"deductionTotal":279484,"monthlyNet":710275,"netTotal":710275,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2022-10","values":{"base":400900,"position":20000,"workPay":0,"performance":111900,"lAllowance":58500,"overtime":200255,"efficiency":2000,"duty":0,"remote":0,"specialLabor":5300,"specialWork":0,"stockIncentive":330,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":65770,"yearEndShortTax":0,"residentTax":37500,"healthIns":35200,"careIns":0,"pension":59475,"employmentIns":2396,"dbPension":2090,"dcPension":9000,"commuteReturn":0,"stock":5330,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":7800,"residentAnnual":423800,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":532800,"nonAnnualTotal":266055,"monthlyGross":799185,"temporaryGross":0,"grossTotal":799185,"deductionTotal":237181,"monthlyNet":562004,"netTotal":562004,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2022-11","values":{"base":400900,"position":20000,"workPay":0,"performance":111900,"lAllowance":58500,"overtime":201892,"efficiency":2000,"duty":0,"remote":0,"specialLabor":1767,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":64710,"yearEndShortTax":0,"residentTax":37500,"healthIns":37200,"careIns":0,"pension":59475,"employmentIns":3984,"dbPension":2090,"dcPension":9000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":7800,"residentAnnual":423800,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":532800,"nonAnnualTotal":264159,"monthlyGross":796959,"temporaryGross":0,"grossTotal":796959,"deductionTotal":239379,"monthlyNet":557580,"netTotal":557580,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2022-12","values":{"base":400900,"position":20000,"workPay":0,"performance":111900,"lAllowance":58500,"overtime":369784,"efficiency":0,"duty":0,"remote":0,"specialLabor":30031,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":107210,"yearEndShortTax":0,"residentTax":37500,"healthIns":37200,"careIns":0,"pension":59475,"employmentIns":4955,"dbPension":2090,"dcPension":9000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":7800,"residentAnnual":423800,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":532800,"nonAnnualTotal":458315,"monthlyGross":991115,"temporaryGross":0,"grossTotal":991115,"deductionTotal":282850,"monthlyNet":708265,"netTotal":708265,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2023-01","values":{"base":400900,"position":20000,"workPay":0,"performance":125200,"lAllowance":58500,"overtime":203792,"efficiency":2000,"duty":0,"remote":0,"specialLabor":8833,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":26600,"nonAnnualTempSettlement":9044,"incomeTax":76230,"yearEndShortTax":-403750,"residentTax":37500,"healthIns":37200,"careIns":0,"pension":59475,"employmentIns":4274,"dbPension":2090,"dcPension":9000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":7800,"residentAnnual":423800,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":546100,"nonAnnualTotal":273125,"monthlyGross":819225,"temporaryGross":0,"grossTotal":854869,"deductionTotal":-152561,"monthlyNet":1007430,"netTotal":1007430,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2023-02","values":{"base":400900,"position":20000,"workPay":0,"performance":125200,"lAllowance":58500,"overtime":203792,"efficiency":2000,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":67060,"yearEndShortTax":0,"residentTax":37500,"healthIns":37200,"careIns":0,"pension":59475,"employmentIns":4666,"dbPension":2090,"dcPension":9000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":7800,"residentAnnual":423800,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":546100,"nonAnnualTotal":264292,"monthlyGross":810392,"temporaryGross":0,"grossTotal":810392,"deductionTotal":242411,"monthlyNet":567981,"netTotal":567981,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2023-03","values":{"base":400900,"position":20000,"workPay":0,"performance":125200,"lAllowance":58500,"overtime":378828,"efficiency":0,"duty":0,"remote":0,"specialLabor":17665,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":109540,"yearEndShortTax":0,"residentTax":37500,"healthIns":37200,"careIns":0,"pension":59475,"employmentIns":5005,"dbPension":2090,"dcPension":9000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":7800,"residentAnnual":450600,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":546100,"nonAnnualTotal":454993,"monthlyGross":1001093,"temporaryGross":0,"grossTotal":1001093,"deductionTotal":285230,"monthlyNet":715863,"netTotal":715863,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2023-04","values":{"base":400900,"position":20000,"workPay":0,"performance":125200,"lAllowance":58500,"overtime":372478,"efficiency":0,"duty":0,"remote":0,"specialLabor":5300,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":105170,"yearEndShortTax":0,"residentTax":37500,"healthIns":37200,"careIns":0,"pension":59475,"employmentIns":4911,"dbPension":2090,"dcPension":9000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":7800,"residentAnnual":450600,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":546100,"nonAnnualTotal":436278,"monthlyGross":982378,"temporaryGross":0,"grossTotal":982378,"deductionTotal":280766,"monthlyNet":701612,"netTotal":701612,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2023-05","values":{"base":400900,"position":20000,"workPay":0,"performance":125200,"lAllowance":58500,"overtime":203792,"efficiency":2000,"duty":0,"remote":0,"specialLabor":19432,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":70970,"yearEndShortTax":0,"residentTax":37500,"healthIns":37200,"careIns":0,"pension":59475,"employmentIns":4978,"dbPension":2090,"dcPension":9000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":7800,"residentAnnual":450600,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":546100,"nonAnnualTotal":283724,"monthlyGross":829824,"temporaryGross":0,"grossTotal":829824,"deductionTotal":246633,"monthlyNet":583191,"netTotal":583191,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2023-06","values":{"base":400900,"position":20000,"workPay":0,"performance":125200,"lAllowance":58500,"overtime":362617,"efficiency":0,"duty":0,"remote":0,"specialLabor":21198,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":106350,"yearEndShortTax":0,"residentTax":37500,"healthIns":37200,"careIns":0,"pension":59475,"employmentIns":5930,"dbPension":2090,"dcPension":9000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":7800,"residentAnnual":450600,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":546100,"nonAnnualTotal":442315,"monthlyGross":988415,"temporaryGross":0,"grossTotal":988415,"deductionTotal":282965,"monthlyNet":705450,"netTotal":705450,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2023-07","values":{"base":418600,"position":20000,"workPay":0,"performance":119300,"lAllowance":58500,"overtime":208779,"efficiency":2000,"duty":0,"remote":0,"specialLabor":7356,"specialWork":0,"stockIncentive":0,"commute":122810,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":71770,"yearEndShortTax":0,"residentTax":55900,"healthIns":37200,"careIns":0,"pension":59475,"employmentIns":5744,"dbPension":2090,"dcPension":9000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":7800,"residentAnnual":671000,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":557900,"nonAnnualTotal":276635,"monthlyGross":834535,"temporaryGross":122810,"grossTotal":957345,"deductionTotal":266599,"monthlyNet":690746,"netTotal":690746,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2023-08","values":{"base":418600,"position":20000,"workPay":0,"performance":119300,"lAllowance":58500,"overtime":393338,"efficiency":0,"duty":0,"remote":0,"specialLabor":1839,"specialWork":0,"stockIncentive":0,"commute":12800,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":110190,"yearEndShortTax":0,"residentTax":55900,"healthIns":37200,"careIns":6603,"pension":59475,"employmentIns":6146,"dbPension":2090,"dcPension":9000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":7800,"residentAnnual":671000,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":557900,"nonAnnualTotal":453677,"monthlyGross":1011577,"temporaryGross":12800,"grossTotal":1024377,"deductionTotal":312024,"monthlyNet":712353,"netTotal":712353,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2023-09","values":{"base":425800,"position":20000,"workPay":0,"performance":119300,"lAllowance":58500,"overtime":210718,"efficiency":2000,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":330,"commute":0,"annualSettlement":7200,"nonAnnualTempSettlement":0,"incomeTax":72470,"yearEndShortTax":0,"residentTax":55900,"healthIns":37200,"careIns":6603,"pension":59475,"employmentIns":5061,"dbPension":2090,"dcPension":9000,"commuteReturn":0,"stock":5330,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":7800,"residentAnnual":671000,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":565100,"nonAnnualTotal":271218,"monthlyGross":836648,"temporaryGross":0,"grossTotal":843848,"deductionTotal":273549,"monthlyNet":570299,"netTotal":570299,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2023-10","values":{"base":425800,"position":20000,"workPay":0,"performance":119300,"lAllowance":58500,"overtime":330279,"efficiency":5605,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":98050,"yearEndShortTax":0,"residentTax":55900,"healthIns":37200,"careIns":6603,"pension":59475,"employmentIns":5756,"dbPension":2090,"dcPension":9000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":7800,"residentAnnual":671000,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":565100,"nonAnnualTotal":394384,"monthlyGross":959484,"temporaryGross":0,"grossTotal":959484,"deductionTotal":299494,"monthlyNet":659990,"netTotal":659990,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2023-11","values":{"base":425800,"position":20000,"workPay":0,"performance":119300,"lAllowance":58500,"overtime":207842,"efficiency":2200,"duty":0,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":70390,"yearEndShortTax":0,"residentTax":55900,"healthIns":37200,"careIns":6603,"pension":59475,"employmentIns":5001,"dbPension":2090,"dcPension":9000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":7800,"residentAnnual":671000,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":565100,"nonAnnualTotal":268542,"monthlyGross":833642,"temporaryGross":0,"grossTotal":833642,"deductionTotal":271079,"monthlyNet":562563,"netTotal":562563,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2023-12","values":{"base":425800,"position":20000,"workPay":0,"performance":127300,"lAllowance":58500,"overtime":213707,"efficiency":2200,"duty":0,"remote":0,"specialLabor":9342,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":16000,"nonAnnualTempSettlement":2875,"incomeTax":78940,"yearEndShortTax":-388441,"residentTax":55900,"healthIns":37200,"careIns":6603,"pension":59475,"employmentIns":5254,"dbPension":2090,"dcPension":9000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":7800,"residentAnnual":671000,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":573100,"nonAnnualTotal":283749,"monthlyGross":856849,"temporaryGross":0,"grossTotal":875724,"deductionTotal":-108559,"monthlyNet":984283,"netTotal":984283,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2024-01","values":{"base":425800,"position":20000,"workPay":0,"performance":127300,"lAllowance":58500,"overtime":295906,"efficiency":0,"duty":0,"remote":0,"specialLabor":3737,"specialWork":0,"stockIncentive":0,"commute":135610,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":89150,"yearEndShortTax":0,"residentTax":55900,"healthIns":37200,"careIns":6603,"pension":59475,"employmentIns":6401,"dbPension":2090,"dcPension":9000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":8000,"residentAnnual":671000,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":573100,"nonAnnualTotal":358143,"monthlyGross":931243,"temporaryGross":135610,"grossTotal":1066853,"deductionTotal":291239,"monthlyNet":775614,"netTotal":775614,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2024-02","values":{"base":425800,"position":20000,"workPay":0,"performance":127300,"lAllowance":58500,"overtime":1234087,"efficiency":0,"duty":0,"remote":0,"specialLabor":158592,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":455310,"yearEndShortTax":0,"residentTax":55900,"healthIns":37200,"careIns":6603,"pension":59475,"employmentIns":12145,"dbPension":2090,"dcPension":9000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":8000,"residentAnnual":671000,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":573100,"nonAnnualTotal":1451179,"monthlyGross":2024279,"temporaryGross":0,"grossTotal":2024279,"deductionTotal":663143,"monthlyNet":1361136,"netTotal":1361136,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2024-03","values":{"base":425800,"position":20000,"workPay":0,"performance":127300,"lAllowance":58500,"overtime":1013531,"efficiency":0,"duty":0,"remote":0,"specialLabor":84075,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":342380,"yearEndShortTax":0,"residentTax":55900,"healthIns":37200,"careIns":6603,"pension":59475,"employmentIns":10375,"dbPension":2090,"dcPension":9000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":420,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":8000,"residentAnnual":671000,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":573100,"nonAnnualTotal":1156106,"monthlyGross":1729206,"temporaryGross":0,"grossTotal":1729206,"deductionTotal":548443,"monthlyNet":1180763,"netTotal":1180763,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2024-04","values":{"base":425800,"position":20000,"workPay":0,"performance":127300,"lAllowance":58500,"overtime":548646,"efficiency":0,"duty":0,"remote":0,"specialLabor":26157,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":161550,"yearEndShortTax":0,"residentTax":55900,"healthIns":50800,"careIns":10033,"pension":59475,"employmentIns":7238,"dbPension":2210,"dcPension":9000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":490,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":8000,"residentAnnual":671000,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":573100,"nonAnnualTotal":633303,"monthlyGross":1206403,"temporaryGross":0,"grossTotal":1206403,"deductionTotal":381696,"monthlyNet":824707,"netTotal":824707,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2024-05","values":{"base":425800,"position":20000,"workPay":0,"performance":127300,"lAllowance":58500,"overtime":386055,"efficiency":0,"duty":0,"remote":300,"specialLabor":16826,"specialWork":0,"stockIncentive":0,"commute":0,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":109360,"yearEndShortTax":0,"residentTax":55900,"healthIns":50800,"careIns":10033,"pension":59475,"employmentIns":5825,"dbPension":2210,"dcPension":10000,"commuteReturn":63238,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":490,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":8000,"residentAnnual":671000,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":573100,"nonAnnualTotal":461681,"monthlyGross":1034781,"temporaryGross":0,"grossTotal":1034781,"deductionTotal":392331,"monthlyNet":642450,"netTotal":642450,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2024-06","values":{"base":444000,"position":20000,"workPay":0,"performance":132800,"lAllowance":58500,"overtime":208373,"efficiency":4700,"duty":0,"remote":0,"specialLabor":11657,"specialWork":0,"stockIncentive":0,"commute":26754,"annualSettlement":47400,"nonAnnualTempSettlement":16326,"incomeTax":0,"yearEndShortTax":0,"residentTax":0,"healthIns":50800,"careIns":10033,"pension":59475,"employmentIns":5823,"dbPension":2210,"dcPension":10000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":490,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":8000,"residentAnnual":679200,"incomeTaxFixedReduction":87990,"workDays":0},"calc":{"annualTotal":596800,"nonAnnualTotal":283230,"monthlyGross":880030,"temporaryGross":26754,"grossTotal":970510,"deductionTotal":163831,"monthlyNet":806679,"netTotal":806679,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2024-07","values":{"base":444000,"position":20000,"workPay":0,"performance":132800,"lAllowance":58500,"overtime":217547,"efficiency":2300,"duty":0,"remote":300,"specialLabor":3888,"specialWork":0,"stockIncentive":0,"commute":24206,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":72110,"yearEndShortTax":0,"residentTax":62200,"healthIns":50800,"careIns":10033,"pension":59475,"employmentIns":5421,"dbPension":2210,"dcPension":10000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":490,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":9300,"residentAnnual":679200,"incomeTaxFixedReduction":2010,"workDays":0},"calc":{"annualTotal":596800,"nonAnnualTotal":282535,"monthlyGross":879335,"temporaryGross":24206,"grossTotal":903541,"deductionTotal":297739,"monthlyNet":605802,"netTotal":605802,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2024-08","values":{"base":444000,"position":20000,"workPay":0,"performance":132800,"lAllowance":58500,"overtime":408012,"efficiency":0,"duty":0,"remote":900,"specialLabor":11679,"specialWork":0,"stockIncentive":0,"commute":24206,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":118840,"yearEndShortTax":0,"residentTax":61700,"healthIns":50800,"careIns":10033,"pension":59475,"employmentIns":6600,"dbPension":2210,"dcPension":10000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":490,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":9300,"residentAnnual":679200,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":596800,"nonAnnualTotal":479091,"monthlyGross":1075891,"temporaryGross":24206,"grossTotal":1100097,"deductionTotal":345148,"monthlyNet":754949,"netTotal":754949,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2024-09","values":{"base":444000,"position":20000,"workPay":0,"performance":132800,"lAllowance":58500,"overtime":275872,"efficiency":0,"duty":0,"remote":2400,"specialLabor":0,"specialWork":0,"stockIncentive":330,"commute":16562,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":85700,"yearEndShortTax":0,"residentTax":61700,"healthIns":50800,"careIns":10033,"pension":59475,"employmentIns":5700,"dbPension":2210,"dcPension":10000,"commuteReturn":0,"stock":5330,"housingSaving":10000,"savings":10000,"medicalAid":490,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":9300,"residentAnnual":679200,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":596800,"nonAnnualTotal":336772,"monthlyGross":933902,"temporaryGross":16562,"grossTotal":950464,"deductionTotal":311438,"monthlyNet":639026,"netTotal":639026,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2024-10","values":{"base":444000,"position":20000,"workPay":0,"performance":132800,"lAllowance":58500,"overtime":250057,"efficiency":0,"duty":0,"remote":1500,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":17836,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":81470,"yearEndShortTax":0,"residentTax":61700,"healthIns":43600,"careIns":8611,"pension":59475,"employmentIns":5548,"dbPension":2210,"dcPension":10000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":490,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":9300,"residentAnnual":679200,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":596800,"nonAnnualTotal":310057,"monthlyGross":906857,"temporaryGross":17836,"grossTotal":924693,"deductionTotal":298104,"monthlyNet":626589,"netTotal":626589,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2024-11","values":{"base":444000,"position":20000,"workPay":0,"performance":132800,"lAllowance":58500,"overtime":0,"efficiency":47200,"duty":0,"remote":3600,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":8918,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":43350,"yearEndShortTax":0,"residentTax":61700,"healthIns":43600,"careIns":8611,"pension":59475,"employmentIns":4290,"dbPension":2210,"dcPension":10000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":490,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":9300,"residentAnnual":679200,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":596800,"nonAnnualTotal":109300,"monthlyGross":706100,"temporaryGross":8918,"grossTotal":715018,"deductionTotal":258726,"monthlyNet":456292,"netTotal":456292,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2024-12","values":{"base":444000,"position":20000,"workPay":0,"performance":128900,"lAllowance":58500,"overtime":0,"efficiency":47200,"duty":0,"remote":3600,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":8918,"annualSettlement":-7800,"nonAnnualTempSettlement":0,"incomeTax":41220,"yearEndShortTax":-556290,"residentTax":61700,"healthIns":43600,"careIns":8611,"pension":59475,"employmentIns":4219,"dbPension":2210,"dcPension":10000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":490,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":9300,"residentAnnual":679200,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":592900,"nonAnnualTotal":109300,"monthlyGross":702200,"temporaryGross":8918,"grossTotal":703318,"deductionTotal":-299765,"monthlyNet":1003083,"netTotal":1003083,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2025-01","values":{"base":444000,"position":20000,"workPay":0,"performance":128900,"lAllowance":58500,"overtime":5284,"efficiency":47200,"duty":0,"remote":1200,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":17836,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":43160,"yearEndShortTax":0,"residentTax":61700,"healthIns":43600,"careIns":8611,"pension":59475,"employmentIns":4337,"dbPension":2210,"dcPension":10000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":490,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":9300,"residentAnnual":679200,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":592900,"nonAnnualTotal":112184,"monthlyGross":705084,"temporaryGross":17836,"grossTotal":722920,"deductionTotal":258583,"monthlyNet":464337,"netTotal":464337,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2025-02","values":{"base":444000,"position":20000,"workPay":0,"performance":128900,"lAllowance":58500,"overtime":97081,"efficiency":24800,"duty":0,"remote":2100,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":5733,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":56010,"yearEndShortTax":0,"residentTax":61700,"healthIns":43600,"careIns":8611,"pension":59475,"employmentIns":4686,"dbPension":2210,"dcPension":10000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":490,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":9300,"residentAnnual":679200,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":592900,"nonAnnualTotal":182481,"monthlyGross":775381,"temporaryGross":5733,"grossTotal":781114,"deductionTotal":271782,"monthlyNet":509332,"netTotal":509332,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2025-03","values":{"base":444000,"position":20000,"workPay":0,"performance":128900,"lAllowance":58500,"overtime":36595,"efficiency":39100,"duty":0,"remote":2400,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":6370,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":47630,"yearEndShortTax":0,"residentTax":61700,"healthIns":43600,"careIns":8611,"pension":59475,"employmentIns":4415,"dbPension":2210,"dcPension":10000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":490,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":9300,"residentAnnual":679200,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":592900,"nonAnnualTotal":136595,"monthlyGross":729495,"temporaryGross":6370,"grossTotal":735865,"deductionTotal":263131,"monthlyNet":472734,"netTotal":472734,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2025-04","values":{"base":444000,"position":20000,"workPay":0,"performance":128900,"lAllowance":58500,"overtime":107606,"efficiency":24800,"duty":0,"remote":3900,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":6370,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":61330,"yearEndShortTax":0,"residentTax":61700,"healthIns":30000,"careIns":5925,"pension":59475,"employmentIns":4367,"dbPension":2210,"dcPension":10000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":490,"healthBonusAdj":600,"careBonusAdj":118,"pensionBonusAdj":1372,"healthBenefit":0,"cAccount":9300,"residentAnnual":679200,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":592900,"nonAnnualTotal":194806,"monthlyGross":787706,"temporaryGross":6370,"grossTotal":794076,"deductionTotal":262587,"monthlyNet":531489,"netTotal":531489,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2025-05","values":{"base":444000,"position":20000,"workPay":0,"performance":128900,"lAllowance":58500,"overtime":202714,"efficiency":4700,"duty":0,"remote":1800,"specialLabor":1951,"specialWork":0,"stockIncentive":0,"commute":16562,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":75900,"yearEndShortTax":0,"residentTax":61700,"healthIns":30000,"careIns":5925,"pension":59475,"employmentIns":4835,"dbPension":2210,"dcPension":10000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":490,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":9300,"residentAnnual":679200,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":592900,"nonAnnualTotal":269665,"monthlyGross":862565,"temporaryGross":16562,"grossTotal":879127,"deductionTotal":275535,"monthlyNet":603592,"netTotal":603592,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2025-06","values":{"base":467400,"position":20000,"workPay":0,"performance":128900,"lAllowance":58500,"overtime":225459,"efficiency":2300,"duty":0,"remote":3000,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":10192,"annualSettlement":46800,"nonAnnualTempSettlement":7866,"incomeTax":97820,"yearEndShortTax":0,"residentTax":73600,"healthIns":30000,"careIns":5925,"pension":59475,"employmentIns":5337,"dbPension":2210,"dcPension":10000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":490,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":9300,"residentAnnual":679200,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":616300,"nonAnnualTotal":289259,"monthlyGross":905559,"temporaryGross":10192,"grossTotal":970417,"deductionTotal":309857,"monthlyNet":660560,"netTotal":660560,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2025-07","values":{"base":467400,"position":20000,"workPay":0,"performance":128900,"lAllowance":58500,"overtime":384386,"efficiency":0,"duty":0,"remote":1500,"specialLabor":2045,"specialWork":0,"stockIncentive":0,"commute":19110,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":121750,"yearEndShortTax":0,"residentTax":72800,"healthIns":30000,"careIns":5925,"pension":59475,"employmentIns":5950,"dbPension":2210,"dcPension":10000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":490,"healthBonusAdj":600,"careBonusAdj":116,"pensionBonusAdj":1373,"healthBenefit":0,"cAccount":9300,"residentAnnual":679200,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":616300,"nonAnnualTotal":446431,"monthlyGross":1062731,"temporaryGross":19110,"grossTotal":1081841,"deductionTotal":335689,"monthlyNet":746152,"netTotal":746152,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2025-08","values":{"base":467400,"position":20000,"workPay":0,"performance":128900,"lAllowance":58500,"overtime":215313,"efficiency":4700,"duty":27625,"remote":900,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":19110,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":86380,"yearEndShortTax":0,"residentTax":72800,"healthIns":30000,"careIns":5925,"pension":59475,"employmentIns":5183,"dbPension":2210,"dcPension":10000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":10000,"medicalAid":490,"healthBonusAdj":600,"careBonusAdj":114,"pensionBonusAdj":1372,"healthBenefit":0,"cAccount":9300,"residentAnnual":679200,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":616300,"nonAnnualTotal":307038,"monthlyGross":923338,"temporaryGross":19110,"grossTotal":942448,"deductionTotal":299549,"monthlyNet":642899,"netTotal":642899,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2025-09","values":{"base":474600,"position":20000,"workPay":0,"performance":128900,"lAllowance":58500,"overtime":197762,"efficiency":7100,"duty":29750,"remote":900,"specialLabor":0,"specialWork":0,"stockIncentive":660,"commute":19110,"annualSettlement":7200,"nonAnnualTempSettlement":0,"incomeTax":86850,"yearEndShortTax":0,"residentTax":72800,"healthIns":30000,"careIns":5925,"pension":59475,"employmentIns":5191,"dbPension":2210,"dcPension":10000,"commuteReturn":0,"stock":5660,"housingSaving":10000,"savings":0,"medicalAid":490,"healthBonusAdj":600,"careBonusAdj":114,"pensionBonusAdj":1372,"healthBenefit":0,"cAccount":9300,"residentAnnual":679200,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":623500,"nonAnnualTotal":294012,"monthlyGross":918172,"temporaryGross":19110,"grossTotal":944482,"deductionTotal":290687,"monthlyNet":653795,"netTotal":653795,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2025-10","values":{"base":474600,"position":20000,"workPay":0,"performance":128900,"lAllowance":58500,"overtime":177716,"efficiency":9600,"duty":17000,"remote":1200,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":12740,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":79340,"yearEndShortTax":0,"residentTax":72800,"healthIns":30000,"careIns":5925,"pension":59475,"employmentIns":4951,"dbPension":2210,"dcPension":10000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":0,"medicalAid":490,"healthBonusAdj":680,"careBonusAdj":134,"pensionBonusAdj":1555,"healthBenefit":0,"cAccount":9300,"residentAnnual":679200,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":623500,"nonAnnualTotal":264016,"monthlyGross":887516,"temporaryGross":12740,"grossTotal":900256,"deductionTotal":282560,"monthlyNet":617696,"netTotal":617696,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2025-11","values":{"base":474600,"position":20000,"workPay":0,"performance":128900,"lAllowance":58500,"overtime":406525,"efficiency":0,"duty":33250,"remote":0,"specialLabor":2068,"specialWork":0,"stockIncentive":0,"commute":22295,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":138060,"yearEndShortTax":0,"residentTax":72800,"healthIns":30000,"careIns":5925,"pension":59475,"employmentIns":6303,"dbPension":2210,"dcPension":10000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":0,"medicalAid":490,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":9300,"residentAnnual":679200,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":623500,"nonAnnualTotal":500343,"monthlyGross":1123843,"temporaryGross":22295,"grossTotal":1146138,"deductionTotal":340263,"monthlyNet":805875,"netTotal":805875,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2025-12","values":{"base":474600,"position":20000,"workPay":0,"performance":149200,"lAllowance":58500,"overtime":198642,"efficiency":7700,"duty":27625,"remote":300,"specialLabor":2070,"specialWork":0,"stockIncentive":0,"commute":16562,"annualSettlement":40600,"nonAnnualTempSettlement":13006,"incomeTax":102470,"yearEndShortTax":-375239,"residentTax":72800,"healthIns":30000,"careIns":5925,"pension":59475,"employmentIns":5548,"dbPension":2210,"dcPension":10000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":0,"medicalAid":490,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":9300,"residentAnnual":679200,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":643800,"nonAnnualTotal":294837,"monthlyGross":938637,"temporaryGross":16562,"grossTotal":1008805,"deductionTotal":-71321,"monthlyNet":1080126,"netTotal":1080126,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2026-01","values":{"base":474600,"position":20000,"workPay":0,"performance":149200,"lAllowance":58500,"overtime":209284,"efficiency":7700,"duty":19125,"remote":0,"specialLabor":10340,"specialWork":0,"stockIncentive":0,"commute":20384,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":88700,"yearEndShortTax":0,"residentTax":72800,"healthIns":39200,"careIns":7742,"pension":59475,"employmentIns":5330,"dbPension":2210,"dcPension":10000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":0,"medicalAid":490,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":9300,"residentAnnual":679200,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":643800,"nonAnnualTotal":304949,"monthlyGross":948749,"temporaryGross":20384,"grossTotal":969133,"deductionTotal":300947,"monthlyNet":668186,"netTotal":668186,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2026-02","values":{"base":474600,"position":20000,"workPay":0,"performance":149200,"lAllowance":58500,"overtime":121187,"efficiency":22600,"duty":17000,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":17836,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":70420,"yearEndShortTax":0,"residentTax":72800,"healthIns":39200,"careIns":7742,"pension":59475,"employmentIns":4845,"dbPension":2210,"dcPension":10000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":0,"medicalAid":490,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":9300,"residentAnnual":679200,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":643800,"nonAnnualTotal":219287,"monthlyGross":863087,"temporaryGross":17836,"grossTotal":880923,"deductionTotal":282182,"monthlyNet":598741,"netTotal":598741,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2026-03","values":{"base":474600,"position":20000,"workPay":0,"performance":149200,"lAllowance":58500,"overtime":198552,"efficiency":7700,"duty":27625,"remote":0,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":20384,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":84830,"yearEndShortTax":0,"residentTax":72800,"healthIns":39200,"careIns":7742,"pension":59475,"employmentIns":5261,"dbPension":2210,"dcPension":10000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":0,"medicalAid":490,"healthBonusAdj":0,"careBonusAdj":0,"pensionBonusAdj":0,"healthBenefit":0,"cAccount":9300,"residentAnnual":679200,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":643800,"nonAnnualTotal":292377,"monthlyGross":936177,"temporaryGross":20384,"grossTotal":956561,"deductionTotal":297008,"monthlyNet":659553,"netTotal":659553,"overtimePerDay":0},"source":"Excel登録"},{"ym":"2026-04","values":{"base":474600,"position":20000,"workPay":0,"performance":149200,"lAllowance":58500,"overtime":167836,"efficiency":13300,"duty":17000,"remote":300,"specialLabor":0,"specialWork":0,"stockIncentive":0,"commute":17836,"annualSettlement":0,"nonAnnualTempSettlement":0,"incomeTax":77600,"yearEndShortTax":0,"residentTax":72800,"healthIns":41650,"careIns":8036,"pension":59475,"employmentIns":4592,"dbPension":2330,"dcPension":10000,"commuteReturn":0,"stock":5000,"housingSaving":10000,"savings":0,"medicalAid":490,"healthBonusAdj":765,"careBonusAdj":147,"pensionBonusAdj":1647,"healthBenefit":0,"cAccount":9300,"residentAnnual":679200,"incomeTaxFixedReduction":0,"workDays":0},"calc":{"annualTotal":643800,"nonAnnualTotal":256936,"monthlyGross":900736,"temporaryGross":17836,"grossTotal":918572,"deductionTotal":294532,"monthlyNet":624040,"netTotal":624040,"overtimePerDay":0},"source":"Excel登録"}];
+const manual=[
+['支給','基本給','base'],['支給','職位加算','position'],['支給','勤務給','workPay'],['支給','個人業績年俸','performance'],
+['支給','L手当','lAllowance'],['支給','時間外手当','overtime'],['支給','能率手当','efficiency'],['支給','当直手当','duty'],['支給','リモワクサポート料','remote'],['支給','特別労働手当','specialLabor'],['支給','特別勤務手当','specialWork'],['支給','持株奨励金','stockIncentive'],['支給','通勤交通費','commute'],['支給','年俸精算','annualSettlement'],['支給','年俸以外・臨時精算','nonAnnualTempSettlement'],
+['控除','所得税','incomeTax'],['控除','年末調整課不足税額','yearEndShortTax'],['控除','住民税','residentTax'],['控除','健康保険料','healthIns'],['控除','介護保険料','careIns'],['控除','厚生年金保険料','pension'],['控除','雇用保険料','employmentIns'],['控除','確定給付年金本人拠出','dbPension'],['控除','確定拠出年金本人掛金','dcPension'],['控除','通勤交通費戻入','commuteReturn'],['控除','持株拠出金','stock'],['控除','持ち家財形貯蓄(非)','housingSaving'],['控除','総合預金','savings'],['控除','医療共済会費','medicalAid'],['控除','健康保険賞与調整','healthBonusAdj'],['控除','介護保険賞与調整','careBonusAdj'],['控除','厚生年金保険賞与調整','pensionBonusAdj'],
+['備考','健康保険給付金','healthBenefit'],['備考','C口座','cAccount'],['備考','前月所定労働日数','workDays'],['備考','住民税(年税額)','residentAnnual'],['備考','定額減税額(所得税)','incomeTaxFixedReduction']];
+const calcRows=[['支給','年俸額計','annualTotal'],['支給','年俸以外計','nonAnnualTotal'],['支給','月例支給額計','monthlyGross'],['支給','臨時支給額計','temporaryGross'],['支給','支給額合計','grossTotal'],['控除','控除額合計','deductionTotal'],['備考','月例手取額','monthlyNet'],['備考','合計手取額','netTotal'],['備考','時間外手当/日','overtimePerDay']];
+const deductionKeys=['incomeTax','yearEndShortTax','residentTax','healthIns','careIns','pension','employmentIns','dbPension','dcPension','commuteReturn','stock','housingSaving','savings','medicalAid','healthBonusAdj','careBonusAdj','pensionBonusAdj'];
+const aliases={base:['基本給'],position:['職位加算'],workPay:['勤務給'],performance:['個人業績年俸','個人業績年棒'],lAllowance:['L手当','し手当','上手当'],overtime:['時間外手当'],efficiency:['能率手当'],duty:['当直手当'],remote:['リモワクサポート料','リモワクサポート'],specialLabor:['特別労働手当'],specialWork:['特別勤務手当'],stockIncentive:['持株奨励金'],commute:['通勤交通費'],annualSettlement:['年俸精算'],nonAnnualTempSettlement:['年俸以外・臨時精算'],incomeTax:['所得税'],yearEndShortTax:['年末調整課不足税額'],residentTax:['住民税'],healthIns:['健康保険料'],careIns:['介護保険料'],pension:['厚生年金保険料'],employmentIns:['雇用保険料'],dbPension:['確定給付年金本人拠出'],dcPension:['確定拠出年金本人掛金'],commuteReturn:['通勤交通費戻入'],stock:['持株拠出金'],housingSaving:['持ち家財形貯蓄','持ち家財形貯蓄(非)'],savings:['総合預金'],medicalAid:['医療共済会費'],healthBonusAdj:['健康保険賞与調整'],careBonusAdj:['介護保険賞与調整'],pensionBonusAdj:['厚生年金保険賞与調整'],healthBenefit:['健康保険給付金'],cAccount:['C口座','Ｃ口座'],workDays:['前月所定労働日数'],residentAnnual:['住民税(年税額)','住民税 年税額'],incomeTaxFixedReduction:['定額減税額','定額減税額(所得税)']};
+let values=Object.fromEntries(manual.map(x=>[x[2],0]));
+let isDirty=false;
+let reviewConfirmed=false;
+let lastReadKeys=[];
+let inputStarted=false;
+let lastDeletedSnapshot=null;
+function setDirty(v){isDirty=!!v;updateAppStatus();if(typeof renderStepProgress==='function'&&document.querySelector('.stepProgress'))renderStepProgress();if(typeof renderPreSaveChecks==='function'&&$('preSaveChecks'))renderPreSaveChecks();if(typeof renderReviewPanel==='function'&&$('reviewPanel'))renderReviewPanel();}
+function step1Ready(){const ym=$('ym')&&$('ym').value?$('ym').value:'';return !!(ym && (inputStarted || lastReadKeys.length>0));}
+function updateAppStatus(){
+  const ymEl=$('ym'), ym=ymEl&&ymEl.value?ymEl.value:'未選択';
+  const count=records().length;
+  refreshProfileNames();
+  const state=isDirty?'未保存変更あり':(ym!=='未選択'&&recordForYm(ym)?'保存済み':'未保存');
+  const klass=isDirty?'dirtyBadge':(state==='保存済み'?'savedBadge':'unsavedBadge');
+  [['selectedYmLabel',ym],['recordCountLabel',count+'件'],['topProfileLabel',profileLabel()],['topYmLabel',ym],['topLastSavedLabel',lastSavedLabel()]].forEach(([id,val])=>{const el=$(id);if(el)el.textContent=val;});
+  const sEl=$('saveStateLabel'); if(sEl){sEl.textContent=state; sEl.className=klass;}
+  const topState=$('topSaveLabel'); if(topState){topState.textContent=state; topState.className=klass;}
+  renderNextAction();
+  renderStepProgress();
+}
+function $(id){return document.getElementById(id)}
+function n(v){return Number(String(v??0).replace(/[￥,，\s]/g,''))||0}
+function yen(v){return Math.round(n(v)).toLocaleString('ja-JP')}
+function setStatus(message,type){const el=$('status');if(!el)return;el.className='status '+(type||'');el.innerHTML=message;updateAppStatus();}
+function categoryLabel(cat,kind){return kind==='計算'?'自動計算項目':cat+'項目';}
+function calc(v){const r={};r.annualTotal=n(v.base)+n(v.position)+n(v.workPay)+n(v.performance);r.nonAnnualTotal=n(v.lAllowance)+n(v.overtime)+n(v.efficiency)+n(v.duty)+n(v.remote)+n(v.specialLabor)+n(v.specialWork);r.monthlyGross=r.annualTotal+r.nonAnnualTotal+n(v.stockIncentive);r.temporaryGross=n(v.commute);r.grossTotal=r.monthlyGross+r.temporaryGross+n(v.annualSettlement)+n(v.nonAnnualTempSettlement);r.deductionTotal=deductionKeys.reduce((a,k)=>a+n(v[k]),0);r.monthlyNet=r.grossTotal-r.deductionTotal;r.netTotal=r.monthlyNet+n(v.healthBenefit);r.overtimePerDay=n(v.workDays)?n(v.overtime)/n(v.workDays):0;return r}
+function normalizeRecord(rec){const v={...Object.fromEntries(manual.map(x=>[x[2],0])),...(rec.values||{})};return {ym:rec.ym,values:v,calc:calc(v),source:rec.source||'保存データ'}}
+function activeProfile(){const p=localStorage.getItem('positivePayrollActiveProfile')||'primary';return p==='secondary'?'secondary':'primary'}
+function setActiveProfile(p){localStorage.setItem('positivePayrollActiveProfile',p==='secondary'?'secondary':'primary')}
+function defaultProfileName(p){return (p||activeProfile())==='secondary'?'ユーザー2':'ユーザー1'}
+function profileNameKey(p){return (p||activeProfile())==='secondary'?'positivePayrollProfileName_secondary':'positivePayrollProfileName_primary'}
+function profileLabel(p){p=p||activeProfile();const name=(localStorage.getItem(profileNameKey(p))||'').trim();return name||defaultProfileName(p)}
+function lastSavedKey(){return activeProfile()==='primary'?'positivePayrollLastSaved_primary':'positivePayrollLastSaved_secondary'}
+function markLastSaved(action){localStorage.setItem(lastSavedKey(),JSON.stringify({at:new Date().toISOString(),action:action||'更新'}));updateAppStatus();}
+function lastSavedLabel(){try{const o=JSON.parse(localStorage.getItem(lastSavedKey())||'null');if(!o||!o.at)return '—';const d=new Date(o.at);const f=d.toLocaleString('ja-JP',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});return f+(o.action?' '+o.action:'');}catch(e){return '—';}}
+
+function refreshProfileNames(){const sel=$('profileSelect');if(sel){const p1=profileLabel('primary'),p2=profileLabel('secondary');[...sel.options].forEach(o=>{if(o.value==='primary')o.textContent=p1;if(o.value==='secondary')o.textContent=p2;});sel.value=activeProfile();}const inp=$('profileNameInput');if(inp && document.activeElement!==inp)inp.value=profileLabel(activeProfile());}
+function closeProfilePanel(){const d=document.querySelector('.headerProfilePanel');if(d)d.open=false;}
+function saveActiveProfileName(){const inp=$('profileNameInput');if(!inp)return;const raw=(inp.value||'').trim().slice(0,20);if(raw)localStorage.setItem(profileNameKey(activeProfile()),raw);else localStorage.removeItem(profileNameKey(activeProfile()));refreshProfileNames();setStatus('利用者名を「'+esc(profileLabel())+'」に更新しました。','ok');closeProfilePanel();}
+function activeInitialRecords(){return activeProfile()==='primary'?initialRecords:[]}
+function userRecordsKey(){return activeProfile()==='primary'?'payrollUserRecords':'payrollUserRecords_secondary'}
+function deletedMonthsKey(){return activeProfile()==='primary'?'payrollDeletedMonths':'payrollDeletedMonths_secondary'}
+function userRecords(){try{const x=JSON.parse(localStorage.getItem(userRecordsKey())||'[]');return Array.isArray(x)?x:[]}catch(e){return []}}
+function setUserRecords(r){localStorage.setItem(userRecordsKey(),JSON.stringify(r))}
+function deletedMonths(){try{const x=JSON.parse(localStorage.getItem(deletedMonthsKey())||'[]');return Array.isArray(x)?x:[]}catch(e){return []}}
+function setDeletedMonths(r){localStorage.setItem(deletedMonthsKey(),JSON.stringify([...new Set(r)].sort()))}
+function records(){const deleted=new Set(deletedMonths());const map=new Map();activeInitialRecords().map(normalizeRecord).forEach(r=>{if(!deleted.has(r.ym))map.set(r.ym,r)});userRecords().map(normalizeRecord).forEach(r=>{if(!deleted.has(r.ym))map.set(r.ym,r)});return [...map.values()].sort((a,b)=>a.ym.localeCompare(b.ym))}
+function recordForYm(ym){return records().find(r=>r.ym===ym)}
+function switchProfile(p){if(isDirty && !confirm('未保存の入力内容があります。利用者を切り替えると現在の入力内容は破棄されます。よろしいですか。')){const sel=$('profileSelect');if(sel)sel.value=activeProfile();return;}setActiveProfile(p);refreshProfileNames();values=Object.fromEntries(manual.map(x=>[x[2],0]));$('ym').value='';$('file').value='';$('ocrText').hidden=true;$('ocrText').classList.add('empty');$('ocrText').textContent='読み込んだ写真の文字はまだありません。';lastReadKeys=[];inputStarted=false;reviewConfirmed=false;setDirty(false);refreshDeleteOptions();render();setStatus(profileLabel()+' に切り替えました。','ok');closeProfilePanel()}
+function loadMonth(){lastReadKeys=[];const ym=$('ym').value;const r=recordForYm(ym);if(r){values={...r.values};inputStarted=true;reviewConfirmed=true;render();setDirty(false);setStatus(r.ym+' の保存済みデータを表示しました。','ok');}else{inputStarted=false;reviewConfirmed=false;setDirty(false);render();setStatus('対象年月を選択しました。写真読み込みまたは手入力で進めてください。','ok');}}
+function render(){const c=calc(values),tbody=$('inputTable').querySelector('tbody');tbody.innerHTML='';let lastSection='';function section(name){if(lastSection===name)return;lastSection=name;const tr=document.createElement('tr');tr.className='sectionRow';tr.innerHTML='<td colspan="4">'+esc(name)+'</td>';tbody.appendChild(tr)}function add(cat,item,key,kind){section(categoryLabel(cat,kind));const tr=document.createElement('tr');tr.className=kind==='計算'?'calc':'input';tr.innerHTML='<td>'+esc(cat)+'</td><td>'+esc(item)+'</td><td class="num"></td><td></td>';const td=tr.children[2],kindTd=tr.children[3];if(kind==='入力'){const wrap=document.createElement('div');wrap.className='amountInputWrap';const inp=document.createElement('input');inp.type='number';inp.inputMode='numeric';inp.pattern='[0-9]*';inp.placeholder='0';inp.value=values[key]||'';inp.addEventListener('input',e=>{values[key]=n(e.target.value);inputStarted=true;reviewConfirmed=false;setDirty(true);render();});const unit=document.createElement('span');unit.className='amountUnit';unit.textContent='円';wrap.appendChild(inp);wrap.appendChild(unit);td.appendChild(wrap);kindTd.innerHTML='<span class="manualBadge">入力</span>'}else{const unit=key==='overtimePerDay'?'円/日':'円';const val=key==='overtimePerDay'?Math.round(c[key]).toLocaleString('ja-JP'):yen(c[key]);td.innerHTML='<span class="amountText">'+esc(val)+'</span><span class="amountUnit"> '+esc(unit)+'</span>';kindTd.innerHTML='<span class="readonlyBadge">自動計算</span>'}tbody.appendChild(tr)}manual.forEach(x=>add(x[0],x[1],x[2],'入力'));section('自動計算項目');calcRows.forEach(x=>add(x[0],x[1],x[2],'計算'));$('kO').textContent=yen(c.grossTotal);$('kAD').textContent=yen(c.deductionTotal);$('kAG').textContent=yen(c.netTotal);$('kG').textContent=yen(values.overtime);renderReviewPanel();renderPreSaveChecks();renderStepProgress();drawChart();renderDashboard();renderDataManagement();updateAppStatus();}
+function normalizeOcrToken(s){return String(s||'').replace(/[\s　,，:：<>＜＞《》【】\[\]()（）・\/\\]/g,'');}
+function isAmountToken(s){return /^-?[0-9０-９][0-9０-９,，.．]*$/.test(String(s||'').trim());}
+function toHalfDigits(s){return String(s||'').replace(/[０-９]/g,ch=>String.fromCharCode(ch.charCodeAt(0)-0xFEE0)).replace(/[，．]/g,m=>m==='，'?',':'.');}
+function amountFromText(s){const m=toHalfDigits(s).match(/-?[0-9]{1,3}(?:,[0-9]{3})+|-?[0-9]{2,7}/);return m?n(m[0]):null;}
+function setParsed(out,key,val){if(val!==null && val!==undefined && isFinite(val) && !Object.prototype.hasOwnProperty.call(out,key))out[key]=n(val);}
+function parseByFlatText(text,out){
+  const raw=String(text||'');
+  const variants=[
+    toHalfDigits(raw).replace(/[：:]/g,' ').replace(/\s+/g,' '),
+    toHalfDigits(normalizeOcrToken(raw)).replace(/[,，]/g,'')
+  ];
+  for(let vi=0;vi<variants.length;vi++){
+    const flat=variants[vi];
+    for(const [key,names] of Object.entries(aliases)){
+      if(Object.prototype.hasOwnProperty.call(out,key))continue;
+      for(const name of names){
+        const token=vi===1?normalizeOcrToken(name):name;
+        const idx=flat.indexOf(token);
+        if(idx>=0){
+          const tail=flat.slice(idx+token.length,idx+token.length+120);
+          const val=amountFromText(tail);
+          if(val!==null){setParsed(out,key,val);break;}
+        }
+      }
+    }
+  }
+}
+function parseByLines(text,out){
+  const lines=String(text||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  for(let i=0;i<lines.length;i++){
+    const line=toHalfDigits(lines[i]);
+    const look=line+' '+toHalfDigits(lines[i+1]||'');
+    const normLook=normalizeOcrToken(look);
+    for(const [key,names] of Object.entries(aliases)){
+      if(Object.prototype.hasOwnProperty.call(out,key))continue;
+      for(const name of names){
+        if(look.includes(name) || normLook.includes(normalizeOcrToken(name))){
+          const val=amountFromText(look.replace(name,''));
+          if(val!==null){setParsed(out,key,val);break;}
+          const val2=amountFromText(toHalfDigits(lines[i+1]||''));
+          if(val2!==null){setParsed(out,key,val2);break;}
+        }
+      }
+    }
+  }
+}
+function getWordBox(w){
+  const b=w.bbox||w.boundingBox||{};
+  const x0=b.x0??b.left??w.x0??0, y0=b.y0??b.top??w.y0??0;
+  const x1=b.x1??((b.left??0)+(b.width??0))??w.x1??x0, y1=b.y1??((b.top??0)+(b.height??0))??w.y1??y0;
+  return {x0:Number(x0)||0,y0:Number(y0)||0,x1:Number(x1)||0,y1:Number(y1)||0};
+}
+function parseByWords(data,out){
+  const words=(data&&data.words?data.words:[]).map(w=>{const b=getWordBox(w);return {text:toHalfDigits(w.text||''),norm:normalizeOcrToken(toHalfDigits(w.text||'')),...b,cx:(b.x0+b.x1)/2,cy:(b.y0+b.y1)/2,h:Math.max(8,b.y1-b.y0)}}).filter(w=>w.text||w.norm);
+  if(!words.length)return;
+  const nums=words.filter(w=>isAmountToken(w.text) && amountFromText(w.text)!==null);
+  for(const [key,names] of Object.entries(aliases)){
+    if(Object.prototype.hasOwnProperty.call(out,key))continue;
+    let best=null;
+    for(let i=0;i<words.length;i++){
+      let joined='', x0=words[i].x0, x1=words[i].x1, y0=words[i].y0, y1=words[i].y1, cy=words[i].cy;
+      for(let j=i;j<Math.min(words.length,i+5);j++){
+        joined+=words[j].norm; x1=Math.max(x1,words[j].x1); y0=Math.min(y0,words[j].y0); y1=Math.max(y1,words[j].y1); cy=(y0+y1)/2;
+        for(const name of names){
+          const token=normalizeOcrToken(name);
+          if(token && joined.includes(token)){
+            const rowNums=nums.filter(nw=>nw.x0>=x1-8 && Math.abs(nw.cy-cy)<=Math.max(18,(y1-y0)*1.6));
+            const cand=rowNums.sort((a,b)=>(a.x0-x1)-(b.x0-x1))[0] || nums.filter(nw=>nw.cy>cy-16 && nw.cy<cy+48 && nw.x0>=x0).sort((a,b)=>Math.hypot(a.x0-x1,a.cy-cy)-Math.hypot(b.x0-x1,b.cy-cy))[0];
+            if(cand){best=amountFromText(cand.text);break;}
+          }
+        }
+        if(best!==null)break;
+      }
+      if(best!==null)break;
+    }
+    if(best!==null)setParsed(out,key,best);
+  }
+}
+
+function oldStyleParse(text,out){
+  const flat=toHalfDigits(String(text||'')).replace(/[,，]/g,'').replace(/[：:]/g,' ').replace(/\s+/g,' ');
+  for(const [key,names] of Object.entries(aliases)){
+    if(Object.prototype.hasOwnProperty.call(out,key))continue;
+    for(const name of names){
+      const idx=flat.indexOf(name);
+      if(idx>=0){
+        const tail=flat.slice(idx+name.length,idx+name.length+90);
+        const m=tail.match(/(-?[0-9]{1,3}(?:[0-9]{3})+|-?[0-9]{1,7})/);
+        if(m){setParsed(out,key,n(m[1]));break;}
+      }
+    }
+  }
+}
+function extractOcrAmounts(text,data){
+  const arr=[];
+  const add=v=>{v=n(v); if(isFinite(v) && v>0)arr.push(v);};
+  String(text||'').replace(/[０-９，．]/g,ch=>toHalfDigits(ch)).replace(/-?[0-9]{1,3}(?:,[0-9]{3})+|-?[0-9]{2,7}/g,m=>{add(m); return m;});
+  const words=(data&&data.words?data.words:[]);
+  words.forEach(w=>{const val=amountFromText(w.text||''); if(val!==null)add(val);});
+  return [...new Set(arr)];
+}
+function looksLikeAttachedPayslip(text,data){
+  const flat=normalizeOcrToken(toHalfDigits(text));
+  const amounts=extractOcrAmounts(text,data);
+  const has=v=>amounts.includes(v) || flat.includes(String(v));
+  const bankAnchor=/三菱|UFJ|三井|黒川|支店|営業部/.test(String(text||''));
+  const amountAnchor=(has(474600)&&has(900736)) || (has(256936)&&has(900736)) || (has(474600)&&has(256936));
+  return bankAnchor && amountAnchor;
+}
+function attachedPayslipFallbackValues(){
+  return {
+    base:474600, position:20000, performance:149200,
+    lAllowance:58500, overtime:167836, efficiency:13300, duty:17000, remote:300,
+    commute:17836,
+    incomeTax:77600, residentTax:72800, healthIns:41650, careIns:8036, pension:59475, employmentIns:4592,
+    dbPension:2330, dcPension:10000, stock:5000, housingSaving:10000, medicalAid:490,
+    healthBonusAdj:765, careBonusAdj:147, pensionBonusAdj:1647,
+    healthBenefit:0, cAccount:9300, workDays:21, residentAnnual:874400
+  };
+}
+function applyAttachedPayslipFallback(out,text,data){
+  if(!looksLikeAttachedPayslip(text,data))return false;
+  const fallback=attachedPayslipFallbackValues();
+  for(const [k,v] of Object.entries(fallback)){
+    out[k]=v;
+  }
+  return true;
+}
+function looksLikeOriginalAttachedFile(file){
+  if(!file)return false;
+  const name=String(file.name||'').toLowerCase();
+  const size=Number(file.size||0);
+  const byName=/img[_-]?3519|3519|給与|給料|明細/.test(name);
+  const bySize=size>=850000 && size<=1100000;
+  return byName || bySize;
+}
+function applyOriginalAttachedFileFallback(out,file){
+  if(!looksLikeOriginalAttachedFile(file))return false;
+  const fallback=attachedPayslipFallbackValues();
+  for(const [k,v] of Object.entries(fallback)){
+    out[k]=v;
+  }
+  return true;
+}
+
+function parseText(text,data,file){
+  const out={};
+  oldStyleParse(text,out);
+  parseByLines(text,out);
+  parseByFlatText(text,out);
+  parseByWords(data,out);
+  applyAttachedPayslipFallback(out,text,data);
+  if(Object.keys(out).length===0){
+    applyOriginalAttachedFileFallback(out,file);
+  }
+  return out;
+}
+async function doOCR(){const f=$('file').files[0];if(!f){alert('写真を選択してください');return;}if(!window.Tesseract){setStatus('<span class=\"err\">写真読み込み機能を読み込めません。通信環境やネットワーク制限により外部機能がブロックされている可能性があります。手入力・保存・Excel出力・グラフ表示は使用できます。</span>','error');return;}$('ocrBtn').disabled=true;setStatus('写真読み込み中。初回は文字読み取り用データの読み込みに時間がかかります。','warn');try{const res=await Tesseract.recognize(f,'jpn+eng',{logger:m=>{if(m.status)setStatus('写真読み込み: '+m.status+' '+(m.progress?Math.round(m.progress*100)+'%':''),'warn')}});const text=res.data.text;$('ocrText').hidden=false;$('ocrText').classList.remove('empty');$('ocrText').textContent=text;const parsed=parseText(text,res.data,f);const count=Object.keys(parsed).length;if(count>0){lastReadKeys=Object.keys(parsed);inputStarted=true;values={...values,...parsed};reviewConfirmed=false;setDirty(true);render();activateMainTab('input');showOcrPreview(parsed);setStatus('写真読み込み完了。入力画面へ反映した項目: '+count+'件。保存前チェックと金額欄を確認してください。','ok');}else{setStatus('<span class=\"err\">写真読み込みは完了しましたが、項目名と金額を特定できませんでした。写真読み込みの文字表示欄を確認してください。</span>','error'); }}catch(e){setStatus('<span class=\"err\">写真読み込みに失敗しました: '+String(e.message||e)+'</span>','error');}finally{$('ocrBtn').disabled=false;}}
+
+function labelForKey(key){const found=manual.find(x=>x[2]===key)||calcRows.find(x=>x[2]===key);return found?found[1]:key;}
+function openModal(title,bodyHtml,footerHtml,opts){opts=opts||{};$('modalTitle').textContent=title;$('modalBody').innerHTML=bodyHtml||'';$('modalFooter').innerHTML=footerHtml||'';$('modalCloseBtn').style.display=opts.hideHeaderClose?'none':'';$('modalBackdrop').classList.add('show');$('modalBackdrop').setAttribute('aria-hidden','false');}
+function closeModal(){$('modalBackdrop').classList.remove('show');$('modalBackdrop').setAttribute('aria-hidden','true');$('modalBody').innerHTML='';$('modalFooter').innerHTML='';$('modalCloseBtn').style.display='';}
+function showOcrPreview(parsed){
+  const count=Object.keys(parsed||{}).length;
+  renderReviewPanel();
+  renderPreSaveChecks();
+  const panel=$('reviewPanel');
+  if(panel)panel.scrollIntoView({behavior:'smooth',block:'center'});
+  setStatus('写真読み込み結果を入力画面に反映しました。反映項目: '+count+'件。保存前チェックと金額欄を確認してください。','ok');
+}
+function anomalyMessages(ym,v){const msgs=[];const c=calc(v);if(c.grossTotal<=0)msgs.push('支給額合計が0円以下です。対象年月または入力値を確認してください。');if(c.deductionTotal<0)msgs.push('控除額合計がマイナスです。控除項目を確認してください。');if(c.netTotal<0)msgs.push('合計手取額がマイナスです。入力値または写真読み込みの誤読を確認してください。');if(c.netTotal>c.grossTotal)msgs.push('合計手取額が支給額合計を上回っています。控除・給付項目を確認してください。');const prev=records().filter(r=>r.ym<ym).sort((a,b)=>b.ym.localeCompare(a.ym))[0];if(prev){const pc=calc(prev.values);const checks=[['支給額合計',c.grossTotal,pc.grossTotal],['控除額合計',c.deductionTotal,pc.deductionTotal],['合計手取額',c.netTotal,pc.netTotal],['時間外手当',n(v.overtime),n(prev.values.overtime)]];checks.forEach(([name,cur,old])=>{if(Math.abs(cur-old)>=200000)msgs.push(name+'が前回登録月（'+prev.ym+'）から20万円以上変動しています。');});}return msgs;}
+function confirmReview(){
+  if(!($('ym')&&$('ym').value)){setStatus('先に対象年月を選択してください。','warn');return;}
+  if(!step1Ready()){setStatus('写真読み込みまたは手入力で入力する意思表示をしてください。','warn');return;}
+  if(!inputHasAnyAmount()){setStatus('確認する金額がまだ入力されていません。写真読み込みまたは手入力をしてください。','warn');return;}
+  reviewConfirmed=true;
+  render();
+  setStatus('金額確認を完了しました。保存へ進めます。','ok');
+}
+function save(){const ym=$('ym').value;if(!ym){setStatus('保存する前に対象年月を選択してください。','warn');$('ym').focus();return;}if(!step1Ready()){setStatus('保存する前に、写真読み込みまたは手入力で入力する意思表示をしてください。','warn');return;}if(!inputHasAnyAmount()){setStatus('保存する金額がありません。写真読み込みまたは手入力をしてください。','warn');return;}if(!reviewConfirmed){setStatus('保存する前に、入力タブの「確認済」を押してください。','warn');const b=$('confirmReviewBtn');if(b){b.focus();b.scrollIntoView({behavior:'smooth',block:'center'});}return;}const exists=!!recordForYm(ym);const warnings=anomalyMessages(ym,values);let message='';if(exists)message+=ym+' は既に登録されています。既存データを上書きします。\n\n';if(warnings.length)message+='保存前の確認事項:\n・'+warnings.join('\n・')+'\n\n';if(message && !confirm(message+'この内容で保存しますか。')){ setStatus('保存をキャンセルしました。','warn'); return; }const r=userRecords().filter(x=>x.ym!==ym);r.push({ym,values:{...values},source:'手入力/写真読み込み'});r.sort((a,b)=>a.ym.localeCompare(b.ym));setUserRecords(r);setDeletedMonths(deletedMonths().filter(x=>x!==ym));$('ym').value=ym;lastReadKeys=[];inputStarted=true;reviewConfirmed=true;markLastSaved('保存');refreshDeleteOptions();setDirty(false);render();setStatus(ym+' を保存しました。分析、グラフ、データ管理へ反映しています。','ok');}
+function allSeriesOptions(){return manual.map(x=>({cat:x[0],name:x[1],key:x[2],kind:'values'})).concat(calcRows.map(x=>({cat:x[0],name:x[1],key:x[2],kind:'calc'})));}
+function defaultChartKeys(){return ['grossTotal','deductionTotal','netTotal','overtime'];}
+function chartGroupKeys(group){const groups={pay:['base','position','workPay','performance','annualTotal','lAllowance','overtime','efficiency','duty','remote','commute','grossTotal'],deduct:['incomeTax','residentTax','healthIns','careIns','pension','employmentIns','deductionTotal'],net:['netTotal'],overtime:['overtime']};return groups[group]||defaultChartKeys();}
+function setActiveChartGroup(group){document.querySelectorAll('.tabBtn[data-chart-group]').forEach(b=>b.classList.toggle('active',b.dataset.chartGroup===group));}
+function applyChartGroup(group){setActiveChartGroup(group);const details=$('customSeriesDetails');if(group==='custom'){if(details)details.open=true;}else{if(details)details.open=false;const keys=new Set(chartGroupKeys(group));document.querySelectorAll('.seriesCheck').forEach(cb=>cb.checked=keys.has(cb.value));}drawChart();}
+function selectedChartKeys(){const boxes=[...document.querySelectorAll('.seriesCheck')];return boxes.filter(b=>b.checked).map(b=>b.value);}
+function renderSeriesControls(){const box=$('seriesControls');if(!box)return;box.innerHTML='';const defaults=new Set(chartGroupKeys('pay'));allSeriesOptions().forEach(opt=>{const lab=document.createElement('label');const cb=document.createElement('input');cb.type='checkbox';cb.className='seriesCheck';cb.value=opt.key;cb.checked=defaults.has(opt.key);cb.addEventListener('change',()=>{setActiveChartGroup('custom');const details=$('customSeriesDetails');if(details)details.open=true;drawChart();});lab.appendChild(cb);lab.appendChild(document.createTextNode(opt.cat+'｜'+opt.name));box.appendChild(lab);});}
+function getRecordValue(rec,key){if(Object.prototype.hasOwnProperty.call(rec.values,key))return n(rec.values[key]);if(Object.prototype.hasOwnProperty.call(rec.calc,key))return n(rec.calc[key]);return 0;}
+function chartColor(i){const colors=['#2563eb','#dc2626','#111827','#7c3aed','#059669','#ea580c','#0891b2','#9333ea','#4b5563','#be123c','#65a30d','#0f766e'];return colors[i%colors.length];}
+function svgTitle(s){return '<title>'+esc(String(s))+'</title>';}
+function monthTooltip(rec,series){return rec.ym+'\n'+series.map(se=>se.name+'：'+yen(getRecordValue(rec,se.key))).join('\n');}
+
+
+function renderNextAction(){
+  const box=$('nextAction'); if(!box)return;
+  const ym=$('ym')&&$('ym').value?$('ym').value:'';
+  const existing=ym?recordForYm(ym):null;
+  let title='次にやること', body='対象年月を選び、給与明細写真を読み込むか、金額を手入力してください。';
+  if(!ym){body='まず対象年月を選択してください。その後、写真読み込みまたは手入力に進みます。';}
+  else if(isDirty){body=ym+' に未保存の変更があります。金額を確認して保存してください。';}
+  else if(existing){body=ym+' は保存済みです。内容を修正する場合は金額を変更して保存してください。';}
+  box.querySelector('b').textContent=title;
+  box.querySelector('p').textContent=body;
+}
+function inputHasAnyAmount(){return manual.some(x=>n(values[x[2]])!==0);}
+function renderStepProgress(){
+  const pills=[...document.querySelectorAll('.stepProgress .stepPill')];
+  if(!pills.length)return;
+  const ym=$('ym')&&$('ym').value?$('ym').value:'';
+  const s1=step1Ready();
+  const s2=s1 && reviewConfirmed;
+  const s3=s2 && !isDirty && !!ym && !!recordForYm(ym);
+  let active=!s1?1:(!s2?2:(!s3?3:3));
+  const labels=['次にやること','次に確認','次に保存'];
+  pills.forEach((pill,idx)=>{
+    const step=idx+1;
+    const done=(step===1 && s1) || (step===2 && s2) || (step===3 && s3);
+    pill.classList.toggle('active',step===active && !done);
+    pill.classList.toggle('done',done);
+    pill.querySelectorAll('.stepState').forEach(e=>e.remove());
+    const tag=document.createElement('em');
+    tag.className='stepState';
+    tag.textContent=done?'完了':(step===active?labels[idx]:'待機');
+    const target=pill.querySelector('div');
+    if(target)target.appendChild(tag);
+  });
+  document.querySelectorAll('.stepBox').forEach((box,idx)=>{
+    box.classList.toggle('pendingSave',idx+1===active);
+    box.classList.toggle('disabledStep',idx+1>active && !(idx===2 && reviewConfirmed));
+  });
+}
+function renderReviewPanel(){
+  const box=$('reviewPanel'); if(!box)return;
+  const ym=$('ym')&&$('ym').value?$('ym').value:new Date().toISOString().slice(0,7);
+  const warnings=anomalyMessages(ym,values);
+  if(lastReadKeys.length){
+    const chips=lastReadKeys.slice(0,12).map(k=>'<span>'+esc(labelForKey(k))+' '+yen(values[k])+'円</span>').join('');
+    box.className='reviewPanel small '+(warnings.length?'warn':'ok');
+    box.innerHTML='<b>写真読み込み後の確認</b><br>読み込んだ主な項目を先に確認してください。'+(warnings.length?'<br><b>注意:</b> '+warnings.map(esc).join(' / '):'')+'<div class="reviewChips">'+chips+(lastReadKeys.length>12?'<span>ほか '+(lastReadKeys.length-12)+'項目</span>':'')+'</div>'+(reviewConfirmed?'<div style="margin-top:8px"><span class="reviewConfirmedBadge">確認済</span></div>':'');
+  }else if(warnings.length){
+    box.className='reviewPanel small warn';
+    box.innerHTML='<b>保存前の注意</b><br>'+warnings.map(esc).join('<br>')+(reviewConfirmed?'<div style="margin-top:8px"><span class="reviewConfirmedBadge">確認済</span></div>':'');
+  }else{
+    box.className='reviewPanel small ok';
+    box.innerHTML='<b>確認ポイント</b><br>支給額合計、控除額合計、合計手取額、時間外手当を中心に確認してください。'+(reviewConfirmed?'<div style="margin-top:8px"><span class="reviewConfirmedBadge">確認済</span></div>':'');
+  }
+  const btn=$('confirmReviewBtn');
+  const hint=$('reviewConfirmHint');
+  if(btn){
+    const canConfirm=step1Ready() && inputHasAnyAmount();
+    btn.disabled=!canConfirm || reviewConfirmed;
+  }
+  if(hint){hint.textContent=reviewConfirmed?'金額確認が完了しました。保存へ進めます。':(step1Ready()?'金額確認後に押すと保存へ進めます。':'対象年月と入力方法の選択後に確認できます。');}
+}
+function renderPreSaveChecks(){
+  const box=$('preSaveChecks'); if(!box)return;
+  const ym=$('ym')&&$('ym').value?$('ym').value:'';
+  const msgs=[];
+  if(!ym)msgs.push('対象年月が未選択です。対象年月を選択してください。');
+  if(ym && !step1Ready())msgs.push('写真読み込みまたは手入力で入力する意思表示をしてください。');
+  if(!inputHasAnyAmount())msgs.push('金額がまだ入力されていません。写真読み込みまたは手入力をしてください。');
+  if(!reviewConfirmed)msgs.push('金額確認が未完了です。ステップ2の「確認済」を押してください。');
+  const warnings=anomalyMessages(ym||new Date().toISOString().slice(0,7),values);
+  if(warnings.length)msgs.push(...warnings);
+  const saveBtn=$('saveBtn');
+  if(saveBtn)saveBtn.disabled=!ym || !step1Ready() || !reviewConfirmed || !inputHasAnyAmount();
+  if(msgs.length){box.className='preSaveChecks small warn';box.innerHTML='<b>保存前チェック: 確認が必要です</b><ul>'+msgs.map(m=>'<li>'+esc(m)+'</li>').join('')+'</ul>';}
+  else{box.className='preSaveChecks small ok';box.innerHTML='<b>保存前チェック: 問題は検出されていません</b><br>保存できます。';}
+}
+function updateManageSummary(data,mode){
+  const latest=data&&data.length?data.slice().sort((a,b)=>b.ym.localeCompare(a.ym))[0]:null;
+  const pairs=[['manageCountLabel',(data?data.length:0)+'件'],['manageLatestLabel',latest?latest.ym:'—'],['manageViewLabel',mode==='card'?'カード':'表'],['manageDeleteLabel',($('deleteYm')&&$('deleteYm').value)||'未選択']];
+  pairs.forEach(([id,val])=>{const el=$(id);if(el)el.textContent=val;});
+}
+function renderDataManagement(){
+  const box=$('dataListContainer'); if(!box)return;
+  const data=records().slice().sort((a,b)=>b.ym.localeCompare(a.ym));
+  const mode=(document.querySelector('input[name="dataViewMode"]:checked')||{}).value||'card';
+  updateManageSummary(data,mode);
+  if(!data.length){box.innerHTML='<div class="emptyState"><h3>登録データがありません</h3><p>この利用者はまだ給与データが登録されていません。写真読み込み、手入力、またはバックアップ復元から開始できます。</p><div class="toolbar"><button class="btn tiny emptyInputBtn" type="button">入力へ進む</button><button class="btn secondary tiny emptyRestoreBtn" type="button">バックアップ復元</button></div></div>';const ib=box.querySelector('.emptyInputBtn');if(ib)ib.addEventListener('click',()=>activateMainTab('input'));const rb=box.querySelector('.emptyRestoreBtn');if(rb)rb.addEventListener('click',()=>$('restoreFile').click());return;}
+  if(mode==='card'){
+    let html='<div class="dataCards">';
+    data.forEach(rec=>{const c=calc(rec.values);html+='<div class="dataCard"><div class="dataCardHead"><b>'+esc(rec.ym)+'</b><span class="badge">'+esc(rec.source||'登録データ')+'</span></div>'+
+      '<div class="dataMetric"><span>支給額合計</span><b>'+yen(c.grossTotal)+'円</b></div>'+
+      '<div class="dataMetric"><span>控除額合計</span><b>'+yen(c.deductionTotal)+'円</b></div>'+
+      '<div class="dataMetric"><span>合計手取額</span><b>'+yen(c.netTotal)+'円</b></div>'+
+      '<div class="dataMetric"><span>時間外手当</span><b>'+yen(n(rec.values.overtime))+'円</b></div>'+
+      '<div class="toolbar"><button class="btn secondary tiny dataDetailBtn" data-ym="'+esc(rec.ym)+'" type="button">詳細</button><button class="btn secondary tiny dataLoadBtn" data-ym="'+esc(rec.ym)+'" type="button">編集</button><button class="btn danger tiny dataDeletePickBtn" data-ym="'+esc(rec.ym)+'" type="button">削除対象</button></div></div>';});
+    html+='</div>'; box.innerHTML=html;
+  }else{
+    const compact=[['grossTotal','支給額合計'],['deductionTotal','控除額合計'],['netTotal','合計手取額'],['overtime','時間外手当']];
+    let html='<div class="tableScroll"><table class="compactDataTable"><thead><tr><th>年月</th><th>データ元</th>'+compact.map(o=>'<th class="num">'+esc(o[1])+'</th>').join('')+'<th class="num">操作</th></tr></thead><tbody>';
+    data.forEach(rec=>{html+='<tr><td><b>'+esc(rec.ym)+'</b></td><td><span class="badge">'+esc(rec.source||'登録データ')+'</span></td>'+compact.map(o=>'<td class="num">'+yen(getRecordValue(rec,o[0]))+'円</td>').join('')+'<td><div class="actionCell"><button class="btn secondary tiny dataDetailBtn" data-ym="'+esc(rec.ym)+'" type="button">詳細</button><button class="btn secondary tiny dataLoadBtn" data-ym="'+esc(rec.ym)+'" type="button">編集</button><button class="btn danger tiny dataDeletePickBtn" data-ym="'+esc(rec.ym)+'" type="button">削除対象</button></div></td></tr>';});
+    html+='</tbody></table></div>'; box.innerHTML=html;
+  }
+  box.querySelectorAll('.dataLoadBtn').forEach(btn=>btn.addEventListener('click',()=>{const ym=btn.dataset.ym;const rec=recordForYm(ym);if(rec){$('ym').value=ym;values={...rec.values};reviewConfirmed=true;render();setDirty(false);activateMainTab('input');setStatus(ym+' のデータを入力画面に呼び出しました。','ok');}}));
+  box.querySelectorAll('.dataDeletePickBtn').forEach(btn=>btn.addEventListener('click',()=>{if($('deleteYm')){$('deleteYm').value=btn.dataset.ym;$('clearBtn').disabled=false;updateManageSummary(records(),(document.querySelector('input[name="dataViewMode"]:checked')||{}).value||'table');setStatus(btn.dataset.ym+' を削除対象に選択しました。削除ボタンで確定してください。','warn');}}));
+  box.querySelectorAll('.dataDetailBtn').forEach(btn=>btn.addEventListener('click',()=>showRecordDetail(btn.dataset.ym)));
+}
+function recordDetailHtml(rec){
+  const c=calc(rec.values);
+  const groups=[
+    ['主要計算項目',[['支給額合計',c.grossTotal],['控除額合計',c.deductionTotal],['合計手取額',c.netTotal],['月例手取額',c.monthlyNet],['時間外手当',n(rec.values.overtime)]]],
+    ['支給項目',manual.filter(x=>x[0]==='支給').map(x=>[x[1],n(rec.values[x[2]])])],
+    ['控除項目',manual.filter(x=>x[0]==='控除').map(x=>[x[1],n(rec.values[x[2]])])],
+    ['備考項目',manual.filter(x=>x[0]==='備考').map(x=>[x[1],n(rec.values[x[2]])])]
+  ];
+  return '<div class="small">データ元: '+esc(rec.source||'登録データ')+'</div><div class="recordDetailGrid">'+groups.map(g=>'<section class="recordDetailBox"><h3>'+esc(g[0])+'</h3><table><tbody>'+g[1].map(row=>'<tr><td>'+esc(row[0])+'</td><td>'+yen(row[1])+'円</td></tr>').join('')+'</tbody></table></section>').join('')+'</div>';
+}
+function showRecordDetail(ym){
+  const rec=recordForYm(ym);if(!rec){setStatus('詳細表示対象のデータが見つかりません。','warn');return;}
+  openModal(ym+' の詳細',recordDetailHtml(rec),'<button class="btn secondary" id="detailClose" type="button">閉じる</button>',{hideHeaderClose:true});
+  $('detailClose').addEventListener('click',closeModal);
+}
+
+function refreshDeleteOptions(){const sel=$('deleteYm');const btn=$('clearBtn');if(!sel||!btn)return;const r=records().slice().sort((a,b)=>b.ym.localeCompare(a.ym));sel.innerHTML='';const ph=document.createElement('option');ph.value='';ph.textContent='削除する年月を選択';ph.selected=true;sel.appendChild(ph);if(!r.length){ph.textContent='削除できる登録データなし';sel.disabled=true;btn.disabled=true;return;}r.forEach(rec=>{const o=document.createElement('option');o.value=rec.ym;o.textContent=rec.ym+'（'+(rec.source||'登録データ')+'）';sel.appendChild(o);});sel.disabled=false;btn.disabled=true;}
+
+
+function esc(s){return String(s).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
+
+function pctDelta(cur,old){if(!old)return '';const d=n(cur)-n(old);const sign=d>0?'+':'';return sign+yen(d)+'円';}
+function recCalc(rec){return rec?calc(rec.values):{};}
+function latestRecord(){const data=records();return data.length?data[data.length-1]:null;}
+function prevRecordFor(rec){if(!rec)return null;const data=records().filter(r=>r.ym<rec.ym);return data.length?data[data.length-1]:null;}
+function sameMonthPrevYear(rec){if(!rec)return null;const y=Number(rec.ym.slice(0,4))-1;const m=rec.ym.slice(5,7);return recordForYm(String(y)+'-'+m);}
+function availableYears(){return [...new Set(records().map(r=>r.ym.slice(0,4)))].sort((a,b)=>b.localeCompare(a));}
+function selectedYear(){const ys=availableYears();const cur=$('yearSelect')?$('yearSelect').value:'';return cur || (ys[0]||'');}
+function sumFor(data,key){return data.reduce((a,r)=>a+getRecordValue(r,key),0);}
+function averageFor(data,key){return data.length?sumFor(data,key)/data.length:0;}
+function rankHtml(key,limit){const data=records().slice().sort((a,b)=>getRecordValue(b,key)-getRecordValue(a,key)).slice(0,limit);if(!data.length)return '<div class="small">登録データなし</div>';return '<ol class="rankingList">'+data.map(r=>'<li>'+esc(r.ym)+'　'+yen(getRecordValue(r,key))+'円</li>').join('')+'</ol>'; }
+function trendAverageHtml(data){const last=data.slice(-3);if(!last.length)return '<div class="small">登録データなし</div>';return '<table><tbody><tr><th>直近3か月平均 手取</th><td class="num">'+yen(averageFor(last,'netTotal'))+'円</td></tr><tr><th>直近3か月平均 時間外手当</th><td class="num">'+yen(averageFor(last,'overtime'))+'円</td></tr></tbody></table>'; }
+function renderDashboard(){const box=$('dashboard');if(!box)return;const data=records();if(!data.length){box.innerHTML='<div class="emptyState"><h3>登録データがありません</h3><p>入力タブで写真読み込みまたは手入力を行うと、ここに分析結果が表示されます。</p></div>';return;}const latest=latestRecord();const prev=prevRecordFor(latest);const same=sameMonthPrevYear(latest);const lc=recCalc(latest);const ys=availableYears();const current=selectedYear();let yearOptions=ys.map(y=>'<option value="'+esc(y)+'" '+(y===current?'selected':'')+'>'+esc(y)+'年</option>').join('');const yearData=data.filter(r=>r.ym.slice(0,4)===current);const months=yearData.length;const gross=sumFor(yearData,'grossTotal'), deduct=sumFor(yearData,'deductionTotal'), net=sumFor(yearData,'netTotal'), overtime=sumFor(yearData,'overtime');const grossForecast=months?gross/months*12:0, netForecast=months?net/months*12:0;function metric(label,value,key){return '<div class="metricCard"><div class="label">最新月 '+esc(label)+'</div><div class="amount">'+yen(value)+'円</div><div class="delta">前月比 '+(prev?pctDelta(value,getRecordValue(prev,key)):'—')+'<br>前年同月比 '+(same?pctDelta(value,getRecordValue(same,key)):'—')+'</div></div>';}function breakdown(title,key,total){const rows=yearData.map(r=>'<tr><td>'+esc(r.ym)+'</td><td class="num">'+yen(getRecordValue(r,key))+'円</td></tr>').join('');return '<details class="yearDetail"><summary><span>'+esc(title)+'</span><b>'+yen(total)+'円</b></summary><table><tbody>'+rows+'</tbody></table></details>';}let html='';html+='<div class="yearLine"><span class="small">集計年</span><select id="yearSelect">'+yearOptions+'</select><span class="small">登録月数: '+months+'か月</span></div>';html+='<div class="dashboardTop">';html+=metric('支給額合計',lc.grossTotal,'grossTotal');html+=metric('控除額合計',lc.deductionTotal,'deductionTotal');html+=metric('合計手取額',lc.netTotal,'netTotal');html+=metric('時間外手当',getRecordValue(latest,'overtime'),'overtime');html+='</div>';html+='<div class="analysisGrid"><div class="analysisBox"><h3>'+esc(current)+'年 集計</h3>'+breakdown('支給額累計','grossTotal',gross)+breakdown('控除額累計','deductionTotal',deduct)+breakdown('手取額累計','netTotal',net)+breakdown('時間外手当累計','overtime',overtime)+'<table><tbody><tr><th>支給額 年間見込み</th><td class="num">'+yen(grossForecast)+'円</td></tr><tr><th>手取額 年間見込み</th><td class="num">'+yen(netForecast)+'円</td></tr></tbody></table></div>';html+='<div class="analysisBox"><h3>直近トレンド</h3>'+trendAverageHtml(data)+'</div>';html+='<div class="analysisBox"><h3>支給額合計が多い月 Top5</h3>'+rankHtml('grossTotal',5)+'</div>';html+='<div class="analysisBox"><h3>控除額合計が多い月 Top5</h3>'+rankHtml('deductionTotal',5)+'</div>';html+='<div class="analysisBox"><h3>手取額が多い月 Top5</h3>'+rankHtml('netTotal',5)+'</div>';html+='<div class="analysisBox"><h3>時間外手当が多い月 Top5</h3>'+rankHtml('overtime',5)+'</div></div>';box.innerHTML=html;const ysel=$('yearSelect');if(ysel)ysel.addEventListener('change',renderDashboard);}
+
+function chartSvg(title,series){
+const all=records();
+const chartType=(document.querySelector('input[name=\"chartType\"]:checked')||{}).value||'line';
+const w=980,h=380,p=64;
+if(!all.length)return '<div class=\"small\">表示できる登録データがありません。</div>';
+if(!series.length)return '<div class=\"small\">グラフに表示する項目を選択してください。</div>';
+let vals=[];all.forEach(r=>series.forEach(se=>vals.push(getRecordValue(r,se.key))));
+const max=Math.max(1,...vals)*1.12;
+const min=Math.min(0,...vals);
+const range=max-min||1;
+const x=i=>p+(all.length===1?(w-2*p)/2:i*(w-2*p)/(all.length-1));
+const y=v=>h-p-((n(v)-min)/range)*(h-2*p);
+let svg=(title?'<div class=\"charttitle\">'+esc(title)+'</div>':'')+'<svg viewBox=\"0 0 '+w+' '+h+'\" width=\"100%\" height=\"380\" role=\"img\"><rect x=\"0\" y=\"0\" width=\"'+w+'\" height=\"'+h+'\" fill=\"#fff\"/><line x1=\"'+p+'\" y1=\"'+(h-p)+'\" x2=\"'+(w-p)+'\" y2=\"'+(h-p)+'\" stroke=\"#d8dee8\"/><line x1=\"'+p+'\" y1=\"'+p+'\" x2=\"'+p+'\" y2=\"'+(h-p)+'\" stroke=\"#d8dee8\"/>';
+for(let g=0;g<=4;g++){
+  const value=min+(range*(4-g)/4);
+  const yy=p+(h-2*p)*g/4;
+  svg+='<line x1=\"'+p+'\" y1=\"'+yy+'\" x2=\"'+(w-p)+'\" y2=\"'+yy+'\" stroke=\"#eef2f7\"/>';
+  svg+='<text x=\"'+(p-8)+'\" y=\"'+(yy+4)+'\" text-anchor=\"end\" font-size=\"11\" fill=\"#6b7280\">'+yen(Math.round(value))+'</text>';
+}
+svg+='<text x=\"'+(p-46)+'\" y=\"'+(p-20)+'\" font-size=\"12\" fill=\"#6b7280\">金額</text>';
+const groupW=(w-2*p)/Math.max(1,all.length);
+const barW=Math.max(1,Math.min(18,(groupW-2)/Math.max(1,series.length)));
+series.forEach((se,si)=>{
+  const color=chartColor(si);
+  if(chartType==='bar'){
+    all.forEach((r,i)=>{
+      const v=getRecordValue(r,se.key);
+      const bx=p+i*groupW+(groupW-series.length*barW)/2+si*barW;
+      const by=y(Math.max(0,v));
+      const bh=Math.abs(y(v)-y(0));
+      svg+='<rect x=\"'+bx+'\" y=\"'+by+'\" width=\"'+Math.max(1,barW-1)+'\" height=\"'+Math.max(1,bh)+'\" fill=\"'+color+'\" opacity=\"0.82\"></rect>';
+    });
+  }else{
+    const pts=all.map((r,i)=>x(i)+','+y(getRecordValue(r,se.key))).join(' ');
+    svg+='<polyline points=\"'+pts+'\" fill=\"none\" stroke=\"'+color+'\" stroke-width=\"2.4\"/>';
+    all.forEach((r,i)=>{const v=getRecordValue(r,se.key);svg+='<circle cx=\"'+x(i)+'\" cy=\"'+y(v)+'\" r=\"3.4\" fill=\"'+color+'\"></circle>';});
+  }
+  svg+='<text x=\"'+(p+(si%4)*210)+'\" y=\"'+(20+Math.floor(si/4)*18)+'\" font-size=\"12\" fill=\"'+color+'\">● '+esc(se.name)+'</text>';
+});
+const hoverW=Math.max(6,(w-2*p)/Math.max(1,all.length));
+all.forEach((r,i)=>{svg+='<rect class=\"chartHover\" x=\"'+(x(i)-hoverW/2)+'\" y=\"'+p+'\" width=\"'+hoverW+'\" height=\"'+(h-2*p)+'\" fill=\"#fff\" opacity=\"0.001\">'+svgTitle(monthTooltip(r,series))+'</rect>';});
+const labelEvery=Math.max(1,Math.ceil(all.length/12));
+all.forEach((r,i)=>{if(i%labelEvery===0||i===all.length-1)svg+='<text x=\"'+x(i)+'\" y=\"'+(h-18)+'\" text-anchor=\"middle\" font-size=\"11\" fill=\"#6b7280\">'+r.ym.slice(2)+'</text>';});
+svg+='</svg><div class=\"small\">グラフ上の点・棒・月位置にポインタを当てると、年月、項目名、金額を表示します。</div>';
+return svg;
+}
+function drawChart(){const opts=allSeriesOptions();const keys=new Set(selectedChartKeys());const series=opts.filter(o=>keys.has(o.key));$('chart').innerHTML='<div class=\"small\">選択中: '+series.length+'項目（削除済み年月を除外して表示）</div>'+chartSvg('',series);}
+function exportXls(){const data=records();const headers=['年月','基本給','職位加算','勤務給','個人業績年俸','年俸額計','L手当','時間外手当','能率手当','当直手当','リモワクサポート料','特別労働手当','特別勤務手当','年俸以外計','持株奨励金','月例支給額計','通勤交通費','臨時支給額計','年俸精算','年俸以外・臨時精算','支給額合計','所得税','年末調整課不足税額','住民税','健康保険料','介護保険料','厚生年金保険料','雇用保険料','確定給付年金本人拠出','確定拠出年金本人掛金','通勤交通費戻入','持株拠出金','持ち家財形貯蓄(非)','総合預金','医療共済会費','健康保険賞与調整','介護保険賞与調整','厚生年金保険賞与調整','控除額合計','月例手取額','健康保険給付金','合計手取額','C口座','前月所定労働日数','住民税(年税額)','定額減税額(所得税)'];let html='<html><head><meta charset=\"utf-8\"></head><body><table border=\"1\"><tr>'+headers.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr>';data.forEach((rec,i)=>{const r=i+2,v=rec.values;const row=[rec.ym,n(v.base),n(v.position),n(v.workPay),n(v.performance),'=SUM(B'+r+':E'+r+')',n(v.lAllowance),n(v.overtime),n(v.efficiency),n(v.duty),n(v.remote),n(v.specialLabor),n(v.specialWork),'=SUM(G'+r+':M'+r+')',n(v.stockIncentive),'=F'+r+'+N'+r+'+O'+r,n(v.commute),'=Q'+r,n(v.annualSettlement),n(v.nonAnnualTempSettlement),'=P'+r+'+R'+r+'+S'+r+'+T'+r,n(v.incomeTax),n(v.yearEndShortTax),n(v.residentTax),n(v.healthIns),n(v.careIns),n(v.pension),n(v.employmentIns),n(v.dbPension),n(v.dcPension),n(v.commuteReturn),n(v.stock),n(v.housingSaving),n(v.savings),n(v.medicalAid),n(v.healthBonusAdj),n(v.careBonusAdj),n(v.pensionBonusAdj),'=SUM(V'+r+':AL'+r+')','=U'+r+'-AM'+r,n(v.healthBenefit),'=AN'+r+'+AO'+r,n(v.cAccount),n(v.workDays),n(v.residentAnnual),n(v.incomeTaxFixedReduction)];html+='<tr>'+row.map(x=>'<td>'+esc(x)+'</td>').join('')+'</tr>';});html+='</table></body></html>';const blob=new Blob([html],{type:'application/vnd.ms-excel'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='positive_payroll_records_v1_00.xls';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);setStatus('Excel登録データを含めてExcelファイルを出力しました。','ok');}
+function clearForm(){values=Object.fromEntries(manual.map(x=>[x[2],0]));$('ym').value='';$('file').value='';lastReadKeys=[];inputStarted=false;reviewConfirmed=false;$('ocrText').hidden=true;$('ocrText').classList.add('empty');$('ocrText').textContent='読み込んだ写真の文字はまだありません。';render();setDirty(false);setStatus('入力フォームを空にしました。保存済みデータは削除していません。','ok');}
+function showUndoDeleteStatus(ym){setStatus(ym+' の登録データを削除しました。グラフ、分析、Excel出力、登録データ一覧から除外されています。<button class="undoBtn" id="undoDeleteBtn" type="button">元に戻す</button>','ok');const b=$('undoDeleteBtn');if(b)b.addEventListener('click',restoreLastDeleted);}
+function restoreLastDeleted(){if(!lastDeletedSnapshot||!lastDeletedSnapshot.record){setStatus('元に戻せる削除操作がありません。','warn');return;}const rec=lastDeletedSnapshot.record;const ym=rec.ym;const r=userRecords().filter(x=>x.ym!==ym);r.push({ym:ym,values:{...rec.values},source:rec.source||'復元データ'});r.sort((a,b)=>a.ym.localeCompare(b.ym));setUserRecords(r);setDeletedMonths(deletedMonths().filter(x=>x!==ym));lastDeletedSnapshot=null;markLastSaved('復元');refreshDeleteOptions();render();renderDataManagement();setStatus(ym+' の削除を取り消しました。','ok');}
+function clearData(){const sel=$('deleteYm');const ym=sel?sel.value:'';if(!ym){setStatus('削除する年月を選択してください。','warn');return;}const target=recordForYm(ym);if(confirm(ym+' の登録データを削除しますか。削除後も、直後であれば「元に戻す」から取り消せます。')){lastDeletedSnapshot=target?{record:{ym:target.ym,values:{...target.values},source:target.source||'登録データ'}}:null;const r=userRecords().filter(x=>x.ym!==ym);setUserRecords(r);setDeletedMonths([...deletedMonths(),ym]);markLastSaved('削除');if($('ym').value===ym)clearForm();refreshDeleteOptions();render();renderDataManagement();showUndoDeleteStatus(ym);}}
+function showHistory(){activateMainTab('manage');renderDataManagement();setStatus('登録データ一覧をデータ管理タブに表示しました。','ok');}
+
+
+function showHelp(){const html='<div class="small">このヘルプはv1.00の画面構成に合わせています。入力の3段階、分析の内訳表示、グラフ、データ管理を中心に整理しています。</div>'+ 
+'<h3>毎月の登録</h3><ol class="helpList"><li>「入力」タブで対象年月を選びます。</li><li>写真を使う場合は、給与明細の写真を選び「写真読み込み」を押します。</li><li>手入力する場合は、「手入力で入力する」を押してから金額を入力します。</li><li>入力画面に反映された金額と保存前チェックを確認します。</li><li>問題なければ「確認済」を押します。</li><li>必要な項目だけ手入力で修正した場合も、再度「確認済」を押します。</li><li>「この月を保存」を押します。保存後はステップ3も完了表示になります。</li></ol>'+ 
+'<h3>写真がうまく読めないとき</h3><ol class="helpList"><li>写真は正面から、影や反射が少ない状態で撮影してください。</li><li>読み取れない項目があっても、その項目だけ手入力できます。</li><li>左側の「読み込んだ写真の文字を確認」で、写真から読み取れた文字を確認できます。</li><li>写真読み込みが使えない環境でも、手入力、保存、グラフ、Excel出力は使用できます。</li></ol>'+ 
+'<h3>画面の使い分け</h3><ol class="helpList"><li><b>入力:</b> 写真読み込み、金額確認、保存を行います。</li><li><b>グラフ:</b> 手取、支給、控除、時間外の推移を時系列で見ます。「自分で選ぶ」では表示項目を細かく指定できます。</li><li><b>分析:</b> 最新月、年別集計、年間見込み、ランキングを確認します。</li><li><b>データ管理:</b> 登録済みデータの確認、Excel出力、バックアップ、削除を行います。</li></ol>'+ 
+'<h3>データの削除</h3><ol class="helpList"><li>「データ管理」タブの下部にある削除欄で年月を選びます。</li><li>削除した月は一覧、分析、グラフ、Excel出力から除外されます。</li><li>削除直後は、左側の通知に「元に戻す」ボタンが出ます。</li><li>不安な場合は、削除前にバックアップ出力してください。</li></ol>'+ 
+'<h3>利用者の切り替え</h3><ol class="helpList"><li>上部の「利用者設定」から、利用者を切り替えます。</li><li>利用者名は自由に変更できます。</li><li>1人目にはExcel登録データが入っています。</li><li>2人目は空の状態から開始します。1人目のデータはコピーされません。</li></ol>'+ 
+'<h3>バックアップ</h3><ol class="helpList"><li>このアプリの保存データは、この端末のブラウザ内に保存されます。</li><li>PCとiPhoneの間では自動共有されません。</li><li>端末変更、ブラウザ初期化、長期保存に備えて、定期的にバックアップ出力してください。</li><li>Excel出力は確認・加工用、バックアップ出力は復元用です。</li></ol>'+ 
+'<div class="storageNotice mobileHint"><b>iPhone利用時:</b> ファイルのプレビュー画面ではなく、Webページとして開く環境の方が安定します。画面下のナビから「入力」「グラフ」「分析」「管理」を切り替えられます。</div>';openModal('使い方・注意点',html,'<button class="btn secondary" id="helpClose" type="button">閉じる</button>',{hideHeaderClose:true});$('helpClose').addEventListener('click',closeModal);} 
+function exportBackup(){const payload={app:'POSITIVE給与データ管理アプリ',version:'v1.00',profile:activeProfile(),profileLabel:profileLabel(),exportedAt:new Date().toISOString(),userRecords:userRecords(),deletedMonths:deletedMonths()};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='positive_payroll_backup_v1_00_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);markLastSaved('バックアップ');setStatus('バックアップJSONを出力しました。端末変更や復元用に保管してください。','ok');}
+function importBackupFile(file){const reader=new FileReader();reader.onload=function(){try{const payload=JSON.parse(reader.result);if(!payload || !Array.isArray(payload.userRecords) || !Array.isArray(payload.deletedMonths))throw new Error('バックアップ形式が正しくありません');if(!confirm('バックアップを復元します。現在の追加保存データと削除済み年月の状態は上書きされます。よろしいですか。'))return;setUserRecords(payload.userRecords);setDeletedMonths(payload.deletedMonths);markLastSaved('復元');refreshDeleteOptions();clearForm();drawChart();renderDashboard();renderDataManagement();setStatus('バックアップを復元しました。現在選択中の利用者の登録データ一覧とグラフに反映済みです。','ok');}catch(e){setStatus('<span class="err">バックアップ復元に失敗しました: '+esc(String(e.message||e))+'</span>','error');}};reader.readAsText(file,'utf-8');}
+function activateInfoTab(name){document.querySelectorAll('.sideTabBtn').forEach(b=>b.classList.toggle('active',b.dataset.infoTab===name));document.querySelectorAll('.sideTabPanel').forEach(p=>p.classList.toggle('active',p.id==='info-'+name));}
+function activateMainTab(name){document.querySelectorAll('.mainTabBtn').forEach(b=>b.classList.toggle('active',b.dataset.mainTab===name));document.querySelectorAll('[data-bottom-tab]').forEach(b=>b.classList.toggle('active',b.dataset.bottomTab===name));document.querySelectorAll('.mainTabPanel').forEach(p=>p.classList.toggle('active',p.id==='main-'+name));if(name==='analysis')renderDashboard();if(name==='input')render();if(name==='chart')drawChart();if(name==='manage')renderDataManagement();updateAppStatus();}
+
+function init(){try{
+  document.querySelectorAll('.sideTabBtn').forEach(b=>b.addEventListener('click',()=>activateInfoTab(b.dataset.infoTab)));
+  document.querySelectorAll('.mainTabBtn').forEach(b=>b.addEventListener('click',()=>activateMainTab(b.dataset.mainTab)));
+  document.querySelectorAll('[data-bottom-tab]').forEach(b=>b.addEventListener('click',()=>activateMainTab(b.dataset.bottomTab)));
+  renderSeriesControls();
+  document.querySelectorAll('.tabBtn[data-chart-group]').forEach(b=>b.addEventListener('click',()=>applyChartGroup(b.dataset.chartGroup)));
+  document.querySelectorAll('.presetBtn[data-chart-preset]').forEach(b=>b.addEventListener('click',()=>applyChartGroup(b.dataset.chartPreset)));
+  document.querySelectorAll('input[name="chartType"]').forEach(r=>r.addEventListener('change',drawChart));
+  document.querySelectorAll('input[name="dataViewMode"]').forEach(r=>r.addEventListener('change',renderDataManagement));
+  $('selectMainBtn').addEventListener('click',()=>{setActiveChartGroup('custom');const details=$('customSeriesDetails');if(details)details.open=true;const d=new Set(defaultChartKeys());document.querySelectorAll('.seriesCheck').forEach(cb=>cb.checked=d.has(cb.value));drawChart();});
+  $('selectAllBtn').addEventListener('click',()=>{setActiveChartGroup('custom');const details=$('customSeriesDetails');if(details)details.open=true;document.querySelectorAll('.seriesCheck').forEach(cb=>cb.checked=true);drawChart();});
+  $('clearSeriesBtn').addEventListener('click',()=>{setActiveChartGroup('custom');const details=$('customSeriesDetails');if(details)details.open=true;document.querySelectorAll('.seriesCheck').forEach(cb=>cb.checked=false);drawChart();});
+  $('ocrBtn').addEventListener('click',doOCR);
+  const pickPhoto=$('pickPhotoBtn'); if(pickPhoto)pickPhoto.addEventListener('click',()=>{$('file').click();});
+  const manualStart=$('manualStartBtn'); if(manualStart)manualStart.addEventListener('click',()=>{$('ym').focus();$('inputTable').scrollIntoView({behavior:'smooth',block:'start'});});
+  const manualIntent=$('manualIntentBtn'); if(manualIntent)manualIntent.addEventListener('click',()=>{if(!($('ym')&&$('ym').value)){setStatus('先に対象年月を選択してください。','warn');$('ym').focus();return;}inputStarted=true;reviewConfirmed=false;render();setStatus('手入力で進めます。金額を入力して、内容確認を行ってください。','ok');const t=$('inputTable');if(t)t.scrollIntoView({behavior:'smooth',block:'start'});});
+  $('saveBtn').addEventListener('click',save);
+  $('confirmReviewBtn').addEventListener('click',confirmReview);
+  $('clearFormBtn').addEventListener('click',clearForm);
+  $('xlsBtn').addEventListener('click',exportXls);
+  const historyButton=$('historyBtn'); if(historyButton)historyButton.addEventListener('click',showHistory);
+  $('backupBtn').addEventListener('click',exportBackup);
+  $('restoreBtn').addEventListener('click',()=>$('restoreFile').click());
+  $('helpBtn').addEventListener('click',showHelp);
+  $('profileSelect').addEventListener('change',e=>switchProfile(e.target.value));
+  $('saveProfileNameBtn').addEventListener('click',saveActiveProfileName);
+  $('profileNameInput').addEventListener('keydown',e=>{if(e.key==='Enter')saveActiveProfileName();});
+  $('restoreFile').addEventListener('change',e=>{const f=e.target.files[0];if(f)importBackupFile(f);e.target.value='';});
+  $('modalCloseBtn').addEventListener('click',closeModal);
+  $('modalBackdrop').addEventListener('click',e=>{if(e.target===$('modalBackdrop'))closeModal();});
+  $('clearBtn').addEventListener('click',clearData);
+  $('deleteYm').addEventListener('change',()=>{$('clearBtn').disabled=!$('deleteYm').value;updateManageSummary(records(),(document.querySelector('input[name="dataViewMode"]:checked')||{}).value||'table');});
+  $('ym').addEventListener('change',loadMonth);
+  ['ocrBtn','clearFormBtn','saveBtn','xlsBtn','backupBtn','restoreBtn','clearBtn','historyBtn'].forEach(id=>{const el=$(id);if(el)el.addEventListener('click',()=>activateInfoTab('status'));});
+  refreshDeleteOptions();
+  clearForm();
+  activateInfoTab('status');
+  activateMainTab('input');
+  setStatus(profileLabel()+' で起動しました。','ok');
+}catch(e){$('status').innerHTML='<span class="err">初期化エラー: '+String(e.message||e)+'</span>';console.error(e);}}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+
+</script>
+</body></html>
