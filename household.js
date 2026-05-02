@@ -1282,6 +1282,7 @@ function renderMaster() {
   if (byId("masterCards")) byId("masterCards").innerHTML = renderMasterCards(rows);
   byId("masterRows").innerHTML = rows.map(renderMasterRow).join("");
   renderDetailPanel();
+  positionDetailPanel();
 }
 
 function renderMasterCards(rows) {
@@ -1535,6 +1536,19 @@ function renderDetailPanel() {
       <div>${renderAmountHistory(item)}${renderVersionHistory(item)}</div>
     </div>
   `;
+}
+
+function positionDetailPanel() {
+  const panel = byId("detailPanel");
+  if (!panel) return;
+  const layout = document.querySelector(".master-layout");
+  if (!isMobileExpenseLayout()) {
+    layout?.appendChild(panel);
+    return;
+  }
+  if (!selectedId || panel.classList.contains("detail-panel-empty")) return;
+  const selectedCard = [...document.querySelectorAll("#masterCards [data-select-id]")].find((element) => element.dataset.selectId === selectedId);
+  if (selectedCard) selectedCard.insertAdjacentElement("afterend", panel);
 }
 
 function renderAmountHistory(item) {
