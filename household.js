@@ -1743,18 +1743,19 @@ function commitEdit() {
 }
 
 function cancelEdit() {
+  const closeAfterCancel = isMobileExpenseLayout();
   const item = selectedItem();
   if (item?.draftNew) {
     master = master.filter((entry) => entry.id !== item.id);
-    selectedId = master[0]?.id || null;
+    selectedId = closeAfterCancel ? null : master[0]?.id || null;
     saveMaster();
     loadOptions();
   }
   editingId = null;
   editDraft = null;
+  if (closeAfterCancel) selectedId = null;
   renderMaster();
 }
-
 function saveVersion() {
   const item = selectedItem();
   const month = item.updateMonth;

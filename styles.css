@@ -5008,3 +5008,262 @@ th {
     width: 100%;
   }
 }
+
+
+/* Final UI polish: neutral tabs, card rhythm, and mobile income input */
+.tab,
+.subtab,
+.income-tabs .tab,
+.expense-tabs .tab,
+.import-subtabs .subtab,
+.tab-strip button {
+  background: transparent !important;
+}
+
+.tab.active,
+.subtab.active,
+.income-tabs .tab.active,
+.expense-tabs .tab.active,
+.import-subtabs .subtab.active,
+.tab-strip button.active {
+  background: transparent !important;
+  color: var(--accent-strong, #0f513f) !important;
+  box-shadow: inset 0 -3px 0 var(--accent, #1f7a63) !important;
+}
+
+.tab:hover,
+.subtab:hover,
+.tab-strip button:hover {
+  background: rgba(15, 81, 63, 0.04) !important;
+}
+
+.payroll-ym-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.payroll-ym-row input {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.payroll-ym-row button {
+  flex: 0 0 auto;
+}
+
+.payroll-input-placeholder {
+  margin: 14px 0;
+}
+
+.payroll-manage-card,
+.external-mobile-card,
+.expense-category-card,
+.update-candidate-card,
+.candidate-card,
+.expense-analysis-card,
+.expense-data-card {
+  border: 1px solid var(--line, #dfe8e2);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(16, 45, 35, 0.06);
+}
+
+.payroll-manage-card-head,
+.external-mobile-card-head,
+.expense-card-row,
+.candidate-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.payroll-manage-card-head strong,
+.external-mobile-card-head strong,
+.expense-card-title,
+.candidate-card-head strong {
+  color: var(--ink, #17231d);
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.payroll-manage-card-head span,
+.external-mobile-card-amount,
+.expense-card-amount,
+.candidate-card-amount {
+  color: var(--accent-strong, #0f513f);
+  font-size: 18px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.payroll-complete-step {
+  display: none !important;
+}
+
+.payroll-summary-trend-panel,
+.payroll-summary-trend-panel * {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.payroll-mini-chart {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.payroll-mini-chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .payroll-method-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .payroll-method-actions > button,
+  .payroll-method-actions .file-button,
+  .payroll-sub-actions button,
+  .payroll-ym-row button {
+    min-height: 44px;
+    width: 100%;
+  }
+
+  .payroll-ym-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    width: 100%;
+  }
+
+  .payroll-ym-row input {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .income-input-table {
+    overflow: visible !important;
+    max-height: none !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .income-input-table table,
+  .income-input-table thead,
+  .income-input-table tbody,
+  .income-input-table tr,
+  .income-input-table th,
+  .income-input-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .income-input-table thead {
+    display: none;
+  }
+
+  .income-input-table tbody {
+    display: grid;
+    gap: 10px;
+  }
+
+  .income-input-table tr {
+    border: 1px solid var(--line, #dfe8e2);
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 8px 20px rgba(16, 45, 35, 0.06);
+    padding: 12px;
+  }
+
+  .income-input-table tr.section-row {
+    padding: 8px 2px 0;
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+    color: var(--muted, #66756c);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .income-input-table tr.section-row td {
+    padding: 0;
+  }
+
+  .income-input-table td {
+    border: 0 !important;
+    padding: 0 !important;
+  }
+
+  .income-input-table td:nth-child(1) {
+    color: var(--muted, #66756c);
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .income-input-table td:nth-child(2) {
+    color: var(--ink, #17231d);
+    font-size: 15px;
+    font-weight: 800;
+    margin-bottom: 10px;
+  }
+
+  .income-input-table tr.calc td:nth-child(3) {
+    color: var(--accent-strong, #0f513f);
+    font-size: 18px;
+    font-weight: 800;
+    text-align: right;
+  }
+
+  .payroll-input-cell,
+  .payroll-input-cell input {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .payroll-input-cell input {
+    min-height: 44px;
+    font-size: 16px;
+    text-align: right;
+  }
+
+  .payroll-summary-trend-panel {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .payroll-summary-trend-panel summary {
+    gap: 8px;
+  }
+
+  .payroll-input-kpis,
+  .income-kpis {
+    grid-template-columns: 1fr !important;
+  }
+
+  .payroll-mini-chart > div {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .payroll-mini-chart .chart-axis-label {
+    font-size: 10px;
+  }
+
+  #detailPanel.mobile-detail-open {
+    margin-top: 10px;
+  }
+}

@@ -508,7 +508,6 @@ function payrollStepClass(step, { hasYm, method, hasAmount }) {
   if (payrollState.lastSavedFeedback) return step === 1 ? "active" : "done";
   if (payrollState.reviewConfirmed) {
     if (step === 3) return "active confirmed";
-    if (step === 4) return "locked";
     return "done";
   }
   if (step === 1) return hasYm ? "done" : "active";
@@ -520,7 +519,6 @@ function payrollStepClass(step, { hasYm, method, hasAmount }) {
     if (!hasAmount) return "locked";
     return "active";
   }
-  if (step === 4) return payrollState.lastSavedFeedback ? "done" : "locked";
   return "";
 }
 
@@ -564,7 +562,7 @@ function payrollBindShellEvents() {
     payrollState.inputStarted = false;
     payrollState.reviewConfirmed = false;
     payrollState.dirty = false;
-    payrollRenderAll("ユーザーを切り替えました。");
+    payrollRenderAll();
   });
   document.querySelector(".income-tabs")?.addEventListener("click", (event) => {
     const button = event.target.closest("[data-income-tab]");
@@ -582,7 +580,7 @@ function payrollSetStatus(message = "", type = "ok") {
     status.textContent = message;
     status.dataset.type = type;
   }
-  if (typeof showToast === "function") showToast(message, type);
+  if (message && typeof showToast === "function") showToast(message, type);
 }
 
 function payrollInputStateLabel() {
@@ -607,6 +605,7 @@ function payrollRenderInput() {
   const ym = payrollState.registrationYm;
   const hasYm = !!ym;
   const method = payrollState.inputMethod;
+  const showInputItems = hasYm && !!method;
   const hasAmount = Object.values(values).some((value) => payrollNumber(value) !== 0);
   const stepContext = { hasYm, method, hasAmount };
   const previousYm = payrollPreviousYm(ym);
@@ -641,27 +640,30 @@ function payrollRenderInput() {
         <div>
           <b>登録年月</b>
           <p>最初に給与データを登録する年月を決めます。</p>
-          <input id="payrollYm" type="month" value="${esc(ym)}" />
+          <div class="payroll-ym-row">
+            <input id="payrollYm" type="month" value="${esc(ym)}" />
+            <button id="payrollApplyYm" type="button">決定</button>
+          </div>
         </div>
       </section>
       <section class="flow-step ${payrollStepClass(2, stepContext)}">
         <span>2</span>
         <div>
           <b>入力方法</b>
-          <p>写真を選ぶと自動で読み込みます。必要なら前月コピーや手入力で補正します。</p>
+          <p>写真から読み込むか、直接入力します。</p>
           <div class="payroll-method-actions">
             <button class="payroll-primary-action ${method === "photo" ? "selected" : ""}" id="payrollChoosePhoto" type="button" ${hasYm ? "" : "disabled"}>写真から読込</button>
-            <div class="payroll-sub-actions">
+            <button class="${method === "manual" ? "selected" : ""}" id="payrollChooseManual" type="button" ${hasYm ? "" : "disabled"}>直接入力</button>
+            <label class="file-button payroll-file-action ${method === "photo" ? "" : "hidden"}">写真ファイル<input id="payrollPhoto" type="file" accept="image/*" ${method === "photo" ? "" : "disabled"} /></label>
+            <div class="payroll-sub-actions ${method === "manual" ? "" : "hidden"}">
               <button id="payrollCopyPrevious" type="button" ${hasPreviousRecord ? "" : "disabled"}>前月コピー${previousYm ? ` (${esc(previousYm)})` : ""}</button>
-              <button class="${method === "manual" ? "selected" : ""}" id="payrollChooseManual" type="button" ${hasYm ? "" : "disabled"}>手入力</button>
-              <button class="${payrollState.diffMode ? "selected" : ""}" id="payrollToggleDiffMode" type="button" ${hasPreviousRecord ? "" : "disabled"}>${payrollState.diffMode ? "通常入力へ戻す" : "差分入力"}</button>
-              <label class="file-button payroll-file-action ${method === "photo" ? "" : "disabled"}">写真ファイル<input id="payrollPhoto" type="file" accept="image/*" ${method === "photo" ? "" : "disabled"} /></label>
             </div>
           </div>
         </div>
       </section>
     </div>
-    <div class="table-wrap income-input-table">
+    ${showInputItems ? "" : '<div class="empty-state payroll-input-placeholder">入力方法を選ぶと、入力項目が表示されます。</div>'}
+    <div class="table-wrap income-input-table ${showInputItems ? "" : "hidden"}">
       <table>
         <thead><tr><th>分類</th><th>項目</th><th>金額</th></tr></thead>
         <tbody>${inputRows}<tr class="section-row"><td colspan="3">自動計算</td></tr>${calcRows}</tbody>
@@ -686,20 +688,12 @@ function payrollRenderInput() {
         </div>
       </div>
     </section>
-    <section class="flow-step payroll-complete-step ${payrollStepClass(4, stepContext)}">
-      <span>4</span>
-      <div>
-        <b>完了</b>
-        <p>${payrollState.lastSavedFeedback ? "保存が完了しました。次の入力に備えて登録年月から開始できます。" : "保存が完了すると状態が反映されます。"}</p>
-      </div>
-    </section>
   `;
-  byId("payrollYm")?.addEventListener("change", payrollChangeRegistrationMonth);
+  byId("payrollApplyYm")?.addEventListener("click", payrollChangeRegistrationMonth);
   byId("payrollSummaryDetails")?.addEventListener("toggle", (event) => {
     payrollState.inputSummaryOpen = event.target.open;
   });
   byId("payrollCopyPrevious")?.addEventListener("click", payrollCopyPreviousMonth);
-  byId("payrollToggleDiffMode")?.addEventListener("click", payrollToggleDiffMode);
   byId("payrollChoosePhoto")?.addEventListener("click", () => payrollChooseInputMethod("photo", true));
   byId("payrollChooseManual")?.addEventListener("click", () => payrollChooseInputMethod("manual"));
   byId("payrollPhoto")?.addEventListener("change", payrollReadPhoto);
@@ -709,11 +703,11 @@ function payrollRenderInput() {
       return;
     }
     if (!Object.values(payrollState.values).some((value) => payrollNumber(value) !== 0)) {
-      payrollSetStatus("確認できる金額がありません。写真読み込みまたは手入力をしてください。", "warn");
+      payrollSetStatus("確認できる金額がありません。写真読み込みまたは直接入力をしてください。", "warn");
       return;
     }
     payrollState.reviewConfirmed = true;
-    payrollRenderAll("内容を確認済みにしました。");
+    payrollRenderAll();
   });
   byId("payrollSave")?.addEventListener("click", payrollSaveMonth);
   byId("payrollClear")?.addEventListener("click", () => {
@@ -771,7 +765,7 @@ function payrollChooseInputMethod(method, openPhotoPicker = false) {
   if (method === "photo") payrollState.diffMode = false;
   payrollState.reviewConfirmed = false;
   payrollState.lastSavedFeedback = null;
-  payrollRenderAll(method === "photo" ? "写真を選択すると自動で読み込みます。" : "下の表へ金額を入力してください。");
+  payrollRenderAll();
   if (method === "photo" && openPhotoPicker) byId("payrollPhoto")?.click();
 }
 
@@ -805,7 +799,7 @@ function payrollLoadMonth(ym = payrollState.registrationYm) {
   payrollState.dirty = false;
   payrollState.lastSavedFeedback = null;
   payrollState.diffMode = false;
-  payrollRenderAll(record ? `${ym} の登録済みデータを表示しました。必要なら上書きできます。` : "登録年月を選択しました。次に入力方法を選んでください。");
+  payrollRenderAll();
 }
 
 async function payrollReadPhoto() {
@@ -814,7 +808,7 @@ async function payrollReadPhoto() {
     return;
   }
   if (payrollState.inputMethod !== "photo") {
-    payrollSetStatus("入力方法で「写真で登録」を選んでください。", "warn");
+    payrollSetStatus("入力方法で「写真から読込」を選んでください。", "warn");
     return;
   }
   const file = byId("payrollPhoto")?.files?.[0];
@@ -835,7 +829,7 @@ async function payrollReadPhoto() {
     } catch {
       payrollState.inputMethod = "manual";
       payrollRenderAll();
-      payrollSetStatus("写真読み込み機能を読み込めませんでした。手入力で登録してください。", "warn");
+      payrollSetStatus("写真読み込み機能を読み込めませんでした。直接入力で登録してください。", "warn");
       return;
     }
   }
@@ -846,7 +840,7 @@ async function payrollReadPhoto() {
     if (!Object.keys(parsed).length) {
       payrollState.inputMethod = "manual";
       payrollRenderAll();
-      payrollSetStatus("読み取れる給与項目が見つかりませんでした。必要な項目を手入力してください。", "warn");
+      payrollSetStatus("読み取れる給与項目が見つかりませんでした。必要な項目を直接入力してください。", "warn");
       return;
     }
     payrollState.values = { ...payrollState.values, ...parsed };
@@ -1120,7 +1114,7 @@ function payrollSaveMonth() {
   const savedCalc = payrollCalc({ ...payrollBaseValues(), ...payrollState.values });
   const previous = payrollPreviousRecord(ym);
   const rows = payrollUserRecords().filter((record) => record.ym !== ym);
-  rows.push({ ym, values: { ...payrollState.values }, source: "手入力/写真読み込み" });
+  rows.push({ ym, values: { ...payrollState.values }, source: "直接入力/写真読み込み" });
   rows.sort((a, b) => a.ym.localeCompare(b.ym));
   if (!rows.every(payrollValidateRecord)) {
     payrollSetStatus("保存データに不正な値を検知したため、保存を中止しました。", "warn");
@@ -1136,6 +1130,13 @@ function payrollSaveMonth() {
     calc: savedCalc,
     previousNet: previous ? payrollValue(previous, "netTotal") : null,
   };
+  payrollState.registrationYm = "";
+  payrollState.values = payrollBaseValues();
+  payrollState.inputMethod = "";
+  payrollState.inputStarted = false;
+  payrollState.reviewConfirmed = false;
+  payrollState.diffMode = false;
+  payrollState.inputSummaryOpen = false;
   payrollRenderAll(`${ym} を保存しました。`);
   if (typeof notifyLinkGroupCandidates === "function") notifyLinkGroupCandidates("収入管理保存");
 }
@@ -1591,5 +1592,5 @@ function mountIncomeManagement() {
   payrollState.values = payrollBaseValues();
   payrollRenderShell();
   payrollMounted = true;
-  payrollRenderAll("収入管理を表示しました。");
+  payrollRenderAll();
 }
