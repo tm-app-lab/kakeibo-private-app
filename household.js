@@ -1626,6 +1626,9 @@ function selectRow(event) {
   }
   selectedId = id;
   renderMaster();
+  if (isMobileExpenseLayout()) {
+    requestAnimationFrame(() => byId("detailPanel")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  }
 }
 
 function updateDetail(event) {

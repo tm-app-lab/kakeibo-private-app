@@ -23,6 +23,55 @@ function renderRakutenDetailButton(row) {
   return "linked";
 }
 
+function renderExternalActionButtons(row, hasLink = false) {
+  const key = encodeURIComponent(externalKey(row));
+  const linkButton = row.sourceType === "moneyforward"
+    ? `<button class="link-button" type="button" data-mf-link="${key}" ${hasLink ? "" : "disabled"}>紐づけ</button>`
+    : "";
+  const deleteButton = importEditMode
+    ? `<button class="subtle-button danger-button" type="button" data-delete-import="${key}">削除</button>`
+    : "";
+  return `${linkButton}<button class="subtle-button" type="button" data-row-popup="${encodeURIComponent(JSON.stringify(row))}">詳細</button>${deleteButton}`;
+}
+
+function renderMoneyForwardCards(rows) {
+  const target = byId("mfImportedCards");
+  if (!target) return;
+  target.innerHTML = rows.length
+    ? rows.map((row) => {
+        const hasLink = !!findRakutenMatchForMf(row)?.rows?.length;
+        return `
+          <article class="external-mobile-card ${highlightClass(row)}" data-external-key="${encodeURIComponent(externalKey(row))}">
+            <div class="external-card-head"><span>${esc(row.date || "-")}</span><strong class="amount">${yen(numberValue(row.amount))}</strong></div>
+            <strong class="external-card-title">${esc(row.content || "-")}</strong>
+            <dl>
+              <div><dt>分類</dt><dd>${esc(row.major || "-")}${row.middle ? ` / ${esc(row.middle)}` : ""}</dd></div>
+              <div><dt>詳細</dt><dd>${esc(row.institution || "-")}</dd></div>
+              <div><dt>紐づけ状態</dt><dd>${hasLink ? "候補あり" : "候補なし"}</dd></div>
+            </dl>
+            <div class="external-card-actions">${renderExternalActionButtons(row, hasLink)}</div>
+          </article>`;
+      }).join("")
+    : `<div class="external-empty-card">マネーフォワード明細はまだ取り込まれていません。</div>`;
+}
+
+function renderRakutenCards(rows) {
+  const target = byId("rakutenImportedCards");
+  if (!target) return;
+  target.innerHTML = rows.length
+    ? rows.map((row) => `
+        <article class="external-mobile-card ${highlightClass(row)}" data-external-key="${encodeURIComponent(externalKey(row))}">
+          <div class="external-card-head"><span>${esc(row.date || "-")}</span><strong class="amount">${yen(numberValue(row.paymentAmount))}</strong></div>
+          <strong class="external-card-title">${esc(row.content || "-")}</strong>
+          <dl>
+            <div><dt>支払方法</dt><dd>${esc(row.paymentMethod || "-")}</dd></div>
+            <div><dt>詳細</dt><dd>${esc(row.sourceFile || "-")}</dd></div>
+            <div><dt>紐づけ状態</dt><dd>${highlightClass(row) ? "遷移対象" : "-"}</dd></div>
+          </dl>
+          <div class="external-card-actions">${renderExternalActionButtons(row)}</div>
+        </article>`).join("")
+    : `<div class="external-empty-card">楽天カード明細はまだ取り込まれていません。</div>`;
+}
 function renderMoneyForwardRows(rows) {
   const income = rows.filter((row) => Number(String(row.amount || "0").replaceAll(",", "")) > 0).reduce((sum, row) => sum + numberValue(row.amount), 0);
   const payment = rows.filter((row) => Number(String(row.amount || "0").replaceAll(",", "")) < 0).reduce((sum, row) => sum + numberValue(row.amount), 0);
@@ -30,30 +79,20 @@ function renderMoneyForwardRows(rows) {
   byId("mfPaymentTotal").innerHTML = `<small>支払い</small><strong>${yen(payment)}</strong>`;
   byId("mfBalanceTotal").innerHTML = `<small>収支</small><strong>${yen(income - payment)}</strong>`;
   byId("mfImportedRows").innerHTML = rows.length
-    ? rows
-        .map(
-          (row) => {
-            const hasLink = !!findRakutenMatchForMf(row)?.rows?.length;
-            return `
-            <tr class="${highlightClass(row)}" data-external-key="${encodeURIComponent(externalKey(row))}">
-              <td><button class="link-button" type="button" data-mf-link="${encodeURIComponent(externalKey(row))}" ${hasLink ? "" : "disabled"}>紐づけ</button></td>
-              <td>${esc(row.date)}</td>
-              <td>
-                <strong>${esc(row.content)}</strong>
-                <small>${esc(row.institution)}</small>
-              </td>
-              <td class="amount">${yen(numberValue(row.amount))}</td>
-              <td>${esc(row.major)}<br><small>${esc(row.middle)}</small></td>
-              <td>
-                <button class="subtle-button" type="button" data-row-popup="${encodeURIComponent(JSON.stringify(row))}">詳細</button>
-                ${importEditMode ? `<button class="subtle-button danger-button" type="button" data-delete-import="${encodeURIComponent(externalKey(row))}">削除</button>` : ""}
-              </td>
-            </tr>
-          `;
-          },
-        )
-        .join("")
+    ? rows.map((row) => {
+        const hasLink = !!findRakutenMatchForMf(row)?.rows?.length;
+        return `
+          <tr class="${highlightClass(row)}" data-external-key="${encodeURIComponent(externalKey(row))}">
+            <td><button class="link-button" type="button" data-mf-link="${encodeURIComponent(externalKey(row))}" ${hasLink ? "" : "disabled"}>紐づけ</button></td>
+            <td>${esc(row.date)}</td>
+            <td><strong>${esc(row.content)}</strong><small>${esc(row.institution)}</small></td>
+            <td class="amount">${yen(numberValue(row.amount))}</td>
+            <td>${esc(row.major)}<br><small>${esc(row.middle)}</small></td>
+            <td><button class="subtle-button" type="button" data-row-popup="${encodeURIComponent(JSON.stringify(row))}">詳細</button>${importEditMode ? `<button class="subtle-button danger-button" type="button" data-delete-import="${encodeURIComponent(externalKey(row))}">削除</button>` : ""}</td>
+          </tr>`;
+      }).join("")
     : `<tr><td colspan="6">マネーフォワード明細はまだ取り込まれていません。</td></tr>`;
+  renderMoneyForwardCards(rows);
 }
 
 function externalKey(row) {
@@ -84,28 +123,20 @@ function renderRakutenRows(rows) {
   const total = rows.reduce((sum, row) => sum + numberValue(row.paymentAmount), 0);
   byId("rakutenPaymentTotal").innerHTML = `<small>支払い総計</small><strong>${yen(total)}</strong>`;
   byId("rakutenImportedRows").innerHTML = rows.length
-    ? rows
-        .map(
-          (row) => `
-            <tr class="${highlightClass(row)}" data-external-key="${encodeURIComponent(externalKey(row))}">
-              <td>${esc(row.date)}</td>
-              <td><strong>${esc(row.content)}</strong><br><small>${esc(row.sourceFile || "")}</small></td>
-              <td>${esc(row.user)}</td>
-              <td>${esc(row.paymentMethod)}</td>
-              <td class="amount">${yen(numberValue(row.amount))}</td>
-              <td class="amount">${yen(numberValue(row.fee))}</td>
-              <td class="amount">${yen(numberValue(row.total))}</td>
-              <td class="amount">${yen(numberValue(row.paymentAmount))}</td>
-              <td>
-                <button class="subtle-button" type="button" data-row-popup="${encodeURIComponent(JSON.stringify(row))}">詳細</button>
-                ${importEditMode ? `<button class="subtle-button danger-button" type="button" data-delete-import="${encodeURIComponent(externalKey(row))}">削除</button>` : ""}
-              </td>
-            </tr>
-          `,
-        )
-        .join("")
+    ? rows.map((row) => `
+        <tr class="${highlightClass(row)}" data-external-key="${encodeURIComponent(externalKey(row))}">
+          <td>${esc(row.date)}</td>
+          <td><strong>${esc(row.content)}</strong><br><small>${esc(row.sourceFile || "")}</small></td>
+          <td>${esc(row.user)}</td>
+          <td>${esc(row.paymentMethod)}</td>
+          <td class="amount">${yen(numberValue(row.amount))}</td>
+          <td class="amount">${yen(numberValue(row.fee))}</td>
+          <td class="amount">${yen(numberValue(row.total))}</td>
+          <td class="amount">${yen(numberValue(row.paymentAmount))}</td>
+          <td>${renderExternalActionButtons(row)}</td>
+        </tr>`).join("")
     : `<tr><td colspan="9">楽天カード明細はまだ取り込まれていません。</td></tr>`;
-
+  renderRakutenCards(rows);
   byId("rakutenSummary").innerHTML = rows.length
     ? `<div class="candidate-card"><strong>表示中の楽天カード合計</strong><span>${rows.length}件 / ${yen(total)}</span></div>`
     : "";
