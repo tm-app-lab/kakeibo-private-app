@@ -1,0 +1,20 @@
+{
+  "name": "家計管理",
+  "short_name": "家計管理",
+  "description": "収入と支出設計をまとめて確認する個人用家計管理アプリです。",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f6f3",
+  "theme_color": "#17352e",
+  "icons": [
+    {
+      "src": "./app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "orientation": "portrait-primary",
+  "lang": "ja"
+}
