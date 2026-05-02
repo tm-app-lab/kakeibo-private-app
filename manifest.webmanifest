@@ -1,0 +1,26 @@
+{
+  "name": "Kakei Compass",
+  "short_name": "Kakei",
+  "description": "収入・支出・外部データを統合し、家計の現在地と見直し余地を確認する個人用Webアプリです。",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f6f3",
+  "theme_color": "#17352e",
+  "icons": [
+    {
+      "src": "./app-icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./app-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "orientation": "portrait-primary",
+  "lang": "ja"
+}
