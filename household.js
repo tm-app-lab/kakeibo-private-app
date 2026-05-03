@@ -1,6 +1,7 @@
 ﻿// household.js
 
 let maintenanceCandidateCache = null;
+let mobileDetailExplicitlyOpened = false;
 
 function categoryText(item) {
   return String(item?.category || "");
@@ -1357,7 +1358,8 @@ function renderMaster() {
   renderExpensePersonSelect();
   const rows = filteredSortedRows();
   const mobileExpenseLayout = isMobileExpenseLayout();
-  if (!rows.some((item) => item.id === selectedId)) selectedId = mobileExpenseLayout ? null : rows[0]?.id || null;
+  if (mobileExpenseLayout && !mobileDetailExplicitlyOpened) selectedId = null;
+  else if (!rows.some((item) => item.id === selectedId)) selectedId = mobileExpenseLayout ? null : rows[0]?.id || null;
   if (byId("masterCount")) byId("masterCount").textContent = `${rows.length}件表示`;
   renderMaintenanceNotice();
   renderPendingApplyPanel();
@@ -1576,12 +1578,13 @@ function renderDetailPanel() {
   const item = selectedItem();
   if (!item) {
     panel.classList.add("detail-panel-empty");
+    panel.classList.toggle("hidden", isMobileExpenseLayout());
     panel.innerHTML = isMobileExpenseLayout()
-      ? `<p class="detail-mobile-empty">支出項目を選択すると詳細を表示します。</p>`
+      ? ""
       : `<p>支出項目がありません。</p>`;
     return;
   }
-  panel.classList.remove("detail-panel-empty");
+  panel.classList.remove("detail-panel-empty", "hidden");
   selectedId = item.id;
   const editing = editingId === item.id;
   if (editing && !editDraft) editDraft = { ...item, externalAliases: externalAliases(item) };
@@ -1716,6 +1719,7 @@ function closeDetailPanel() {
     editDraft = null;
   }
   selectedId = null;
+  mobileDetailExplicitlyOpened = false;
   renderMaster();
 }
 
@@ -1735,6 +1739,7 @@ function selectRow(event) {
     editDraft = null;
   }
   selectedId = id;
+  if (isMobileExpenseLayout()) mobileDetailExplicitlyOpened = true;
   renderMaster();
   if (isMobileExpenseLayout()) {
     requestAnimationFrame(() => byId("detailPanel")?.scrollIntoView({ block: "nearest" }));
@@ -1967,6 +1972,7 @@ function addMasterItem() {
   };
   master.unshift(item);
   selectedId = id;
+  if (isMobileExpenseLayout()) mobileDetailExplicitlyOpened = true;
   editingId = id;
   editDraft = { ...item, externalAliases: [] };
   saveMaster();
@@ -2017,6 +2023,7 @@ function bindHouseholdEvents() {
   byId("expensePersonSelect").addEventListener("change", (event) => {
     selectedExpensePerson = event.target.value || "all";
     selectedId = null;
+    mobileDetailExplicitlyOpened = false;
     editingId = null;
     editDraft = null;
     renderMaster();
