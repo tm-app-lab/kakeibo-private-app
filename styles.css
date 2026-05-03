@@ -5509,3 +5509,39 @@ th {
     -webkit-tap-highlight-color: transparent;
   }
 }
+
+
+/* Payroll month picker containment */
+.flow-step > div,
+.payroll-ym-row {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.payroll-ym-row {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.payroll-ym-row input[type="month"],
+.payroll-ym-row button {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.payroll-ym-row input[type="month"] {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .payroll-ym-row {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .payroll-ym-row input[type="month"],
+  .payroll-ym-row button {
+    width: 100% !important;
+  }
+}
