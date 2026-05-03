@@ -264,6 +264,12 @@ function renderImport() {
   const current = byId("importMonthSelect").value;
   const selected = months.includes(current) ? current : months[0] || "";
   byId("importSummary").textContent = importedRows.length ? `${importedRows.length}件 / ${months.length}か月` : "未取り込み";
+  const externalNotice = byId("externalCandidateNotice");
+  if (externalNotice) {
+    const count = typeof pendingMaintenanceCandidates === "function" ? pendingMaintenanceCandidates().filter((candidate) => ["moneyforward", "rakuten", "link-external"].includes(candidate.source)).length : 0;
+    externalNotice.classList.toggle("hidden", !count);
+    externalNotice.innerHTML = count ? `<span>外部データ由来の更新確認 ${count}件</span><button type="button" data-open-maintenance>入力で確認</button>` : "";
+  }
   byId("importMonthSelect").innerHTML = months.length
     ? months.map((month) => `<option value="${esc(month)}" ${month === selected ? "selected" : ""}>${esc(month)}</option>`).join("")
     : '<option value="">データなし</option>';
@@ -302,6 +308,8 @@ function bindImportEvents() {
     if (deleteButton) deleteImportedRow(decodeURIComponent(deleteButton.dataset.deleteImport));
     const popup = event.target.closest("[data-row-popup]");
     if (popup) showRowPopup(popup.dataset.rowPopup);
+    const openMaintenance = event.target.closest("[data-open-maintenance]");
+    if (openMaintenance) switchTabTo("master");
   });
   byId("externalCsvInput").addEventListener("change", handleExternalImport);
   byId("importMonthSelect").addEventListener("change", renderImport);

@@ -188,7 +188,7 @@ function renderExpenseSummary() {
     ["固定費率", percent(metrics.fixedRatio), "固定費を世帯収入で割った割合です。"],
     ["貯蓄率", percent(metrics.savingRatio), "貯蓄・投資合計を世帯収入で割った割合です。"],
     ["住宅費率", percent(metrics.housingRatio), "住宅費を世帯収入で割った割合です。"],
-    ["更新候補", `${metrics.pendingCount}件`, "外部データなどから反映候補として確認できる件数です。"],
+    ["更新確認", `${metrics.pendingCount}件`, "外部データなどから確認できるメンテナンス通知の件数です。"],
     ["要確認項目", `${metrics.attentionCount}件`, "金額未設定、高額項目の情報不足、編集中など確認したい項目です。"],
   ]
     .map(([label, value, help]) => `<div class="summary-card expense-summary-card" title="${esc(help)}" tabindex="0"><span>${esc(label)}<em class="kpi-info" title="${esc(help)}">i</em></span><strong>${esc(value)}</strong></div>`)
@@ -208,7 +208,7 @@ function renderExpenseSummary() {
     </section>
     <div class="expense-summary-actions">
       <button type="button" data-summary-tab="master">入力を見る</button>
-      <button type="button" data-summary-tab="candidates">更新候補を見る</button>
+      <button type="button" data-summary-tab="master">入力で確認</button>
       <button type="button" data-summary-tab="import">外部データを見る</button>
     </div>
   `;
@@ -250,6 +250,52 @@ function notifyLinkGroupCandidates(context = "") {
   const count = buildLinkGroupCandidates().filter((candidate) => candidateDisplayStatus(candidate) === "pending").length;
   if (!count || typeof showToast !== "function") return;
   showToast(`紐づけ済みの支出項目に更新候補があります。${context ? `（${context}）` : ""}`, "warn");
+}
+
+
+function activeMaintenanceCandidates() {
+  return buildUpdateCandidates().filter((candidate) => ["pending", "hold"].includes(candidateDisplayStatus(candidate)) && candidateTargetItem(candidate));
+}
+
+function itemMaintenanceCandidates(item) {
+  if (!item) return [];
+  return activeMaintenanceCandidates().filter((candidate) => candidateTargetItem(candidate)?.id === item.id);
+}
+
+function pendingMaintenanceCandidates() {
+  return buildUpdateCandidates().filter((candidate) => candidateDisplayStatus(candidate) === "pending" && candidateTargetItem(candidate));
+}
+
+function renderMaintenanceNotice() {
+  const notice = byId("masterCandidateNotice");
+  if (!notice) return;
+  const count = pendingMaintenanceCandidates().length;
+  notice.classList.toggle("hidden", !count);
+  notice.innerHTML = count ? '<span>更新確認が必要な項目 ' + count + '件</span><small>各カードの「更新候補あり」から確認できます。</small>' : "";
+}
+
+function renderDetailMaintenanceCandidates(item) {
+  const candidates = itemMaintenanceCandidates(item);
+  if (!candidates.length) return "";
+  return '<section class="detail-maintenance-box"><div class="detail-maintenance-head"><strong>支出項目メンテナンス通知</strong><span>' + candidates.length + '件</span></div>' +
+    candidates.map((candidate) => {
+      const status = candidateDisplayStatus(candidate);
+      const canApply = status !== "reflected" && Number.isFinite(Number(candidate.latest));
+      return '<article class="detail-candidate-card">' +
+        '<div class="detail-candidate-title"><span class="mini-badge attention">' + esc(candidateSourceLabel(candidate.source)) + '</span><strong>' + esc(candidate.ym || "対象月なし") + '</strong><small>' + esc(candidateStatusLabel(status)) + '</small></div>' +
+        '<div class="detail-candidate-grid">' +
+          '<div><span>現在額</span><b>' + yen(candidate.current) + '</b></div>' +
+          '<div><span>候補額</span><b>' + yen(candidate.latest) + '</b></div>' +
+          '<div><span>差額</span><b>' + (candidate.diff > 0 ? "+" : "") + yen(candidate.diff) + '</b></div>' +
+          '<div><span>データ元</span><b>' + esc(candidateSourceLabel(candidate.source)) + '</b></div>' +
+        '</div>' +
+        '<details class="candidate-evidence compact"><summary>根拠</summary><p>' + esc(candidateEvidenceText(candidate) || "根拠情報なし") + '</p></details>' +
+        '<div class="candidate-actions compact">' +
+          '<button type="button" data-candidate-action="amount" data-candidate-apply="' + encodeURIComponent(candidate.id) + '" ' + (canApply ? "" : "disabled") + '>反映</button>' +
+          '<button type="button" data-candidate-status="' + encodeURIComponent(candidate.id) + '" data-status-value="hold">保留</button>' +
+          '<button type="button" data-candidate-status="' + encodeURIComponent(candidate.id) + '" data-status-value="ignored">無視</button>' +
+        '</div></article>';
+    }).join("") + '</section>';
 }
 
 function candidateStatusLabel(status) {
@@ -731,12 +777,27 @@ function updateCandidateFilters(event) {
   renderUpdateCandidates();
 }
 
+function handleCandidateActionClick(event) {
+  const apply = event.target.closest("[data-candidate-apply]");
+  if (apply) {
+    openCandidateApplyModal(decodeURIComponent(apply.dataset.candidateApply), apply.dataset.candidateAction || "amount");
+    return true;
+  }
+  const button = event.target.closest("[data-candidate-status]");
+  if (button) {
+    updateCandidateStatus(decodeURIComponent(button.dataset.candidateStatus), button.dataset.statusValue);
+    return true;
+  }
+  return false;
+}
+
 function updateCandidateStatus(id, status) {
   const labels = { hold: "保留", ignored: "無視" };
   if ((status === "hold" || status === "ignored") && !window.confirm(`この更新候補を「${labels[status]}」にしますか？`)) return;
   candidateStatus[id] = { status, at: new Date().toISOString() };
   saveCandidateStatus();
-  renderUpdateCandidates();
+  renderMaster();
+  renderExpenseAnalysis();
   renderExpenseSummary();
 }
 
@@ -900,7 +961,7 @@ function applyPendingUpdateCandidate() {
   saveCandidateStatus();
   closeCandidateApplyModal();
   renderMaster();
-  renderUpdateCandidates();
+  renderExpenseAnalysis();
   renderHeader();
   if (typeof showToast === "function") {
     const message = shouldUpdateAmount
@@ -1063,7 +1124,7 @@ function renderExpenseAnalysis() {
       <section class="analysis-card analysis-card-wide">
         <div class="analysis-card-head">
           <h4>見直し候補 Top5</h4>
-          <button type="button" data-analysis-tab="candidates">更新候補を見る</button>
+          <button type="button" data-analysis-tab="master">入力で確認</button>
         </div>
         <div class="review-top-list">
           ${
@@ -1073,7 +1134,7 @@ function renderExpenseAnalysis() {
                     (row, index) => `
                       <div class="review-top-item">
                         <strong>${index + 1}. ${esc(row.item.name || "名称未設定")}</strong>
-                        <span>${yen(row.item.monthlyAmount)} / ${esc(row.reasons.join("・"))}</span>
+                        <span>${yen(row.item.monthlyAmount)} / ${esc([...row.reasons, ...itemMaintenanceCandidates(row.item).map(() => "更新候補あり")].join("・"))}</span>
                         <button type="button" data-analysis-item="${encodeURIComponent(row.item.id)}">支出設計で確認</button>
                       </div>
                     `,
@@ -1274,6 +1335,7 @@ function renderMaster() {
   const mobileExpenseLayout = isMobileExpenseLayout();
   if (!rows.some((item) => item.id === selectedId)) selectedId = mobileExpenseLayout ? null : rows[0]?.id || null;
   if (byId("masterCount")) byId("masterCount").textContent = `${rows.length}件表示`;
+  renderMaintenanceNotice();
   renderPendingApplyPanel();
   renderColumnFilters();
   parkDetailPanelBeforeMasterRender();
@@ -1324,6 +1386,7 @@ function renderMasterCardItem(item) {
   const aliasFlag = externalAliases(item).length ? '<span class="mini-badge">外部別名</span>' : "";
   const essentialFlag = `<span class="mini-badge ${item.essential ? "essential" : "optional"}">${item.essential ? "必須" : "任意"}</span>`;
   const reducibleFlag = `<span class="mini-badge ${item.reducible ? "reducible" : "hard-reduce"}">${item.reducible ? "見直し可" : "削減困難"}</span>`;
+  const candidateFlag = itemMaintenanceCandidates(item).length ? '<span class="mini-badge attention">更新候補あり</span>' : "";
   return `
     <button class="expense-card-row ${selected}" type="button" data-select-id="${esc(item.id)}">
       <span>
@@ -1332,7 +1395,7 @@ function renderMasterCardItem(item) {
       </span>
       <span class="expense-card-meta">
         ${costText(item)}
-        ${essentialFlag}${reducibleFlag}
+        ${candidateFlag}${essentialFlag}${reducibleFlag}
         ${incomeFlag}${aliasFlag}
       </span>
     </button>
@@ -1374,10 +1437,11 @@ function renderMasterRow(item) {
   const aliasFlag = externalAliases(item).length ? '<span class="alias-flag" title="外部データ別名あり">外</span>' : "";
   const incomeFlag = incomeLinks(item).length ? '<span class="alias-flag income-link-flag" title="収入管理と紐づいています">収入連携済み</span>' : "";
   const judgmentFlags = `<span class="mini-badge ${item.essential ? "essential" : "optional"}">${item.essential ? "必須" : "任意"}</span><span class="mini-badge ${item.reducible ? "reducible" : "hard-reduce"}">${item.reducible ? "見直し可" : "削減困難"}</span>`;
+  const candidateFlag = itemMaintenanceCandidates(item).length ? '<span class="alias-flag candidate-flag" title="更新候補あり">更新候補あり</span>' : "";
   return `
     <tr class="${selected} ${pending || reflected}" data-row-id="${esc(item.id)}">
       <td>${statusPill(rowStatus(item))}</td>
-      <td><strong>${esc(item.name || "名称未設定")}</strong>${aliasFlag}${incomeFlag}<span class="row-badges">${judgmentFlags}</span></td>
+      <td><strong>${esc(item.name || "名称未設定")}</strong>${candidateFlag}${aliasFlag}${incomeFlag}<span class="row-badges">${judgmentFlags}</span></td>
       <td>${esc(item.category)}</td>
       <td>${displayValue("nature", item.nature)}</td>
       <td class="amount">${costText(item)}</td>
@@ -1524,6 +1588,7 @@ function renderDetailPanel() {
       ${renderAliasPicker(view, editing)}
       <label class="wide">メモ<textarea data-detail-field="note" ${disabled}>${esc(view.note)}</textarea></label>
     </div>
+    ${editing ? "" : renderDetailMaintenanceCandidates(item)}
     <div class="detail-actions">
       ${
         editing
@@ -1906,6 +1971,7 @@ function bindHouseholdEvents() {
     if (event.target.id === "deleteItem") deleteSelectedItem();
     if (event.target.id === "saveVersion") saveVersion();
     if (event.target.id === "toggleHistory") byId("historyPanel")?.classList.toggle("hidden");
+    if (handleCandidateActionClick(event)) return;
     const addAlias = event.target.closest("[data-add-alias]");
     if (addAlias) addExternalAlias(decodeURIComponent(addAlias.dataset.addAlias));
     const removeAlias = event.target.closest("[data-remove-alias]");
@@ -1954,17 +2020,8 @@ function bindHouseholdEvents() {
     loadOptions();
     rerender();
   });
-  byId("panel-candidates").addEventListener("change", updateCandidateFilters);
-  byId("panel-candidates").addEventListener("click", (event) => {
-    const apply = event.target.closest("[data-candidate-apply]");
-    if (apply) {
-      openCandidateApplyModal(decodeURIComponent(apply.dataset.candidateApply), apply.dataset.candidateAction || "amount");
-      return;
-    }
-    const button = event.target.closest("[data-candidate-status]");
-    if (!button) return;
-    updateCandidateStatus(decodeURIComponent(button.dataset.candidateStatus), button.dataset.statusValue);
-  });
+  byId("panel-candidates")?.addEventListener("change", updateCandidateFilters);
+  byId("panel-candidates")?.addEventListener("click", handleCandidateActionClick);
   byId("panel-expense-analysis").addEventListener("click", (event) => {
     const item = event.target.closest("[data-analysis-item]");
     if (item) {

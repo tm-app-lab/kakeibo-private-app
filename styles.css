@@ -5267,3 +5267,129 @@ th {
     margin-top: 10px;
   }
 }
+
+
+/* Expense maintenance candidates integrated into input/detail */
+.maintenance-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 10px 0 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(180, 120, 20, 0.22);
+  border-radius: 12px;
+  background: rgba(255, 248, 235, 0.72);
+  color: #5f4516;
+  font-size: 13px;
+}
+
+.maintenance-notice span {
+  font-weight: 800;
+}
+
+.maintenance-notice small {
+  color: #7c6a42;
+}
+
+.maintenance-notice.compact {
+  margin: 0;
+  flex: 1 1 220px;
+}
+
+.maintenance-notice button {
+  min-height: 34px;
+  padding: 6px 10px;
+}
+
+.detail-maintenance-box {
+  margin: 14px 0;
+  padding: 12px;
+  border: 1px solid rgba(180, 120, 20, 0.22);
+  border-radius: 12px;
+  background: rgba(255, 248, 235, 0.6);
+}
+
+.detail-maintenance-head,
+.detail-candidate-title,
+.detail-candidate-grid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.detail-maintenance-head {
+  margin-bottom: 10px;
+}
+
+.detail-candidate-card {
+  padding: 10px;
+  border: 1px solid var(--line, #dfe8e2);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.detail-candidate-card + .detail-candidate-card {
+  margin-top: 10px;
+}
+
+.detail-candidate-title {
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.detail-candidate-title small {
+  color: var(--muted, #66756c);
+}
+
+.detail-candidate-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.detail-candidate-grid div span {
+  display: block;
+  color: var(--muted, #66756c);
+  font-size: 11px;
+}
+
+.detail-candidate-grid div b {
+  display: block;
+  font-size: 14px;
+}
+
+.candidate-actions.compact {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.candidate-actions.compact button {
+  min-height: 34px;
+  padding: 6px 10px;
+}
+
+.candidate-flag {
+  border-color: rgba(180, 120, 20, 0.35);
+  color: #7a4d05;
+}
+
+@media (max-width: 768px) {
+  .maintenance-notice,
+  .maintenance-notice.compact {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .detail-candidate-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .candidate-actions.compact button {
+    flex: 1 1 30%;
+    min-height: 44px;
+  }
+}

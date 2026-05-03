@@ -86,7 +86,6 @@ function renderExpenseVisible() {
   const tab = activeExpenseTab();
   if (tab === "summary") renderExpenseSummary();
   if (tab === "master") renderMaster();
-  if (tab === "candidates") renderUpdateCandidates();
   if (tab === "import") renderImport();
   if (tab === "expense-analysis") renderExpenseAnalysis();
   if (tab === "expense-data") renderExpenseData();
@@ -628,6 +627,7 @@ function switchTab(event) {
 }
 
 function switchTabTo(target) {
+  if (target === "candidates") target = "master";
   document.querySelectorAll(".tab").forEach((tab) => {
     const active = tab.dataset.tab === target;
     tab.classList.toggle("active", active);
@@ -636,7 +636,6 @@ function switchTabTo(target) {
   document.querySelectorAll(".tab-panel").forEach((panel) => panel.classList.toggle("active", panel.id === `panel-${target}`));
   if (target === "summary" && typeof renderExpenseSummary === "function") renderExpenseSummary();
   if (target === "master" && typeof renderMaster === "function") renderMaster();
-  if (target === "candidates" && typeof renderUpdateCandidates === "function") renderUpdateCandidates();
   if (target === "import" && typeof renderImport === "function") renderImport();
   if (target === "expense-analysis" && typeof renderExpenseAnalysis === "function") renderExpenseAnalysis();
   if (target === "expense-data" && typeof renderExpenseData === "function") renderExpenseData();

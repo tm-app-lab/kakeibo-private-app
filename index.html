@@ -4,12 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kakei Compass</title>
-    <link rel="stylesheet" href="styles.css?v=20260503-income-mobile-flow" />
-    <link rel="manifest" href="manifest.webmanifest?v=20260503-income-mobile-flow" />
+    <link rel="stylesheet" href="styles.css?v=20260503-candidate-integrated" />
+    <link rel="manifest" href="manifest.webmanifest?v=20260503-candidate-integrated" />
     <meta name="theme-color" content="#17352e" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Kakei Compass" />
-    <link rel="apple-touch-icon" href="app-icon.png?v=20260503-income-mobile-flow" />
+    <link rel="apple-touch-icon" href="app-icon.png?v=20260503-candidate-integrated" />
   </head>
   <body class="auth-locked">
     <section id="authScreen" class="auth-screen" aria-labelledby="authTitle">
@@ -62,13 +62,12 @@
           <div class="income-topbar">
             <div>
               <h3>支出管理</h3>
-              <p>支出項目の入力、更新候補、外部データ、分析、データ管理をまとめて扱います。</p>
+              <p>支出項目の入力、外部データ、分析、データ管理をまとめて扱います。</p>
             </div>
           </div>
 
         <div class="tab-strip expense-view hidden" role="tablist" aria-label="支出管理の表示切替">
           <button class="tab active" id="tab-master" type="button" role="tab" aria-selected="true" data-tab="master">入力</button>
-          <button class="tab" id="tab-candidates" type="button" role="tab" aria-selected="false" data-tab="candidates">更新候補</button>
           <button class="tab" id="tab-import" type="button" role="tab" aria-selected="false" data-tab="import">外部データ</button>
           <button class="tab" id="tab-expense-analysis" type="button" role="tab" aria-selected="false" data-tab="expense-analysis">分析</button>
           <button class="tab" id="tab-expense-data" type="button" role="tab" aria-selected="false" data-tab="expense-data">データ管理</button>
@@ -94,6 +93,7 @@
                 <button type="button" data-master-view="list" aria-label="リスト表示" title="リスト表示"><span class="view-icon view-icon-list" aria-hidden="true"></span></button>
               </div>
             </div>
+            <div id="masterCandidateNotice" class="maintenance-notice hidden"></div>
             <p class="status-help">状態: 通常=閲覧中の項目、編集中=右側の詳細カードで変更中の項目。</p>
             <div class="master-layout">
               <section class="master-cards" id="masterCards"></section>
@@ -122,11 +122,7 @@
             </div>
           </article>
         </section>
-
-        <section class="tab-panel expense-view hidden" id="panel-candidates" role="tabpanel" aria-labelledby="tab-candidates">
-        </section>
-
-        <section class="tab-panel expense-view hidden" id="panel-import" role="tabpanel" aria-labelledby="tab-import">
+<section class="tab-panel expense-view hidden" id="panel-import" role="tabpanel" aria-labelledby="tab-import">
           <article class="panel">
             <div class="toolbar external-toolbar">
               <label class="file-button">
@@ -148,6 +144,7 @@
                 <button id="bulkDeleteImportedRows" class="danger-button hidden" type="button">一括削除</button>
               </div>
               <span id="importSummary" class="muted-text">未取り込み</span>
+              <div id="externalCandidateNotice" class="maintenance-notice compact hidden"></div>
             </div>
             <div id="externalMfPanel">
               <div class="external-heading">
@@ -310,16 +307,16 @@
         <div id="helpContent" class="help-content"></div>
       </div>
     </div>
-    <script src="data/household-data.js?v=20260503-income-mobile-flow"></script>
-    <script src="data/payroll-data.js?v=20260503-income-mobile-flow"></script>
-    <script src="storage.js?v=20260503-income-mobile-flow"></script>
-    <script src="ui.js?v=20260503-income-mobile-flow"></script>
-    <script src="household.js?v=20260503-income-mobile-flow"></script>
-    <script src="import-utils.js?v=20260503-income-mobile-flow"></script>
-    <script src="import.js?v=20260503-income-mobile-flow"></script>
-    <script src="payroll.js?v=20260503-income-mobile-flow"></script>
-    <script src="auth.js?v=20260503-income-mobile-flow"></script>
-    <script src="app.js?v=20260503-income-mobile-flow"></script>
+    <script src="data/household-data.js?v=20260503-candidate-integrated"></script>
+    <script src="data/payroll-data.js?v=20260503-candidate-integrated"></script>
+    <script src="storage.js?v=20260503-candidate-integrated"></script>
+    <script src="ui.js?v=20260503-candidate-integrated"></script>
+    <script src="household.js?v=20260503-candidate-integrated"></script>
+    <script src="import-utils.js?v=20260503-candidate-integrated"></script>
+    <script src="import.js?v=20260503-candidate-integrated"></script>
+    <script src="payroll.js?v=20260503-candidate-integrated"></script>
+    <script src="auth.js?v=20260503-candidate-integrated"></script>
+    <script src="app.js?v=20260503-candidate-integrated"></script>
   </body>
 </html>
 
