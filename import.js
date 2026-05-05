@@ -2,7 +2,7 @@
 
 function rakutenRowsForPayment(month, amount) {
   const rows = importedRows.filter((row) => row.sourceType === "rakuten" && row.month === month);
-  const total = rows.reduce((sum, row) => sum + numberValue(row.paymentAmount), 0);
+  const total = rows.reduce((sum, row) => sum + numberValue(row.paymentAmount || row.amount), 0);
   return total === numberValue(amount) ? rows : [];
 }
 
@@ -61,7 +61,7 @@ function renderRakutenCards(rows) {
   target.innerHTML = rows.length
     ? rows.map((row) => `
         <article class="external-mobile-card ${highlightClass(row)}" data-external-key="${encodeURIComponent(externalKey(row))}">
-          <div class="external-card-head"><span>${esc(row.date || "-")}</span><strong class="amount">${yen(numberValue(row.paymentAmount))}</strong></div>
+          <div class="external-card-head"><span>${esc(row.date || "-")}</span><strong class="amount">${yen(numberValue(row.paymentAmount || row.amount))}</strong></div>
           <strong class="external-card-title">${esc(row.content || "-")}</strong>
           <dl>
             <div><dt>支払方法</dt><dd>${esc(row.paymentMethod || "-")}</dd></div>
@@ -254,6 +254,7 @@ async function handleExternalImport(event) {
   for (const file of files) imported.push(...(await decodeCsvFile(file)));
   importedRows = mergeImportedRows(importedRows, imported);
   saveImportedRows();
+  if (imported.some((row) => row.sourceType === "rakuten") && typeof switchExternalTab === "function") switchExternalTab("rakuten");
   renderImport();
   if (typeof notifyLinkGroupCandidates === "function") notifyLinkGroupCandidates("外部データ取り込み");
   event.target.value = "";

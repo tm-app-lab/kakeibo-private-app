@@ -87,8 +87,6 @@ function renderExpenseVisible() {
   if (tab === "summary") renderExpenseSummary();
   if (tab === "master") renderMaster();
   if (tab === "import") renderImport();
-  if (tab === "expense-analysis") renderExpenseAnalysis();
-  if (tab === "expense-data") renderExpenseData();
 }
 
 function renderHeader() {
@@ -212,7 +210,7 @@ function renderHelp() {
           <div><h5>できること</h5><ul><li>当月収支と健全性を確認できます。</li><li>支出項目の最新化候補を確認できます。</li><li>収入天引き、支出項目、外部明細を紐づけて判断できます。</li></ul></div>
         </div>
         <h5>操作手順</h5>
-        <ol><li>左メニューの当月収支で全体感を確認します。</li><li>収入管理で給与データを登録します。</li><li>支出管理で支出設計を整えます。</li><li>外部データを取り込み、更新候補を確認します。</li></ol>
+        <ol><li>左メニューの当月収支で全体感を確認します。</li><li>収入管理の月収登録で給与データを登録します。</li><li>支出管理で支出設計を整えます。</li><li>外部データを取り込み、入力画面の更新候補表示を確認します。</li></ol>
         <div class="help-note"><strong>注意点</strong><span>外部データは補完・確認用です。取り込んだだけで支出項目を自動上書きすることはありません。</span></div>
         <p class="help-miss"><strong>よくあるミス：</strong>家計簿のように毎月すべての明細を分類しようとすること。目的は「支出設計の判断」です。</p>
       </section>
@@ -221,7 +219,7 @@ function renderHelp() {
         <h4>2. 全体の使い方（全体フロー）</h4>
         <h5>目的</h5><p>毎月の作業を短くし、判断に必要な情報だけを更新します。</p>
         <h5>できること</h5><ul><li>収入、支出、外部データ、更新候補を順番に確認できます。</li><li>迷った場合は左メニューのヘルプからいつでも戻れます。</li></ul>
-        <h5>操作手順</h5><ol><li>収入管理で対象月の給与を保存します。</li><li>外部データでMoneyForwardまたは楽天カードCSVを取り込みます。</li><li>支出管理の更新候補で差額を確認します。</li><li>必要な候補だけ確認モーダルから反映します。</li><li>サマリーと分析で支出設計の健全性を確認します。</li></ol>
+        <h5>操作手順</h5><ol><li>収入管理で対象月の給与を保存します。</li><li>外部データでMoneyForwardまたは楽天カードCSVを取り込みます。</li><li>支出管理の入力画面で更新候補バッジと差額を確認します。</li><li>必要な候補だけ確認モーダルから反映します。</li><li>サマリーと分析で支出設計の健全性を確認します。</li></ol>
         <div class="help-note"><strong>注意点</strong><span>「反映する」「復元」「初期値へ戻す」など、データに影響する操作は内容を確認してから実行してください。</span></div>
         <p class="help-miss"><strong>よくあるミス：</strong>CSVを取り込んだだけで支出項目が更新されたと思い込むこと。更新は必ず候補確認後です。</p>
       </section>
@@ -238,9 +236,9 @@ function renderHelp() {
       <section id="help-income" class="help-section">
         <h4>4. 収入管理</h4>
         <h5>目的</h5><p>毎月の給与データを短時間で登録し、手取り・控除・前月差を確認します。</p>
-        <h5>できること</h5><ul><li>写真から読込、前月コピー、手入力、差分入力を使えます。</li><li>入力中にKPIとサマリーが更新されます。</li><li>確認済にしてから保存できます。</li><li>分析とデータ管理で過去データを確認できます。</li></ul>
-        <h5>操作手順</h5><ol><li>収入管理を開き、右上でユーザーを選びます。</li><li>入力タブで登録年月を選びます。</li><li>写真から読込、前月コピー、手入力、差分入力のいずれかで入力します。</li><li>金額を確認し、確認済を押します。</li><li>保存します。保存後に登録完了と前月比が表示されます。</li></ol>
-        <div class="help-keywords"><span>前月コピー</span><span>写真読み込み</span><span>差分入力</span><span>サマリー</span></div>
+        <h5>できること</h5><ul><li>写真から読込、直接入力、前月コピーを使えます。</li><li>入力中にKPIとサマリーが更新されます。</li><li>確認済にしてから保存できます。</li><li>データ管理で過去データを確認できます。分析は左メニューの分析に統合しています。</li></ul>
+        <h5>操作手順</h5><ol><li>収入管理を開き、右上でユーザーを選びます。</li><li>月収登録で登録年月を選びます。</li><li>写真から読込または直接入力で入力します。直接入力では前月コピーも使えます。</li><li>金額を確認し、確認済を押します。</li><li>保存します。保存後に登録完了と前月比が表示されます。</li></ol>
+        <div class="help-keywords"><span>前月コピー</span><span>写真読み込み</span><span>直接入力</span><span>サマリー</span></div>
         <div class="help-note"><strong>注意点</strong><span>写真を選択すると自動で読込を開始します。読込できない場合でも手入力と保存は使えます。</span></div>
         <p class="help-miss"><strong>よくあるミス：</strong>登録年月を変更した後、入力内容を確認せず保存すること。保存前にKPIと明細を見てください。</p>
       </section>
@@ -248,7 +246,7 @@ function renderHelp() {
       <section id="help-expense" class="help-section">
         <h4>5. 支出管理</h4>
         <h5>目的</h5><p>支出項目を網羅し、世帯収入に対して無理のない支出設計かを判断します。</p>
-        <h5>できること</h5><ul><li>入力タブでカード表示とリスト表示を切り替えられます。</li><li>支払者を「すべて」または個別に切り替えられます。</li><li>支出種別、固定/変動、必須/任意、削減可能かを設定できます。</li><li>毎月、毎年、隔月、半年の支払い時期に対応します。</li></ul>
+        <h5>できること</h5><ul><li>入力タブでカード表示を中心に支出項目を確認できます。</li><li>支払者を「すべて」または個別に切り替えられます。</li><li>支出種別、固定/変動、必須/任意、削減可能かを設定できます。</li><li>毎月、毎年、隔月、半年の支払い時期に対応します。</li></ul>
         <h5>操作手順</h5><ol><li>支出管理の入力タブを開きます。</li><li>支払者を選びます。全体を見る場合は「すべて」を選びます。</li><li>カードまたはリストから項目を選びます。</li><li>詳細カードで編集を押し、必要項目を変更します。</li><li>保存します。金額変更は履歴として残ります。</li></ol>
         <div class="help-note"><strong>注意点</strong><span>支払者が「すべて」のまま新規作成する場合は、対象支払者を確認してください。</span></div>
         <p class="help-miss"><strong>よくあるミス：</strong>「固定/変動」と「必須/任意」を同じ意味で使うこと。固定費でも削減可能なもの、任意でも継続したいものがあります。</p>
@@ -267,7 +265,7 @@ function renderHelp() {
         <h4>7. 更新候補</h4>
         <h5>目的</h5><p>外部データや収入管理から、支出項目の金額変更が必要そうなものを確認します。</p>
         <h5>できること</h5><ul><li>現在額、候補額、差額、差額率、信頼度、根拠を確認できます。</li><li>反映、保留、無視を選べます。</li><li>反映時は確認モーダルを挟み、履歴を残します。</li></ul>
-        <h5>操作手順</h5><ol><li>支出管理の更新候補タブを開きます。</li><li>未確認、差額あり、信頼度、データ元で絞り込みます。</li><li>根拠を確認します。</li><li>変更する場合は反映するを押します。</li><li>確認モーダルで変更前後を見て、反映します。</li></ol>
+        <h5>操作手順</h5><ol><li>支出管理の入力画面で更新候補がある項目を開きます。</li><li>未確認、差額あり、信頼度、データ元で絞り込みます。</li><li>根拠を確認します。</li><li>変更する場合は反映するを押します。</li><li>確認モーダルで変更前後を見て、反映します。</li></ol>
         <div class="help-note"><strong>注意点</strong><span>候補は提案です。自動上書きは行いません。信頼度が高くても内容を確認してください。</span></div>
         <p class="help-miss"><strong>よくあるミス：</strong>一時的な支出や返品を月額支出として反映してしまうこと。</p>
       </section>
@@ -285,7 +283,7 @@ function renderHelp() {
         <h4>9. 分析</h4>
         <h5>目的</h5><p>支出設計のどこを見るべきか、どこに見直し余地があるかを確認します。</p>
         <h5>できること</h5><ul><li>収入管理では支給、控除、手取り、残業代などを確認できます。</li><li>支出管理では支出合計、必須支出、任意支出、削減可能額を確認できます。</li><li>見直し候補Top5、カテゴリ別、支払者別、固定/変動、支出/貯蓄/投資を確認できます。</li><li>設計額と外部実績の差額を確認できます。</li></ul>
-        <h5>操作手順</h5><ol><li>収入管理または支出管理の分析タブを開きます。</li><li>最上段の要点を確認します。</li><li>見直し候補Top5を確認します。</li><li>必要に応じて入力タブまたは更新候補タブへ移動します。</li></ol>
+        <h5>操作手順</h5><ol><li>左メニューの分析を開きます。</li><li>最上段の要点を確認します。</li><li>見直し候補Top5を確認します。</li><li>必要に応じて支出管理の入力または外部データへ移動します。</li></ol>
         <div class="help-note"><strong>注意点</strong><span>分析は判断材料です。金額は自動変更されません。</span></div>
         <p class="help-miss"><strong>よくあるミス：</strong>変動費の一時的な増加をすぐ固定費として扱うこと。</p>
       </section>
@@ -295,15 +293,15 @@ function renderHelp() {
         <h5>目的</h5><p>収入管理と支出管理を横断し、対象月の実質的な家計収支をすぐ確認します。</p>
         <h5>できること</h5><ul><li>当月収支、黒字・赤字・警戒の状態、対象月を確認できます。</li><li>可能な場合はユーザー別の収支も確認できます。</li></ul>
         <h5>計算の考え方</h5><ul><li>対象月は現在月の1か月前です。</li><li>収入は全ユーザーの手取りから通勤交通費を除いた金額です。</li><li>支出は有効な支出項目のうち、天引きではない支出を月額換算して合計します。</li><li>天引き項目は手取りに反映済みのため、二重計上を避けて除外します。</li></ul>
-        <h5>操作手順</h5><ol><li>左メニューの当月収支を確認します。</li><li>警戒または赤字の場合は支出管理の分析を開きます。</li><li>更新候補や支出入力で見直す項目を確認します。</li></ol>
+        <h5>操作手順</h5><ol><li>左メニューの当月収支を確認します。</li><li>警戒または赤字の場合は左メニューの分析を開きます。</li><li>更新候補や支出入力で見直す項目を確認します。</li></ol>
         <p class="help-miss"><strong>よくあるミス：</strong>貯蓄・投資や天引き項目を当月収支に重ねて入れてしまうこと。</p>
       </section>
 
       <section id="help-data" class="help-section">
         <h4>11. データ管理</h4>
         <h5>目的</h5><p>登録済みデータを確認し、必要に応じて出力や履歴確認を行います。</p>
-        <h5>できること</h5><ul><li>収入管理では登録月データの確認、Excel出力、直近データ復元ができます。</li><li>支出管理では支出項目の簡易一覧、更新履歴、CSVエクスポートを確認できます。</li><li>バックアップと復元は設定内のバックアップに集約しています。</li></ul>
-        <h5>操作手順</h5><ol><li>収入管理または支出管理のデータ管理タブを開きます。</li><li>一覧を確認します。新しい月が上に表示されます。</li><li>必要に応じて出力または履歴確認を行います。</li></ol>
+        <h5>できること</h5><ul><li>収入管理では登録月データの確認、Excel出力、直近データ復元ができます。</li><li>支出管理では入力画面下部からCSVエクスポートできます。</li><li>バックアップと復元は設定内のバックアップに集約しています。</li></ul>
+        <h5>操作手順</h5><ol><li>収入管理のデータ管理、または支出管理の入力下部を開きます。</li><li>一覧を確認します。新しい月が上に表示されます。</li><li>必要に応じて出力または履歴確認を行います。</li></ol>
         <div class="help-note"><strong>注意点</strong><span>月データ削除や復元は対象を確認してから実行してください。</span></div>
         <p class="help-miss"><strong>よくあるミス：</strong>データ管理タブで全体バックアップを探すこと。全体バックアップは設定にあります。</p>
       </section>
@@ -637,14 +635,16 @@ function switchTabTo(target) {
   if (target === "summary" && typeof renderExpenseSummary === "function") renderExpenseSummary();
   if (target === "master" && typeof renderMaster === "function") renderMaster();
   if (target === "import" && typeof renderImport === "function") renderImport();
-  if (target === "expense-analysis" && typeof renderExpenseAnalysis === "function") renderExpenseAnalysis();
-  if (target === "expense-data" && typeof renderExpenseData === "function") renderExpenseData();
 }
 
 function switchExternalTab(target) {
   document.querySelectorAll("[data-external-tab]").forEach((tab) => tab.classList.toggle("active", tab.dataset.externalTab === target));
   byId("externalMfPanel").classList.toggle("hidden", target !== "mf");
   byId("externalRakutenPanel").classList.toggle("hidden", target !== "rakuten");
+  if (typeof renderImport === "function" && !window.__renderingImport) {
+    window.__renderingImport = true;
+    try { renderImport(); } finally { window.__renderingImport = false; }
+  }
 }
 
 function updateSort(event) {

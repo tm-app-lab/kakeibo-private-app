@@ -4,14 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kakei Compass</title>
-    <link rel="stylesheet" href="styles.css?v=20260505-expense-mobile-modal" />
-    <link rel="manifest" href="manifest.webmanifest?v=20260505-expense-mobile-modal" />
+    <link rel="stylesheet" href="styles.css?v=20260505-analysis-nav" />
+    <link rel="manifest" href="manifest.webmanifest?v=20260505-analysis-nav" />
     <meta name="theme-color" content="#17352e" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Kakei Compass" />
-    <link rel="apple-touch-icon" href="app-icon-180.png?v=20260505-expense-mobile-modal" />
-    <link rel="icon" type="image/png" sizes="192x192" href="app-icon-192.png?v=20260505-expense-mobile-modal" />
-    <link rel="icon" type="image/png" sizes="512x512" href="app-icon-512.png?v=20260505-expense-mobile-modal" />
+    <link rel="apple-touch-icon" href="app-icon-180.png?v=20260505-analysis-nav" />
+    <link rel="icon" type="image/png" sizes="192x192" href="app-icon-192.png?v=20260505-analysis-nav" />
+    <link rel="icon" type="image/png" sizes="512x512" href="app-icon-512.png?v=20260505-analysis-nav" />
   </head>
   <body class="auth-locked">
     <section id="authScreen" class="auth-screen" aria-labelledby="authTitle">
@@ -42,11 +42,17 @@
         </div>
         <section id="householdBalanceCard" class="nav-balance-card" aria-live="polite"></section>
         <nav class="mode-switch" aria-label="管理対象の切替">
+          <button class="mode-button" type="button" data-app-mode="summary">
+            <span>サマリー</span>
+          </button>
           <button class="mode-button active" type="button" data-app-mode="income">
             <span>収入管理</span>
           </button>
           <button class="mode-button" type="button" data-app-mode="expense">
             <span>支出管理</span>
+          </button>
+          <button class="mode-button" type="button" data-app-mode="analysis">
+            <span>分析</span>
           </button>
         </nav>
         <div class="nav-tools">
@@ -57,22 +63,22 @@
       </aside>
 
       <section class="workspace">
+        <section class="income-panel hidden" id="panel-summary"></section>
+        <section class="income-panel hidden" id="panel-analysis"></section>
         <section class="income-panel hidden" id="panel-income"></section>
 
         <article class="panel income-native expense-shell expense-view hidden">
           <div class="income-topbar">
             <div>
               <h3>支出管理</h3>
-              <p>支出項目の入力、外部データ、分析、データ管理をまとめて扱います。</p>
+              <p>支出項目の入力と外部データを扱います。分析は左メニューの分析に統合しています。</p>
             </div>
           </div>
 
         <div class="tab-strip expense-view hidden" role="tablist" aria-label="支出管理の表示切替">
           <button class="tab active" id="tab-master" type="button" role="tab" aria-selected="true" data-tab="master">入力</button>
           <button class="tab" id="tab-import" type="button" role="tab" aria-selected="false" data-tab="import">外部データ</button>
-          <button class="tab" id="tab-expense-analysis" type="button" role="tab" aria-selected="false" data-tab="expense-analysis">分析</button>
-          <button class="tab" id="tab-expense-data" type="button" role="tab" aria-selected="false" data-tab="expense-data">データ管理</button>
-        </div>
+                  </div>
 
         <section class="tab-panel expense-view active hidden" id="panel-master" role="tabpanel" aria-labelledby="tab-master">
           <article class="panel">
@@ -122,6 +128,7 @@
             </div>
             <div class="master-bottom-actions">
               <button id="addMasterItem" type="button">新規</button>
+              <button id="exportExpenseCsv" class="subtle-button" type="button">CSV出力</button>
             </div>
           </article>
         </section>
@@ -310,16 +317,16 @@
         <div id="helpContent" class="help-content"></div>
       </div>
     </div>
-    <script src="data/household-data.js?v=20260505-expense-mobile-modal"></script>
-    <script src="data/payroll-data.js?v=20260505-expense-mobile-modal"></script>
-    <script src="storage.js?v=20260505-expense-mobile-modal"></script>
-    <script src="ui.js?v=20260505-expense-mobile-modal"></script>
-    <script src="household.js?v=20260505-expense-mobile-modal"></script>
-    <script src="import-utils.js?v=20260505-expense-mobile-modal"></script>
-    <script src="import.js?v=20260505-expense-mobile-modal"></script>
-    <script src="payroll.js?v=20260505-expense-mobile-modal"></script>
-    <script src="auth.js?v=20260505-expense-mobile-modal"></script>
-    <script src="app.js?v=20260505-expense-mobile-modal"></script>
+    <script src="data/household-data.js?v=20260505-analysis-nav"></script>
+    <script src="data/payroll-data.js?v=20260505-analysis-nav"></script>
+    <script src="storage.js?v=20260505-analysis-nav"></script>
+    <script src="ui.js?v=20260505-analysis-nav"></script>
+    <script src="household.js?v=20260505-analysis-nav"></script>
+    <script src="import-utils.js?v=20260505-analysis-nav"></script>
+    <script src="import.js?v=20260505-analysis-nav"></script>
+    <script src="payroll.js?v=20260505-analysis-nav"></script>
+    <script src="auth.js?v=20260505-analysis-nav"></script>
+    <script src="app.js?v=20260505-analysis-nav"></script>
   </body>
 </html>
 

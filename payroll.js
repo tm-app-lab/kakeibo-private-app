@@ -538,8 +538,7 @@ function payrollRenderShell() {
       </div>
       <div id="payrollStatus" class="inline-status"></div>
       <div class="tab-strip income-tabs" role="tablist" aria-label="収入管理の表示切替">
-        <button class="tab" type="button" data-income-tab="input">入力</button>
-        <button class="tab" type="button" data-income-tab="analysis">分析</button>
+        <button class="tab" type="button" data-income-tab="input">月収登録</button>
         <button class="tab" type="button" data-income-tab="manage">データ管理</button>
       </div>
       <section id="incomeInputPanel" class="income-tab-panel"></section>
@@ -1569,7 +1568,7 @@ function payrollExportExcel() {
 }
 
 function payrollRenderAll(message = "") {
-  if (payrollState.tab === "chart") payrollState.tab = "analysis";
+  if (payrollState.tab === "chart" || payrollState.tab === "analysis") payrollState.tab = "input";
   payrollRefreshHeader();
   document.querySelectorAll("[data-income-tab]").forEach((button) => button.classList.toggle("active", button.dataset.incomeTab === payrollState.tab));
   document.querySelectorAll(".income-tab-panel").forEach((panel) => panel.classList.remove("active"));

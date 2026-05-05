@@ -5710,3 +5710,45 @@ body.auth-locked .auth-screen {
     animation: none !important;
   }
 }
+
+
+/* Integrated analysis and mobile month containment */
+.unified-summary-panel,
+.unified-analysis-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.unified-analysis-panel .income-chart-box,
+.unified-analysis-panel .analysis-card,
+.unified-summary-panel .analysis-card {
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .flow-step,
+  .flow-step > div,
+  .payroll-ym-row,
+  .payroll-ym-row input[type="month"],
+  .payroll-ym-row button {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box;
+  }
+
+  .payroll-ym-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    overflow: hidden;
+  }
+
+  .payroll-ym-row input[type="month"] {
+    inline-size: 100% !important;
+  }
+
+  .unified-analysis-panel .analysis-summary,
+  .unified-summary-panel .analysis-summary {
+    grid-template-columns: 1fr;
+  }
+}

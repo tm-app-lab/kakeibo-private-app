@@ -2062,6 +2062,7 @@ function bindHouseholdEvents() {
   });
   byId("masterFilter").addEventListener("change", renderMaster);
   byId("masterSearch").addEventListener("input", renderMaster);
+  byId("exportExpenseCsv")?.addEventListener("click", exportExpenseItemsCsv);
   window.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && isMobileExpenseLayout() && selectedId) closeDetailPanel();
   });
