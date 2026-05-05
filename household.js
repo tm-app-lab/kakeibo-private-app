@@ -1573,6 +1573,32 @@ function selectedItem() {
   return master.find((item) => item.id === selectedId) || (isMobileExpenseLayout() ? null : master[0]);
 }
 
+function ensureExpenseDetailBackdrop() {
+  let backdrop = byId("expenseDetailBackdrop");
+  if (backdrop) return backdrop;
+  backdrop = document.createElement("div");
+  backdrop.id = "expenseDetailBackdrop";
+  backdrop.className = "expense-detail-backdrop hidden";
+  backdrop.setAttribute("aria-hidden", "true");
+  backdrop.addEventListener("click", closeDetailPanel);
+  document.body.appendChild(backdrop);
+  return backdrop;
+}
+
+function setExpenseDetailModalOpen(open) {
+  const backdrop = ensureExpenseDetailBackdrop();
+  const panel = byId("detailPanel");
+  if (!isMobileExpenseLayout()) {
+    document.body.classList.remove("expense-detail-modal-open");
+    backdrop.classList.add("hidden");
+    panel?.classList.remove("mobile-detail-modal");
+    return;
+  }
+  document.body.classList.toggle("expense-detail-modal-open", open);
+  backdrop.classList.toggle("hidden", !open);
+  panel?.classList.toggle("mobile-detail-modal", open);
+}
+
 function renderDetailPanel() {
   const panel = byId("detailPanel");
   const item = selectedItem();
@@ -1582,9 +1608,11 @@ function renderDetailPanel() {
     panel.innerHTML = isMobileExpenseLayout()
       ? ""
       : `<p>支出項目がありません。</p>`;
+    setExpenseDetailModalOpen(false);
     return;
   }
   panel.classList.remove("detail-panel-empty", "hidden");
+  setExpenseDetailModalOpen(isMobileExpenseLayout());
   selectedId = item.id;
   const editing = editingId === item.id;
   if (editing && !editDraft) editDraft = { ...item, externalAliases: externalAliases(item) };
@@ -1642,12 +1670,12 @@ function positionDetailPanel() {
   if (!panel) return;
   const layout = document.querySelector(".master-layout");
   if (!isMobileExpenseLayout()) {
+    setExpenseDetailModalOpen(false);
     layout?.appendChild(panel);
     return;
   }
   if (!selectedId || panel.classList.contains("detail-panel-empty")) return;
-  const selectedCard = [...document.querySelectorAll("#masterCards [data-select-id]")].find((element) => element.dataset.selectId === selectedId);
-  if (selectedCard) selectedCard.insertAdjacentElement("afterend", panel);
+  document.body.appendChild(panel);
 }
 
 function renderAmountHistory(item) {
@@ -1741,9 +1769,7 @@ function selectRow(event) {
   selectedId = id;
   if (isMobileExpenseLayout()) mobileDetailExplicitlyOpened = true;
   renderMaster();
-  if (isMobileExpenseLayout()) {
-    requestAnimationFrame(() => byId("detailPanel")?.scrollIntoView({ block: "nearest" }));
-  }
+  if (isMobileExpenseLayout()) setExpenseDetailModalOpen(true);
 }
 
 function updateDetail(event) {
@@ -2036,6 +2062,9 @@ function bindHouseholdEvents() {
   });
   byId("masterFilter").addEventListener("change", renderMaster);
   byId("masterSearch").addEventListener("input", renderMaster);
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && isMobileExpenseLayout() && selectedId) closeDetailPanel();
+  });
   byId("resetMaster").addEventListener("click", () => {
     try {
       createHouseholdSnapshot("before-master-reset", {});

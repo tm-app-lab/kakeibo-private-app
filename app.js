@@ -19,6 +19,7 @@ function bindAppModeEvents() {
   });
   byId("mobileNavToggle")?.addEventListener("click", toggleMobileNav);
   byId("mobileNavBackdrop")?.addEventListener("click", closeMobileNav);
+  bindMobileNavSwipe();
   window.addEventListener("keydown", (event) => {
     if (event.key === "Escape") closeMobileNav();
   });
@@ -29,11 +30,15 @@ function bindAppModeEvents() {
 }
 
 function toggleMobileNav() {
-  document.body.classList.toggle("mobile-nav-open");
-  const open = document.body.classList.contains("mobile-nav-open");
-  byId("mobileNavToggle")?.setAttribute("aria-expanded", open ? "true" : "false");
-  byId("mobileNavToggle")?.setAttribute("aria-label", open ? "メニューを閉じる" : "メニューを開く");
-  byId("mobileNavBackdrop")?.classList.toggle("hidden", !open);
+  if (document.body.classList.contains("mobile-nav-open")) closeMobileNav();
+  else openMobileNav();
+}
+
+function openMobileNav() {
+  document.body.classList.add("mobile-nav-open");
+  byId("mobileNavToggle")?.setAttribute("aria-expanded", "true");
+  byId("mobileNavToggle")?.setAttribute("aria-label", "メニューを閉じる");
+  byId("mobileNavBackdrop")?.classList.remove("hidden");
 }
 
 function closeMobileNav() {
@@ -41,6 +46,33 @@ function closeMobileNav() {
   byId("mobileNavToggle")?.setAttribute("aria-expanded", "false");
   byId("mobileNavToggle")?.setAttribute("aria-label", "メニューを開く");
   byId("mobileNavBackdrop")?.classList.add("hidden");
+}
+
+function bindMobileNavSwipe() {
+  let startX = 0;
+  let startY = 0;
+  let tracking = false;
+  const isInteractive = (target) => Boolean(target.closest("input, textarea, select, button, a, [contenteditable='true']"));
+  window.addEventListener("touchstart", (event) => {
+    if (!window.matchMedia("(max-width: 768px)").matches || event.touches.length !== 1) return;
+    const touch = event.touches[0];
+    const navOpen = document.body.classList.contains("mobile-nav-open");
+    if (!navOpen && touch.clientX > 24) return;
+    if (isInteractive(event.target) && !navOpen) return;
+    startX = touch.clientX;
+    startY = touch.clientY;
+    tracking = true;
+  }, { passive: true });
+  window.addEventListener("touchend", (event) => {
+    if (!tracking) return;
+    tracking = false;
+    const touch = event.changedTouches[0];
+    const dx = touch.clientX - startX;
+    const dy = touch.clientY - startY;
+    if (Math.abs(dy) > 50 || Math.abs(dx) < 70) return;
+    if (dx > 0 && startX <= 24) openMobileNav();
+    if (dx < 0 && document.body.classList.contains("mobile-nav-open")) closeMobileNav();
+  }, { passive: true });
 }
 
 function switchAppMode(mode) {

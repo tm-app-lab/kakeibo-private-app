@@ -4,14 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kakei Compass</title>
-    <link rel="stylesheet" href="styles.css?v=20260503-login-detail-fix" />
-    <link rel="manifest" href="manifest.webmanifest?v=20260503-login-detail-fix" />
+    <link rel="stylesheet" href="styles.css?v=20260505-expense-mobile-modal" />
+    <link rel="manifest" href="manifest.webmanifest?v=20260505-expense-mobile-modal" />
     <meta name="theme-color" content="#17352e" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Kakei Compass" />
-    <link rel="apple-touch-icon" href="app-icon-180.png?v=20260503-login-detail-fix" />
-    <link rel="icon" type="image/png" sizes="192x192" href="app-icon-192.png?v=20260503-login-detail-fix" />
-    <link rel="icon" type="image/png" sizes="512x512" href="app-icon-512.png?v=20260503-login-detail-fix" />
+    <link rel="apple-touch-icon" href="app-icon-180.png?v=20260505-expense-mobile-modal" />
+    <link rel="icon" type="image/png" sizes="192x192" href="app-icon-192.png?v=20260505-expense-mobile-modal" />
+    <link rel="icon" type="image/png" sizes="512x512" href="app-icon-512.png?v=20260505-expense-mobile-modal" />
   </head>
   <body class="auth-locked">
     <section id="authScreen" class="auth-screen" aria-labelledby="authTitle">
@@ -81,8 +81,7 @@
               <div class="expense-person-switch">
                 <label>支払者<select id="expensePersonSelect"></select></label>
               </div>
-              <button id="addMasterItem" type="button">新規</button>
-              <label>
+              <label class="master-search-field">
                 検索
                 <input id="masterSearch" type="search" placeholder="保険、住宅ローン、通信など" />
               </label>
@@ -120,6 +119,9 @@
                 </table>
               </section>
               <aside id="detailPanel" class="detail-panel"></aside>
+            </div>
+            <div class="master-bottom-actions">
+              <button id="addMasterItem" type="button">新規</button>
             </div>
           </article>
         </section>
@@ -308,16 +310,16 @@
         <div id="helpContent" class="help-content"></div>
       </div>
     </div>
-    <script src="data/household-data.js?v=20260503-login-detail-fix"></script>
-    <script src="data/payroll-data.js?v=20260503-login-detail-fix"></script>
-    <script src="storage.js?v=20260503-login-detail-fix"></script>
-    <script src="ui.js?v=20260503-login-detail-fix"></script>
-    <script src="household.js?v=20260503-login-detail-fix"></script>
-    <script src="import-utils.js?v=20260503-login-detail-fix"></script>
-    <script src="import.js?v=20260503-login-detail-fix"></script>
-    <script src="payroll.js?v=20260503-login-detail-fix"></script>
-    <script src="auth.js?v=20260503-login-detail-fix"></script>
-    <script src="app.js?v=20260503-login-detail-fix"></script>
+    <script src="data/household-data.js?v=20260505-expense-mobile-modal"></script>
+    <script src="data/payroll-data.js?v=20260505-expense-mobile-modal"></script>
+    <script src="storage.js?v=20260505-expense-mobile-modal"></script>
+    <script src="ui.js?v=20260505-expense-mobile-modal"></script>
+    <script src="household.js?v=20260505-expense-mobile-modal"></script>
+    <script src="import-utils.js?v=20260505-expense-mobile-modal"></script>
+    <script src="import.js?v=20260505-expense-mobile-modal"></script>
+    <script src="payroll.js?v=20260505-expense-mobile-modal"></script>
+    <script src="auth.js?v=20260505-expense-mobile-modal"></script>
+    <script src="app.js?v=20260505-expense-mobile-modal"></script>
   </body>
 </html>
 
