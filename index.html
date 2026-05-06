@@ -71,7 +71,6 @@
           <div class="income-topbar">
             <div>
               <h3>支出管理</h3>
-              <p>支出項目の入力と外部データを扱います。分析は左メニューの分析に統合しています。</p>
             </div>
           </div>
 
@@ -138,9 +137,7 @@
                 CSV取込
                 <input id="externalCsvInput" type="file" accept=".csv,.txt" multiple />
               </label>
-              <label class="external-source-select">
-                外部データ種別
-                <select id="externalSourceSelect" aria-label="外部データ種別">
+              <label class="external-source-select" aria-label="外部データ種別"><select id="externalSourceSelect" aria-label="外部データ種別">
                   <option value="mf">マネーフォワード</option>
                   <option value="rakuten">楽天カード</option>
                 </select>
@@ -331,6 +328,8 @@
     <script src="app.js?v=20260506-ui-simplify"></script>
   </body>
 </html>
+
+
 
 
 

@@ -6844,3 +6844,28 @@ button.danger:hover,
     padding-right: 12px !important;
   }
 }
+
+/* Compact headers and external import controls polish. */
+.income-topbar p {
+  display: none !important;
+}
+
+.external-source-select {
+  gap: 0;
+}
+
+.month-select-wrap select,
+#importMonthSelect {
+  text-align: center;
+  text-align-last: center;
+  min-height: 38px;
+  line-height: 1.2;
+}
+
+@media (max-width: 768px) {
+  .month-select-wrap,
+  .month-select-wrap select,
+  #importMonthSelect {
+    min-height: 44px;
+  }
+}

@@ -1,4 +1,4 @@
-// payroll.js
+﻿// payroll.js
 
 let payrollMounted = false;
 let payrollState = {
@@ -531,7 +531,6 @@ function payrollRenderShell() {
       <div class="income-topbar">
         <div>
           <h3>収入管理</h3>
-          <p>給与明細の登録、推移確認、登録データ確認をこのアプリ本体で扱います。</p>
         </div>
         <div class="income-profile">
           <label><select id="payrollProfileSelect" aria-label="ユーザー"><option value="primary"></option><option value="secondary"></option></select></label>
@@ -654,7 +653,7 @@ function payrollRenderInput() {
           <div class="payroll-method-actions">
             <button class="payroll-primary-action ${method === "photo" ? "selected" : ""}" id="payrollChoosePhoto" type="button" ${hasYm ? "" : "disabled"}>写真から読込</button>
             <button class="${method === "manual" ? "selected" : ""}" id="payrollChooseManual" type="button" ${hasYm ? "" : "disabled"}>直接入力</button>
-            <label class="file-button payroll-file-action ${method === "photo" ? "" : "hidden"}">写真ファイル<input id="payrollPhoto" type="file" accept="image/*" ${method === "photo" ? "" : "disabled"} /></label>
+            <input id="payrollPhoto" class="hidden" type="file" accept="image/*" ${method === "photo" ? "" : "disabled"} />
             <div class="payroll-sub-actions ${method === "manual" ? "" : "hidden"}">
               <button id="payrollCopyPrevious" type="button" ${hasPreviousRecord ? "" : "disabled"}>前月コピー${previousYm ? ` (${esc(previousYm)})` : ""}</button>
             </div>
@@ -1605,3 +1604,5 @@ function mountIncomeManagement() {
   payrollMounted = true;
   payrollRenderAll();
 }
+
+

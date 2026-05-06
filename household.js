@@ -370,6 +370,24 @@ function rowMonthValue(row) {
   return row.month || String(row.date || "").slice(0, 7).replace("/", "-");
 }
 
+function householdExternalSourceType(rowOrValue) {
+  if (typeof normalizeExternalSourceType === "function") return normalizeExternalSourceType(rowOrValue);
+  const value = typeof rowOrValue === "string"
+    ? rowOrValue
+    : rowOrValue?.sourceType || rowOrValue?.source || rowOrValue?.provider || rowOrValue?.importType || rowOrValue?.sourceFile || "";
+  const normalized = normalize(value).toLowerCase();
+  if (/rakuten|楽天|enavi/.test(normalized)) return "rakuten";
+  if (typeof rowOrValue === "object" && (rowOrValue.paymentMethod || rowOrValue.paymentAmount || rowOrValue.user)) return "rakuten";
+  return "moneyforward";
+}
+
+function householdExternalMonth(row) {
+  if (typeof externalMonthOf === "function") return externalMonthOf(row);
+  const raw = String(row?.month || row?.useMonth || row?.date || "").normalize("NFKC");
+  const match = raw.match(/(20\d{2})\D?(0?[1-9]|1[0-2])/);
+  return match ? `${match[1]}-${match[2].padStart(2, "0")}` : raw.replaceAll("/", "-").slice(0, 7);
+}
+
 function findBestMasterForExternal(row) {
   const rowName = normalize(row.content);
   const rowCategory = normalize(row.major || row.category || "");
@@ -426,10 +444,10 @@ function buildStoredExternalCandidates() {
 function buildImportedExternalCandidates() {
   const groups = new Map();
   importedRows.forEach((row) => {
-    if (!row.sourceType) return;
+    if (!householdExternalSourceType(row)) return;
     const match = findBestMasterForExternal(row);
     if (!match?.item) return;
-    const source = row.sourceType === "rakuten" ? "rakuten" : "moneyforward";
+    const source = householdExternalSourceType(row);
     const key = `import:${source}:${match.item.id}:${normalize(row.content).slice(0, 32)}`;
     const group = groups.get(key) || { rows: [], match, source, content: row.content };
     group.rows.push(row);
@@ -601,10 +619,18 @@ function linkGroupIncomeAmount(group) {
   } : null;
 }
 
+function normalizedExternalMemberKey(member) {
+  const source = householdExternalSourceType(member?.source || "moneyforward");
+  const key = String(member?.key || "");
+  const parts = key.split(":");
+  if (parts.length >= 2) return `${source}:${parts.slice(1).join(":")}`;
+  return `${source}:${normalize(member?.label || key)}`;
+}
+
 function rowMatchesExternalMember(row, member) {
-  if (row.sourceType !== member.source) return false;
+  if (householdExternalSourceType(row) !== householdExternalSourceType(member.source)) return false;
   const content = normalize(row.content || "");
-  if (member.matchRule === "normalized-name" && member.key) return `${member.source}:${content}` === member.key;
+  if (member.matchRule === "normalized-name" && member.key) return `${householdExternalSourceType(member.source)}:${content}` === normalizedExternalMemberKey(member);
   if (member.matchRule === "contains") return content.includes(normalize(member.key || member.label || ""));
   return externalKey(row) === member.key || content === normalize(member.label || "");
 }
@@ -614,8 +640,8 @@ function linkGroupExternalAmount(group) {
   if (!externalMembers.length) return null;
   const matched = importedRows.filter((row) => externalMembers.some((member) => rowMatchesExternalMember(row, member)));
   if (!matched.length) return null;
-  const latestMonth = [...new Set(matched.map(rowMonthValue).filter(Boolean))].sort().at(-1) || "";
-  const latestRows = matched.filter((row) => !latestMonth || rowMonthValue(row) === latestMonth);
+  const latestMonth = [...new Set(matched.map(householdExternalMonth).filter(Boolean))].sort().at(-1) || "";
+  const latestRows = matched.filter((row) => !latestMonth || householdExternalMonth(row) === latestMonth);
   const total = latestRows.reduce((sum, row) => sum + externalAmount(row), 0);
   return total ? {
     total,
@@ -2101,4 +2127,6 @@ function bindHouseholdEvents() {
     if (item) openAnalysisItem(decodeURIComponent(item.dataset.expenseDataItem));
   });
 }
+
+
 
