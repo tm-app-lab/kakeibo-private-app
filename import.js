@@ -235,7 +235,7 @@ function deleteImportedRow(key) {
 function clearImportedRows() {
   const month = byId("importMonthSelect").value;
   if (!importedRows.length) return;
-  const targetTab = document.querySelector("[data-external-tab].active")?.dataset.externalTab;
+  const targetTab = byId("externalSourceSelect")?.value || document.querySelector("[data-external-tab].active")?.dataset.externalTab;
   const sourceType = targetTab === "rakuten" ? "rakuten" : "moneyforward";
   const targetRows = importedRows.filter((row) => row.month === month && row.sourceType === sourceType);
   if (!targetRows.length) return;
@@ -340,6 +340,7 @@ function bindImportEvents() {
     if (openMaintenance) switchTabTo("master");
   });
   byId("externalCsvInput").addEventListener("change", handleExternalImport);
+  byId("externalSourceSelect")?.addEventListener("change", (event) => switchExternalTab(event.target.value));
   byId("importMonthSelect").addEventListener("change", renderImport);
   byId("prevImportMonth").addEventListener("click", () => moveImportMonth(1));
   byId("nextImportMonth").addEventListener("click", () => moveImportMonth(-1));

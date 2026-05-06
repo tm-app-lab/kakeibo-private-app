@@ -6069,3 +6069,174 @@ body.auth-locked .auth-screen {
     justify-self: start;
   }
 }
+
+/* Final UI polish: summary default, income records, external picker */
+.nav-brand {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.summary-health-card {
+  background: #fff !important;
+}
+
+.summary-health-card > span {
+  color: #17352e;
+  font-weight: 700;
+}
+
+.summary-health-card .judgment-result {
+  margin-left: 4px;
+  font-size: inherit;
+  font-weight: 800;
+}
+
+.summary-health-card .judgment-result.reflected {
+  color: #0f7a55;
+}
+
+.summary-health-card .judgment-result.attention {
+  color: #a87308;
+}
+
+.summary-health-card .judgment-result.danger {
+  color: #b23b3b;
+}
+
+.summary-health-card .judgment-badge {
+  display: none !important;
+}
+
+.payroll-ym-row input[type="month"],
+.payroll-ym-row button,
+.external-source-select select {
+  min-height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(47, 111, 87, 0.22);
+  background: #fff;
+  color: #17352e;
+  font: inherit;
+  box-shadow: 0 1px 0 rgba(16, 45, 35, 0.03);
+}
+
+.payroll-ym-row input[type="month"] {
+  padding: 0 12px;
+}
+
+.payroll-manage-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.payroll-manage-actions,
+.payroll-manage-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.external-source-select {
+  display: grid;
+  gap: 6px;
+  min-width: 190px;
+  color: #65756f;
+  font-size: 12px;
+}
+
+.external-source-select select {
+  width: 100%;
+  padding: 0 34px 0 12px;
+}
+
+.external-toolbar .subtab-strip {
+  display: none !important;
+}
+
+#tab-import {
+  font-size: inherit !important;
+}
+
+#tab-import::after {
+  content: none !important;
+}
+
+@media (max-width: 768px) {
+  .nav-brand {
+    font-size: 18px;
+    letter-spacing: 0.035em;
+    padding-right: 54px;
+  }
+
+  .payroll-ym-row input[type="month"]::before {
+    content: attr(title);
+  }
+
+  .payroll-manage-toolbar {
+    justify-content: stretch;
+  }
+
+  .payroll-manage-toolbar button {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .external-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .external-toolbar .file-button,
+  .external-source-select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .external-toolbar .file-button {
+    justify-content: center;
+    min-height: 44px;
+  }
+
+  .external-heading h4,
+  .external-heading .external-totals,
+  #rakutenSummary {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .external-toolbar {
+    align-items: end;
+  }
+}
+
+@media (max-width: 768px) {
+  .external-toolbar {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px;
+    align-items: end;
+  }
+
+  .external-toolbar .subtab-controls,
+  .external-toolbar #importSummary,
+  .external-toolbar #externalCandidateNotice {
+    grid-column: 1 / -1;
+  }
+
+  .external-toolbar .file-button,
+  .external-source-select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .external-source-select select {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 390px) {
+  .external-toolbar {
+    grid-template-columns: 1fr;
+  }
+}

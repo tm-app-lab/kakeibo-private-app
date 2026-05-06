@@ -67,9 +67,8 @@ function renderSummaryPanel() {
   panel.innerHTML = `
     <article class="panel income-native unified-summary-panel">
       <div class="income-topbar"><div><h3>サマリー</h3><p>収入と支出から家計全体の現在地を確認します。</p></div></div>
-      <section class="summary-health-card ${healthClass}">
-        <span>家計判定</span>
-        <strong>${esc(metrics.health)}</strong>
+      <section class="summary-health-card">
+        <span>家計判定：<strong class="judgment-result ${healthClass}">${esc(metrics.health)}</strong></span>
         <p>${esc(typeof expenseHealthComment === "function" ? expenseHealthComment(metrics.health) : "収入と支出の登録状況を確認してください。")}</p>
       </section>
       <section class="analysis-summary">
@@ -80,15 +79,6 @@ function renderSummaryPanel() {
         ${appMetricCard("固定費率", percent(metrics.fixedRatio))}
         ${appMetricCard("貯蓄率", percent(metrics.savingRatio))}
       </section>
-      <details class="analysis-card analysis-card-wide income-basis-box">
-        <summary>世帯収入の根拠</summary>
-        <dl class="basis-list">
-          <div><dt>対象月</dt><dd>${esc(ym)}</dd></div>
-          <div><dt>対象ユーザー</dt><dd>全ユーザー</dd></div>
-          <div><dt>手取り合計</dt><dd>${yen(metrics.income)}</dd></div>
-          <div><dt>通勤交通費</dt><dd>当月収支では除外、支出設計サマリーでは月額収入として参照</dd></div>
-        </dl>
-      </details>
     </article>`;
 }
 
@@ -227,7 +217,7 @@ function bindMobileNavSwipe() {
 
 function switchAppMode(mode) {
   if (typeof appMode === "string") appScrollPositions[appMode] = window.scrollY || 0;
-  appMode = ["summary", "income", "expense", "analysis"].includes(mode) ? mode : "income";
+  appMode = ["summary", "income", "expense", "analysis"].includes(mode) ? mode : "summary";
   const modeText = {
     summary: {
       title: "サマリー",
@@ -235,7 +225,7 @@ function switchAppMode(mode) {
     },
     income: {
       title: "収入管理",
-      copy: "月収登録と給与データ管理を行います。",
+      copy: "月収登録と登録データを扱います。",
     },
     expense: {
       title: "支出管理",
@@ -283,7 +273,7 @@ function init() {
   bindHouseholdEvents();
   bindImportEvents();
 
-  switchAppMode("income");
+  switchAppMode("summary");
   rerender();
 }
 

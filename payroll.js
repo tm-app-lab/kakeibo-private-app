@@ -18,6 +18,7 @@ let payrollState = {
   scrollPositions: {},
   inputSummaryOpen: false,
   inputChartOpen: false,
+  manageEditMode: false,
 };
 
 const payrollDeductionKeys = [
@@ -530,7 +531,7 @@ function payrollRenderShell() {
       <div class="income-topbar">
         <div>
           <h3>収入管理</h3>
-          <p>給与明細の登録、推移確認、過去データ確認をこのアプリ本体で扱います。</p>
+          <p>給与明細の登録、推移確認、登録データ確認をこのアプリ本体で扱います。</p>
         </div>
         <div class="income-profile">
           <label><select id="payrollProfileSelect" aria-label="ユーザー"><option value="primary"></option><option value="secondary"></option></select></label>
@@ -539,7 +540,7 @@ function payrollRenderShell() {
       <div id="payrollStatus" class="inline-status"></div>
       <div class="tab-strip income-tabs" role="tablist" aria-label="収入管理の表示切替">
         <button class="tab" type="button" data-income-tab="input">月収登録</button>
-        <button class="tab" type="button" data-income-tab="manage">過去データ</button>
+        <button class="tab" type="button" data-income-tab="manage">登録データ</button>
       </div>
       <section id="incomeInputPanel" class="income-tab-panel"></section>
       <section id="incomeChartPanel" class="income-tab-panel"></section>
@@ -1342,9 +1343,13 @@ function payrollYearComparisonHtml(records) {
 
 function payrollRenderManage() {
   const records = [...payrollRecords()].sort((a, b) => b.ym.localeCompare(a.ym));
+  const editing = !!payrollState.manageEditMode;
   const rows = records.map((record) => {
     const calc = payrollCalc(record.values);
-    return `<tr><td>${esc(payrollFormatYmJa(record.ym))}</td><td class="amount">${payrollAmount(calc.grossTotal)}</td><td class="amount">${payrollAmount(calc.netTotal)}</td><td class="amount">${payrollAmount(calc.deductionTotal)}</td><td><button class="subtle-button" type="button" data-payroll-load="${esc(record.ym)}">表示</button><button class="subtle-button danger" type="button" data-payroll-delete="${esc(record.ym)}">削除</button></td></tr>`;
+    const actions = editing
+      ? `<td class="payroll-manage-actions"><button class="subtle-button" type="button" data-payroll-load="${esc(record.ym)}">表示</button><button class="subtle-button danger" type="button" data-payroll-delete="${esc(record.ym)}">削除</button></td>`
+      : "";
+    return `<tr><td>${esc(payrollFormatYmJa(record.ym))}</td><td class="amount">${payrollAmount(calc.grossTotal)}</td><td class="amount">${payrollAmount(calc.netTotal)}</td><td class="amount">${payrollAmount(calc.deductionTotal)}</td>${actions}</tr>`;
   }).join("");
   const cards = records.map((record) => {
     const calc = payrollCalc(record.values);
@@ -1358,25 +1363,32 @@ function payrollRenderManage() {
           <div><dt>総支給</dt><dd>${payrollAmount(calc.grossTotal)}</dd></div>
           <div><dt>控除</dt><dd>${payrollAmount(calc.deductionTotal)}</dd></div>
         </dl>
-        <div class="payroll-manage-card-actions">
+        <div class="payroll-manage-card-actions ${editing ? "" : "hidden"}">
           <button class="subtle-button" type="button" data-payroll-load="${esc(record.ym)}">表示</button>
           <button class="subtle-button danger" type="button" data-payroll-delete="${esc(record.ym)}">削除</button>
         </div>
       </article>`;
   }).join("");
   byId("incomeManagePanel").innerHTML = `
+    <div class="payroll-manage-toolbar">
+      <button id="togglePayrollManageEdit" class="subtle-button" type="button">${editing ? "完了" : "編集"}</button>
+    </div>
     <div class="table-wrap payroll-record-list">
       <table class="imported-table">
-        <thead><tr><th>年月</th><th>総支給</th><th>手取り</th><th>控除</th><th>操作</th></tr></thead>
-        <tbody>${rows}</tbody>
+        <thead><tr><th>年月</th><th>総支給</th><th>手取り</th><th>控除</th>${editing ? "<th>操作</th>" : ""}</tr></thead>
+        <tbody>${rows || `<tr><td colspan="${editing ? 5 : 4}">登録データはまだありません。</td></tr>`}</tbody>
       </table>
     </div>
-    <div class="payroll-manage-cards">${cards || '<div class="external-empty-card">登録データがありません。</div>'}</div>
+    <div class="payroll-manage-cards">${cards || '<div class="external-empty-card">登録データはまだありません。</div>'}</div>
     <div class="payroll-manage-footer">
       ${payrollSafetyPanelHtml()}
       <button id="payrollExportExcel" type="button">Excel出力</button>
     </div>
   `;
+  byId("togglePayrollManageEdit")?.addEventListener("click", () => {
+    payrollState.manageEditMode = !payrollState.manageEditMode;
+    payrollRenderManage();
+  });
   byId("incomeManagePanel").querySelectorAll("[data-payroll-restore-snapshot]").forEach((button) => {
     button.addEventListener("click", () => payrollRestoreSnapshot(button.dataset.payrollRestoreSnapshot));
   });

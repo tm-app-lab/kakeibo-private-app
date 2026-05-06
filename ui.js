@@ -189,7 +189,7 @@ function renderHelp() {
     ["help-links", "紐づけ管理"],
     ["help-analysis", "分析"],
     ["help-balance", "家計サマリー"],
-    ["help-data", "過去データ / 出力"],
+    ["help-data", "登録データ / 出力"],
     ["help-backup", "バックアップ / 復元"],
     ["help-examples", "よくある使い方"],
     ["help-notes", "注意点"],
@@ -236,7 +236,7 @@ function renderHelp() {
       <section id="help-income" class="help-section">
         <h4>4. 収入管理</h4>
         <h5>目的</h5><p>毎月の給与データを短時間で登録し、手取り・控除・前月差を確認します。</p>
-        <h5>できること</h5><ul><li>写真から読込、直接入力、前月コピーを使えます。</li><li>入力中にKPIとサマリーが更新されます。</li><li>確認済にしてから保存できます。</li><li>過去データで保存済みの月収を確認できます。分析は左メニューの分析に統合しています。</li></ul>
+        <h5>できること</h5><ul><li>写真から読込、直接入力、前月コピーを使えます。</li><li>入力中にKPIとサマリーが更新されます。</li><li>確認済にしてから保存できます。</li><li>登録データで保存済みの月収を確認できます。分析は左メニューの分析に統合しています。</li></ul>
         <h5>操作手順</h5><ol><li>収入管理を開き、右上でユーザーを選びます。</li><li>月収登録で登録年月を選びます。</li><li>写真から読込または直接入力で入力します。直接入力では前月コピーも使えます。</li><li>金額を確認し、確認済を押します。</li><li>保存します。保存後に登録完了と前月比が表示されます。</li></ol>
         <div class="help-keywords"><span>前月コピー</span><span>写真読み込み</span><span>直接入力</span><span>サマリー</span></div>
         <div class="help-note"><strong>注意点</strong><span>写真を選択すると自動で読込を開始します。読込できない場合でも手入力と保存は使えます。</span></div>
@@ -256,7 +256,7 @@ function renderHelp() {
         <h4>6. 外部データ</h4>
         <h5>目的</h5><p>MoneyForwardと楽天カードのCSVを取り込み、支出項目の確認材料として使います。</p>
         <h5>できること</h5><ul><li>複数CSVをまとめて取り込めます。</li><li>MoneyForwardと楽天カードをタブで切り替えられます。</li><li>年月選択と前月・翌月ボタンで明細を移動できます。</li><li>明細の編集、削除、詳細確認ができます。</li></ul>
-        <h5>操作手順</h5><ol><li>支出管理の外部データタブを開きます。</li><li>CSVを選択します。形式は自動判定されます。</li><li>MoneyForwardまたは楽天カードを選びます。</li><li>年月を選び、明細を確認します。</li><li>必要なら編集モードで明細を整理します。</li></ol>
+        <h5>操作手順</h5><ol><li>支出管理の外部データタブを開きます。</li><li>CSV取込からファイルを選択します。形式は自動判定されます。</li><li>外部データ種別でマネーフォワードまたは楽天カードを選びます。</li><li>年月を選び、明細を確認します。</li></ol>
         <div class="help-note"><strong>注意点</strong><span>同じ月のCSVを再取り込みした場合は二重登録を避ける処理を行いますが、取り込み後は件数と金額を確認してください。</span></div>
         <p class="help-miss"><strong>よくあるミス：</strong>MoneyForwardの楽天カード引落と、楽天カード明細を二重に支出として扱うこと。紐づけや更新候補で確認してください。</p>
       </section>
@@ -298,12 +298,12 @@ function renderHelp() {
       </section>
 
       <section id="help-data" class="help-section">
-        <h4>11. 過去データ / 出力</h4>
+        <h4>11. 登録データ / 出力</h4>
         <h5>目的</h5><p>登録済みデータを確認し、必要に応じて出力や履歴確認を行います。</p>
         <h5>できること</h5><ul><li>収入管理では登録月データの確認、Excel出力、直近データ復元ができます。</li><li>支出管理では入力画面下部からCSVエクスポートできます。</li><li>バックアップと復元は設定内のバックアップに集約しています。</li></ul>
-        <h5>操作手順</h5><ol><li>収入管理の過去データ、または支出管理の入力下部を開きます。</li><li>一覧を確認します。新しい月が上に表示されます。</li><li>必要に応じて出力または履歴確認を行います。</li></ol>
+        <h5>操作手順</h5><ol><li>収入管理の登録データ、または支出管理の入力下部を開きます。</li><li>一覧を確認します。新しい月が上に表示されます。</li><li>必要に応じて出力または履歴確認を行います。</li></ol>
         <div class="help-note"><strong>注意点</strong><span>月データ削除や復元は対象を確認してから実行してください。</span></div>
-        <p class="help-miss"><strong>よくあるミス：</strong>過去データ画面で全体バックアップを探すこと。全体バックアップは設定にあります。</p>
+        <p class="help-miss"><strong>よくあるミス：</strong>登録データ画面で全体バックアップを探すこと。全体バックアップは設定にあります。</p>
       </section>
 
       <section id="help-backup" class="help-section">
@@ -638,9 +638,12 @@ function switchTabTo(target) {
 }
 
 function switchExternalTab(target) {
-  document.querySelectorAll("[data-external-tab]").forEach((tab) => tab.classList.toggle("active", tab.dataset.externalTab === target));
-  byId("externalMfPanel").classList.toggle("hidden", target !== "mf");
-  byId("externalRakutenPanel").classList.toggle("hidden", target !== "rakuten");
+  const selected = target === "rakuten" ? "rakuten" : "mf";
+  document.querySelectorAll("[data-external-tab]").forEach((tab) => tab.classList.toggle("active", tab.dataset.externalTab === selected));
+  const sourceSelect = byId("externalSourceSelect");
+  if (sourceSelect) sourceSelect.value = selected;
+  byId("externalMfPanel").classList.toggle("hidden", selected !== "mf");
+  byId("externalRakutenPanel").classList.toggle("hidden", selected !== "rakuten");
   if (typeof renderImport === "function" && !window.__renderingImport) {
     window.__renderingImport = true;
     try { renderImport(); } finally { window.__renderingImport = false; }

@@ -35,17 +35,17 @@
     <main class="app">
       <aside class="nav" id="appNav">
         <div class="nav-head">
-          <h1 class="nav-brand">Kakei Compass</h1>
-          <h2 id="navTitle" class="nav-mode-title">収入管理</h2>
+          <h1 class="nav-brand">KAKEI COMPASS</h1>
+          <h2 id="navTitle" class="nav-mode-title">サマリー</h2>
           <p class="nav-copy" id="navCopy">収入と支出を管理し、家計全体の状況を確認します。</p>
           <p class="nav-updated">最終更新 <strong id="navUpdatedLabel">-</strong></p>
         </div>
         <section id="householdBalanceCard" class="nav-balance-card" aria-live="polite"></section>
         <nav class="mode-switch" aria-label="管理対象の切替">
-          <button class="mode-button" type="button" data-app-mode="summary">
+          <button class="mode-button active" type="button" data-app-mode="summary">
             <span>サマリー</span>
           </button>
-          <button class="mode-button active" type="button" data-app-mode="income">
+          <button class="mode-button" type="button" data-app-mode="income">
             <span>収入管理</span>
           </button>
           <button class="mode-button" type="button" data-app-mode="expense">
@@ -77,7 +77,7 @@
 
         <div class="tab-strip expense-view hidden" role="tablist" aria-label="支出管理の表示切替">
           <button class="tab active" id="tab-master" type="button" role="tab" aria-selected="true" data-tab="master">入力</button>
-          <button class="tab" id="tab-import" type="button" role="tab" aria-selected="false" data-tab="import" data-mobile-label="CSV読込">外部データ</button>
+          <button class="tab" id="tab-import" type="button" role="tab" aria-selected="false" data-tab="import" >外部データ</button>
                   </div>
 
         <section class="tab-panel expense-view active hidden" id="panel-master" role="tabpanel" aria-labelledby="tab-master">
@@ -135,13 +135,16 @@
           <article class="panel">
             <div class="toolbar external-toolbar">
               <label class="file-button">
-                CSVを選択
+                CSV取込
                 <input id="externalCsvInput" type="file" accept=".csv,.txt" multiple />
               </label>
-              <div class="subtab-strip" role="tablist" aria-label="外部取り込み表示切替">
-                <button class="subtab active" type="button" data-external-tab="mf" aria-label="マネーフォワード" title="マネーフォワード">マネーフォワード</button>
-                <button class="subtab" type="button" data-external-tab="rakuten" aria-label="楽天カード" title="楽天カード">楽天カード</button>
-              </div>
+              <label class="external-source-select">
+                外部データ種別
+                <select id="externalSourceSelect" aria-label="外部データ種別">
+                  <option value="mf">マネーフォワード</option>
+                  <option value="rakuten">楽天カード</option>
+                </select>
+              </label>
               <div class="subtab-controls">
                 <div id="externalLinkBack" class="link-back-slot"></div>
                 <button id="prevImportMonth" class="icon-button" type="button" aria-label="前月へ移動" title="前月へ移動">‹</button>

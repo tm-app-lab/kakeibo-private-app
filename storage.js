@@ -41,7 +41,7 @@ let returnExternalKey = null;
 let returnExternalMonth = null;
 let returnExternalTab = null;
 let importEditMode = false;
-let appMode = "income";
+let appMode = "summary";
 
 function readObjectStorage(key, fallback = {}) {
   const value = readJsonStorage(key, fallback);
