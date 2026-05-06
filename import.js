@@ -1,4 +1,4 @@
-// import.js
+﻿// import.js
 
 function rakutenRowsForPayment(month, amount) {
   const rows = importedRows.filter((row) => row.sourceType === "rakuten" && row.month === month);
@@ -67,7 +67,7 @@ function renderRakutenCards(rows) {
           </dl>
           <div class="external-card-actions">${renderExternalActionButtons(row)}</div>
         </article>`).join("")
-    : `<div class="external-empty-card">楽天カード明細はまだ取り込まれていません。</div>`;
+    : `<div class="external-empty-card">楽天カード明細はこの月にはありません。</div>`;
 }
 function renderMoneyForwardRows(rows) {
   const income = rows.filter((row) => Number(String(row.amount || "0").replaceAll(",", "")) > 0).reduce((sum, row) => sum + numberValue(row.amount), 0);
@@ -293,11 +293,26 @@ async function handleExternalImport(event) {
   event.target.value = "";
 }
 
+function currentExternalSourceType() {
+  return byId("externalSourceSelect")?.value === "rakuten" ? "rakuten" : "moneyforward";
+}
+
+function externalRowsForSource(sourceType = currentExternalSourceType()) {
+  return importedRows.filter((row) => row.sourceType === sourceType);
+}
+
+function externalMonthsForSource(sourceType = currentExternalSourceType()) {
+  return [...new Set(externalRowsForSource(sourceType).map((row) => row.month).filter(Boolean))].sort().reverse();
+}
+
 function renderImport() {
-  const months = [...new Set(importedRows.map((row) => row.month).filter(Boolean))].sort().reverse();
-  const current = byId("importMonthSelect").value;
+  const sourceType = currentExternalSourceType();
+  const months = externalMonthsForSource(sourceType);
+  const sourceRows = externalRowsForSource(sourceType);
+  const current = byId("importMonthSelect")?.value || "";
   const selected = months.includes(current) ? current : months[0] || "";
-  byId("importSummary").textContent = importedRows.length ? `${importedRows.length}件 / ${months.length}か月` : "未取り込み";
+  const sourceLabel = sourceType === "rakuten" ? "楽天カード" : "マネーフォワード";
+  byId("importSummary").textContent = sourceRows.length ? `${sourceLabel} ${sourceRows.length}件 / ${months.length}か月` : `${sourceLabel} 未取り込み`;
   const externalNotice = byId("externalCandidateNotice");
   if (externalNotice) {
     externalNotice.classList.add("hidden");
@@ -309,9 +324,9 @@ function renderImport() {
   const monthIndex = months.indexOf(selected);
   byId("prevImportMonth").disabled = monthIndex < 0 || monthIndex >= months.length - 1;
   byId("nextImportMonth").disabled = monthIndex <= 0;
-  const rows = importedRows.filter((row) => !selected || row.month === selected);
-  renderMoneyForwardRows(rows.filter((row) => row.sourceType === "moneyforward"));
-  renderRakutenRows(rows.filter((row) => row.sourceType === "rakuten"));
+  const rows = sourceRows.filter((row) => !selected || row.month === selected);
+  renderMoneyForwardRows(sourceType === "moneyforward" ? rows : []);
+  renderRakutenRows(sourceType === "rakuten" ? rows : []);
   renderExternalBackButton();
   byId("toggleImportEdit")?.classList.add("hidden");
   byId("bulkDeleteImportedRows")?.classList.add("hidden");
@@ -319,7 +334,7 @@ function renderImport() {
 }
 
 function moveImportMonth(direction) {
-  const months = [...new Set(importedRows.map((row) => row.month).filter(Boolean))].sort().reverse();
+  const months = externalMonthsForSource();
   const select = byId("importMonthSelect");
   const index = months.indexOf(select.value);
   if (index < 0) return;
@@ -352,3 +367,4 @@ function bindImportEvents() {
   byId("toggleImportEdit").addEventListener("click", toggleImportEdit);
   byId("bulkDeleteImportedRows").addEventListener("click", clearImportedRows);
 }
+

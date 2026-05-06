@@ -6739,3 +6739,85 @@ button.danger:hover,
     overflow-wrap: normal !important;
   }
 }
+
+/* Final polish: keep logout aligned with Settings/Help and make external mobile cards source-safe. */
+#logoutApp.nav-tool-button,
+#logoutApp.nav-tool-button:hover,
+#logoutApp.nav-tool-button:active,
+#logoutApp.nav-tool-button:focus-visible {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 26px;
+  border: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  color: #c1ceca !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+#logoutApp.nav-tool-button:hover,
+#logoutApp.nav-tool-button:focus-visible {
+  color: #f8faf8 !important;
+}
+
+#logoutApp.nav-tool-button > span {
+  width: 14px;
+  height: 14px;
+  opacity: 0.82;
+  color: currentColor;
+}
+
+.summary-health-card .judgment-result,
+.summary-health-card .judgment-result.reflected,
+.summary-health-card .judgment-result.attention,
+.summary-health-card .judgment-result.danger {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+@media (max-width: 768px) {
+  #logoutApp.nav-tool-button,
+  #logoutApp.nav-tool-button:hover,
+  #logoutApp.nav-tool-button:active,
+  #logoutApp.nav-tool-button:focus-visible {
+    justify-content: center;
+    min-height: 38px;
+    border: 1px solid rgba(255, 255, 255, 0.16) !important;
+    border-radius: 8px;
+    padding: 0 10px !important;
+    background: rgba(255, 255, 255, 0.07) !important;
+    color: #c1ceca !important;
+    text-align: center;
+    font-size: 13px;
+  }
+
+  #logoutApp.nav-tool-button:hover,
+  #logoutApp.nav-tool-button:focus-visible {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #f8faf8 !important;
+  }
+
+  #externalRakutenPanel.hidden #rakutenImportedCards,
+  #externalMfPanel.hidden #mfImportedCards {
+    display: none !important;
+  }
+
+  #externalRakutenPanel:not(.hidden) #rakutenImportedCards,
+  #externalMfPanel:not(.hidden) #mfImportedCards {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  #externalRakutenPanel:not(.hidden) .imported-table-wrap,
+  #externalMfPanel:not(.hidden) .imported-table-wrap {
+    display: none !important;
+  }
+}
