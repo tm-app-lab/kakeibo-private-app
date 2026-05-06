@@ -7105,3 +7105,115 @@ tr.highlight .link-button:hover,
   }
 }
 
+
+/* iPhone final fix: external source select height and expense amount right edge. */
+@media (max-width: 768px) {
+  .external-toolbar {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .external-toolbar .file-button,
+  .external-source-select,
+  .external-source-select select {
+    box-sizing: border-box !important;
+    min-height: 56px !important;
+    height: 56px !important;
+    max-height: 56px !important;
+    border-radius: 16px !important;
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    vertical-align: middle !important;
+  }
+
+  .external-source-select {
+    display: flex !important;
+    align-items: stretch !important;
+  }
+
+  .external-source-select select {
+    display: block !important;
+    padding: 0 38px 0 14px !important;
+    border: 1px solid rgba(47, 111, 87, 0.3) !important;
+    background-color: #fff !important;
+    background-image: linear-gradient(45deg, transparent 50%, #2f6f57 50%), linear-gradient(135deg, #2f6f57 50%, transparent 50%);
+    background-position: calc(100% - 19px) 50%, calc(100% - 13px) 50%;
+    background-size: 6px 6px, 6px 6px;
+    background-repeat: no-repeat;
+    color: #17352e !important;
+    box-shadow: 0 5px 14px rgba(31, 122, 99, 0.08) !important;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .external-toolbar .file-button {
+    padding: 0 14px !important;
+  }
+
+  .expense-card-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(112px, max-content) !important;
+    align-items: center !important;
+    column-gap: 12px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .expense-card-row > span:first-child {
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .expense-card-row > span:first-child strong,
+  .expense-card-row > span:first-child small {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .expense-card-meta {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100% !important;
+    min-width: 112px !important;
+    max-width: none !important;
+    justify-self: stretch !important;
+    justify-items: end !important;
+    align-content: center !important;
+    text-align: right !important;
+    margin-left: 0 !important;
+  }
+
+  .expense-card-meta .amount-stack {
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-items: end !important;
+    text-align: right !important;
+  }
+
+  .expense-card-meta .amount-stack b,
+  .expense-card-meta .amount-stack small {
+    width: 100% !important;
+    text-align: right !important;
+    white-space: nowrap !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .external-toolbar {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  }
+
+  .expense-card-row {
+    grid-template-columns: minmax(0, 1fr) minmax(104px, max-content) !important;
+    column-gap: 10px !important;
+  }
+
+  .expense-card-meta {
+    min-width: 104px !important;
+  }
+}
