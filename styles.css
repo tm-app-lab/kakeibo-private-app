@@ -6684,3 +6684,58 @@ button.danger:hover,
     flex: 1 1 120px;
   }
 }
+
+/* Rakuten mobile cards and calm status polish */
+#logoutApp.nav-tool-button,
+#logoutApp.nav-tool-button:hover,
+#logoutApp.nav-tool-button:focus-visible {
+  border: 0 !important;
+  background: transparent !important;
+  color: #c1ceca !important;
+  box-shadow: none !important;
+}
+
+#logoutApp.nav-tool-button:hover,
+#logoutApp.nav-tool-button:focus-visible {
+  color: #f8faf8 !important;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.summary-health-card .judgment-result,
+.summary-health-card .judgment-result.reflected,
+.summary-health-card .judgment-result.attention,
+.summary-health-card .judgment-result.danger {
+  background: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  min-height: 0 !important;
+  font-size: clamp(22px, 5vw, 32px) !important;
+  line-height: 1.05;
+  font-weight: 900;
+}
+
+@media (max-width: 768px) {
+  #externalRakutenPanel:not(.hidden) #rakutenImportedCards,
+  #externalMfPanel:not(.hidden) #mfImportedCards {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  #externalRakutenPanel:not(.hidden) .external-mobile-card,
+  #externalRakutenPanel:not(.hidden) .external-empty-card,
+  #externalMfPanel:not(.hidden) .external-mobile-card,
+  #externalMfPanel:not(.hidden) .external-empty-card {
+    display: block !important;
+  }
+
+  .external-mobile-card .external-card-title {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    overflow-wrap: normal !important;
+  }
+}

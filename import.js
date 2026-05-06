@@ -282,7 +282,12 @@ async function handleExternalImport(event) {
   for (const file of files) imported.push(...(await decodeCsvFile(file)));
   importedRows = mergeImportedRows(importedRows, imported);
   saveImportedRows();
-  if (imported.some((row) => row.sourceType === "rakuten") && typeof switchExternalTab === "function") switchExternalTab("rakuten");
+  const importedRakuten = imported.filter((row) => row.sourceType === "rakuten" && row.month);
+  const importedMoneyForward = imported.filter((row) => row.sourceType === "moneyforward" && row.month);
+  const preferredSource = importedRakuten.length ? "rakuten" : importedMoneyForward.length ? "mf" : byId("externalSourceSelect")?.value || "mf";
+  const preferredMonth = [...new Set((importedRakuten.length ? importedRakuten : importedMoneyForward).map((row) => row.month).filter(Boolean))].sort().reverse()[0];
+  if (typeof switchExternalTab === "function") switchExternalTab(preferredSource);
+  if (preferredMonth && byId("importMonthSelect")) byId("importMonthSelect").value = preferredMonth;
   renderImport();
   if (typeof notifyLinkGroupCandidates === "function") notifyLinkGroupCandidates("外部データ取り込み");
   event.target.value = "";
