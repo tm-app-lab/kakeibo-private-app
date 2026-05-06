@@ -4,7 +4,7 @@ function normalizeExternalSourceType(rowOrValue) {
   const value = typeof rowOrValue === "string"
     ? rowOrValue
     : rowOrValue?.sourceType || rowOrValue?.source || rowOrValue?.provider || rowOrValue?.importType || "";
-  const normalized = normalize(value);
+  const normalized = normalize(value).toLowerCase();
   if (/rakuten|楽天|enavi|e-navi/.test(normalized)) return "rakuten";
   if (/moneyforward|money forward|mf|マネーフォワード/.test(normalized)) return "moneyforward";
   if (typeof rowOrValue === "object" && (rowOrValue.paymentMethod || rowOrValue.paymentAmount || rowOrValue.user)) return "rakuten";
@@ -95,7 +95,7 @@ function renderMoneyForwardCards(rows) {
     : `<div class="external-empty-card">マネーフォワード明細はまだ取り込まれていません。</div>`;
 }
 
-function renderRakutenCards(rows) {
+function renderRakutenCards(rows, hasAnyRows = getRowsForExternalSource("rakuten").length > 0) {
   const target = byId("rakutenImportedCards");
   if (!target) return;
   target.innerHTML = rows.length
@@ -110,7 +110,7 @@ function renderRakutenCards(rows) {
           </dl>
           <div class="external-card-actions">${renderExternalActionButtons(row)}</div>
         </article>`).join("")
-    : `<div class="external-empty-card">楽天カード明細はこの月にはありません。</div>`;
+    : `<div class="external-empty-card">${hasAnyRows ? "楽天カード明細はこの月にはありません。" : "楽天カードデータは未取り込みです。"}</div>`;
 }
 function renderMoneyForwardRows(rows) {
   const income = rows.filter((row) => Number(String(row.amount || "0").replaceAll(",", "")) > 0).reduce((sum, row) => sum + numberValue(row.amount), 0);
@@ -159,7 +159,7 @@ function findRakutenMatchForMf(row) {
   return sameDay.length ? { type: "record", rows: sameDay } : null;
 }
 
-function renderRakutenRows(rows) {
+function renderRakutenRows(rows, hasAnyRows = getRowsForExternalSource("rakuten").length > 0) {
   const total = rows.reduce((sum, row) => sum + numberValue(row.paymentAmount || row.amount), 0);
   byId("rakutenPaymentTotal").innerHTML = `<small>支払い総計</small><strong>${yen(total)}</strong>`;
   byId("rakutenImportedRows").innerHTML = rows.length
@@ -175,8 +175,8 @@ function renderRakutenRows(rows) {
           <td class="amount">${yen(numberValue(row.paymentAmount || row.amount))}</td>
           <td>${renderExternalActionButtons(row)}</td>
         </tr>`).join("")
-    : `<tr><td colspan="9">楽天カード明細はまだ取り込まれていません。</td></tr>`;
-  renderRakutenCards(rows);
+    : `<tr><td colspan="9">${hasAnyRows ? "楽天カード明細はこの月にはありません。" : "楽天カードデータは未取り込みです。"}</td></tr>`;
+  renderRakutenCards(rows, hasAnyRows);
   byId("rakutenSummary").innerHTML = rows.length
     ? `<div class="candidate-card"><strong>表示中の楽天カード合計</strong><span>${rows.length}件 / ${yen(total)}</span></div>`
     : "";
@@ -352,7 +352,7 @@ function renderImport() {
   const sourceType = currentExternalSourceType();
   const months = externalMonthsForSource(sourceType);
   const sourceRows = externalRowsForSource(sourceType);
-  const current = byId("importMonthSelect")?.value || "";
+  const current = normalizeExternalMonthValue(byId("importMonthSelect")?.value || "");
   const selected = months.includes(current) ? current : months[0] || "";
   const sourceLabel = sourceType === "rakuten" ? "楽天カード" : "マネーフォワード";
   byId("importSummary").textContent = sourceRows.length ? `${sourceLabel} ${sourceRows.length}件 / ${months.length}か月` : `${sourceLabel} 未取り込み`;
@@ -369,7 +369,7 @@ function renderImport() {
   byId("nextImportMonth").disabled = monthIndex <= 0;
   const rows = getExternalRowsForMonth(sourceType, selected);
   renderMoneyForwardRows(sourceType === "moneyforward" ? rows : []);
-  renderRakutenRows(sourceType === "rakuten" ? rows : []);
+  renderRakutenRows(sourceType === "rakuten" ? rows : [], sourceType === "rakuten" ? sourceRows.length > 0 : false);
   renderExternalBackButton();
   byId("toggleImportEdit")?.classList.add("hidden");
   byId("bulkDeleteImportedRows")?.classList.add("hidden");
@@ -410,6 +410,9 @@ function bindImportEvents() {
   byId("toggleImportEdit").addEventListener("click", toggleImportEdit);
   byId("bulkDeleteImportedRows").addEventListener("click", clearImportedRows);
 }
+
+
+
 
 
 

@@ -1,4 +1,4 @@
-// storage.js
+﻿// storage.js
 
 const yenFormatter = new Intl.NumberFormat("ja-JP", {
   maximumFractionDigits: 0,
@@ -121,34 +121,57 @@ function saveCandidateStatus() {
   localStorage.setItem(CANDIDATE_STATUS_KEY, JSON.stringify(candidateStatus));
 }
 
+function normalizeStoredImportMonth(value) {
+  const raw = String(value || "").trim().normalize("NFKC");
+  const match = raw.match(/(20\d{2})\D?(0?[1-9]|1[0-2])/);
+  if (!match) return raw.replaceAll("/", "-").slice(0, 7);
+  return `${match[1]}-${match[2].padStart(2, "0")}`;
+}
+
+function normalizeStoredImportSource(row = {}) {
+  const value = String(row.sourceType || row.source || row.provider || row.importType || row.sourceFile || "").normalize("NFKC").toLowerCase();
+  if (/rakuten|楽天|enavi/.test(value)) return "rakuten";
+  if (row.paymentMethod || row.paymentAmount || row.user || row.useMonth || row.carryover || row["利用日"] || row["利用店名・商品名"] || row["支払方法"] || row["利用者"]) return "rakuten";
+  return "moneyforward";
+}
+
+function normalizeStoredRakutenContent(row = {}) {
+  return row.content || row.shopName || row.merchantName || row["利用店名・商品名"] || row["利用店名"] || row["商品名"] || "";
+}
+
 function seededImportedRows() {
-  const normalizeMonth = (value) => String(value || "").slice(0, 7).replace("/", "-");
+  const normalizeMonth = normalizeStoredImportMonth;
   const moneyForwardRows = (data.moneyForward?.transactions || data.moneyForward?.rows || []).map((row) => ({
     ...row,
     sourceType: "moneyforward",
-    month: row.month || normalizeMonth(row.date),
+    month: normalizeMonth(row.month || row.date),
     absAmount: row.absAmount ?? Math.abs(Number(row.amount || 0)),
   }));
   const rakutenRows = (data.rakutenCard?.rows || []).map((row) => ({
     ...row,
     sourceType: "rakuten",
-    month: row.month || normalizeMonth(row.date || row.useDate),
+    month: normalizeMonth(row.month || row.date || row.useDate),
     amount: Number(row.amount || row.useAmount || 0),
   }));
   return [...moneyForwardRows, ...rakutenRows].filter((row) => row.month && (row.content || row.date || row.amount));
 }
 
 function normalizeStoredImportedRows(rows = []) {
-  const normalizeMonth = (value) => String(value || "").slice(0, 7).replace("/", "-");
   return rows
     .map((row) => {
-      const sourceType = row.sourceType || (row.paymentMethod || row.paymentAmount || row.user ? "rakuten" : "moneyforward");
-      const month = row.month || normalizeMonth(row.date || row.useDate);
+      const sourceType = normalizeStoredImportSource(row);
+      const month = normalizeStoredImportMonth(row.month || row.paymentMonth || row.useMonth || row.date || row.useDate || row["利用日"]);
+      const content = sourceType === "rakuten" ? normalizeStoredRakutenContent(row) : row.content;
       return {
         ...row,
         sourceType,
         month,
-        absAmount: row.absAmount ?? Math.abs(Number(row.amount || row.paymentAmount || 0)),
+        date: row.date || row["利用日"] || row.useDate || "",
+        content,
+        user: row.user || row["利用者"] || "",
+        paymentMethod: row.paymentMethod || row["支払方法"] || "",
+        paymentAmount: sourceType === "rakuten" ? (row.paymentAmount || row.total || row.amount || row.useAmount || row["支払総額"] || row["利用金額"] || "") : row.paymentAmount,
+        absAmount: row.absAmount ?? Math.abs(Number(row.amount || row.paymentAmount || row.useAmount || row["利用金額"] || 0)),
       };
     })
     .filter((row) => row.month && (row.content || row.date || row.amount || row.paymentAmount));
@@ -338,3 +361,8 @@ function importFullBackupFile(file) {
   };
   reader.readAsText(file);
 }
+
+
+
+
+
