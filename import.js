@@ -1,7 +1,50 @@
 ﻿// import.js
 
+function normalizeExternalSourceType(rowOrValue) {
+  const value = typeof rowOrValue === "string"
+    ? rowOrValue
+    : rowOrValue?.sourceType || rowOrValue?.source || rowOrValue?.provider || rowOrValue?.importType || "";
+  const normalized = normalize(value);
+  if (/rakuten|楽天|enavi|e-navi/.test(normalized)) return "rakuten";
+  if (/moneyforward|money forward|mf|マネーフォワード/.test(normalized)) return "moneyforward";
+  if (typeof rowOrValue === "object" && (rowOrValue.paymentMethod || rowOrValue.paymentAmount || rowOrValue.user)) return "rakuten";
+  return "moneyforward";
+}
+
+function normalizeExternalMonthValue(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  const compact = raw.match(/(20\d{2})\D?(0?[1-9]|1[0-2])/);
+  if (!compact) return raw.replaceAll("/", "-").slice(0, 7);
+  return `${compact[1]}-${compact[2].padStart(2, "0")}`;
+}
+
+function externalMonthOf(row) {
+  return normalizeExternalMonthValue(row?.month || row?.paymentMonth || row?.useMonth || row?.date || row?.useDate);
+}
+
+function isExternalSource(row, sourceType) {
+  return normalizeExternalSourceType(row) === sourceType;
+}
+
+function getRowsForExternalSource(sourceType) {
+  return importedRows.filter((row) => isExternalSource(row, sourceType));
+}
+
+function getMonthsForExternalSource(sourceType) {
+  return [...new Set(getRowsForExternalSource(sourceType).map(externalMonthOf).filter(Boolean))].sort().reverse();
+}
+
+function getExternalRowsForMonth(sourceType, selectedMonth) {
+  const normalizedMonth = normalizeExternalMonthValue(selectedMonth);
+  return getRowsForExternalSource(sourceType).filter((row) => !normalizedMonth || externalMonthOf(row) === normalizedMonth);
+}
+
+function getRakutenRowsForMonth(selectedMonth) {
+  return getExternalRowsForMonth("rakuten", selectedMonth);
+}
 function rakutenRowsForPayment(month, amount) {
-  const rows = importedRows.filter((row) => row.sourceType === "rakuten" && row.month === month);
+  const rows = getRakutenRowsForMonth(month);
   const total = rows.reduce((sum, row) => sum + numberValue(row.paymentAmount || row.amount), 0);
   return total === numberValue(amount) ? rows : [];
 }
@@ -101,14 +144,14 @@ function highlightClass(row) {
 }
 
 function findRakutenMatchForMf(row) {
-  const monthRows = importedRows.filter((candidate) => candidate.sourceType === "rakuten" && candidate.month === row.month);
+  const monthRows = getRakutenRowsForMonth(row.month);
   const paymentMatches = renderRakutenDetailButton(row) ? rakutenRowsForPayment(row.month, row.amount) : [];
   if (isRakutenCardTransfer(row) && monthRows.length) return { type: "month", rows: monthRows };
   if (paymentMatches.length) return { type: "month", rows: paymentMatches };
   const amount = numberValue(row.amount);
   const sameDay = importedRows.filter(
     (candidate) =>
-      candidate.sourceType === "rakuten" &&
+      isExternalSource(candidate, "rakuten") &&
       candidate.date === row.date &&
       numberValue(candidate.paymentAmount || candidate.amount) === amount &&
       normalize(candidate.content).includes(normalize(row.content).slice(0, 8)),
@@ -298,11 +341,11 @@ function currentExternalSourceType() {
 }
 
 function externalRowsForSource(sourceType = currentExternalSourceType()) {
-  return importedRows.filter((row) => row.sourceType === sourceType);
+  return getRowsForExternalSource(sourceType);
 }
 
 function externalMonthsForSource(sourceType = currentExternalSourceType()) {
-  return [...new Set(externalRowsForSource(sourceType).map((row) => row.month).filter(Boolean))].sort().reverse();
+  return getMonthsForExternalSource(sourceType);
 }
 
 function renderImport() {
@@ -324,7 +367,7 @@ function renderImport() {
   const monthIndex = months.indexOf(selected);
   byId("prevImportMonth").disabled = monthIndex < 0 || monthIndex >= months.length - 1;
   byId("nextImportMonth").disabled = monthIndex <= 0;
-  const rows = sourceRows.filter((row) => !selected || row.month === selected);
+  const rows = getExternalRowsForMonth(sourceType, selected);
   renderMoneyForwardRows(sourceType === "moneyforward" ? rows : []);
   renderRakutenRows(sourceType === "rakuten" ? rows : []);
   renderExternalBackButton();
@@ -367,4 +410,6 @@ function bindImportEvents() {
   byId("toggleImportEdit").addEventListener("click", toggleImportEdit);
   byId("bulkDeleteImportedRows").addEventListener("click", clearImportedRows);
 }
+
+
 

@@ -6821,3 +6821,26 @@ button.danger:hover,
     display: none !important;
   }
 }
+
+/* Final nav alignment: logout follows Settings/Help text rhythm. */
+#logoutApp.nav-tool-button,
+#logoutApp.nav-tool-button:hover,
+#logoutApp.nav-tool-button:active,
+#logoutApp.nav-tool-button:focus-visible {
+  justify-content: flex-start !important;
+  align-items: center !important;
+  gap: 7px !important;
+  text-align: left !important;
+}
+
+@media (max-width: 768px) {
+  #logoutApp.nav-tool-button,
+  #logoutApp.nav-tool-button:hover,
+  #logoutApp.nav-tool-button:active,
+  #logoutApp.nav-tool-button:focus-visible {
+    justify-content: flex-start !important;
+    text-align: left !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+}
