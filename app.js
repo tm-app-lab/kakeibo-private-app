@@ -221,32 +221,59 @@ function bindPullToRefresh() {
   let startX = 0;
   let pulling = false;
   let refreshing = false;
+  let startScrollTop = 0;
+  let lastRefreshAt = 0;
   const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
-  const isInteractive = (target) => Boolean(target.closest("input, textarea, select, button, a, [contenteditable='true']"));
+  const isFormControl = (target) => Boolean(target.closest("input, textarea, select, [contenteditable='true']"));
+  const scrollParent = (target) => {
+    const nav = target.closest(".nav");
+    if (nav && document.body.classList.contains("mobile-nav-open")) return nav;
+    const modal = target.closest(".modal-card, .detail-panel, .help-body, .settings-content");
+    if (modal) return modal;
+    return document.scrollingElement || document.documentElement;
+  };
+  const scrollTopOf = (element) => element === document.scrollingElement || element === document.documentElement
+    ? (window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0)
+    : element.scrollTop;
+  const runRefresh = () => {
+    const now = Date.now();
+    if (refreshing || now - lastRefreshAt < 1200) return;
+    refreshing = true;
+    lastRefreshAt = now;
+    requestAnimationFrame(() => {
+      refreshAllViews();
+      setTimeout(() => { refreshing = false; }, 700);
+    });
+  };
   window.addEventListener("touchstart", (event) => {
-    if (!isMobile() || event.touches.length !== 1 || isInteractive(event.target)) return;
-    if ((window.scrollY || document.documentElement.scrollTop || 0) > 2) return;
+    if (!isMobile() || event.touches.length !== 1 || isFormControl(event.target)) return;
+    const parent = scrollParent(event.target);
+    startScrollTop = scrollTopOf(parent);
+    if (startScrollTop > 2) return;
     const touch = event.touches[0];
     startY = touch.clientY;
     startX = touch.clientX;
     pulling = true;
   }, { passive: true });
-  window.addEventListener("touchend", (event) => {
-    if (!pulling || refreshing) {
+  window.addEventListener("touchmove", (event) => {
+    if (!pulling) return;
+    const touch = event.touches[0];
+    const dy = touch.clientY - startY;
+    const dx = Math.abs(touch.clientX - startX);
+    if (startScrollTop <= 2 && dy > 110 && dx < 50) {
       pulling = false;
-      return;
+      runRefresh();
     }
+  }, { passive: true });
+  window.addEventListener("touchend", (event) => {
+    if (!pulling) return;
     pulling = false;
     const touch = event.changedTouches[0];
     const dy = touch.clientY - startY;
     const dx = Math.abs(touch.clientX - startX);
-    if (dy < 90 || dx > 45) return;
-    refreshing = true;
-    requestAnimationFrame(() => {
-      refreshAllViews();
-      setTimeout(() => { refreshing = false; }, 700);
-    });
+    if (startScrollTop <= 2 && dy > 90 && dx < 50) runRefresh();
   }, { passive: true });
+  window.addEventListener("touchcancel", () => { pulling = false; }, { passive: true });
 }
 
 function bindMobileNavSwipe() {
