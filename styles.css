@@ -7279,3 +7279,496 @@ tr.highlight .link-button:hover,
     grid-template-columns: 1fr;
   }
 }
+
+/* Final UI harmonization: buttons and analysis page. */
+:root {
+  --button-height: 42px;
+  --button-height-mobile: 46px;
+  --button-radius: 10px;
+  --button-pad-x: 16px;
+  --button-font: 14px;
+  --button-font-mobile: 16px;
+  --button-border: rgba(47, 111, 87, 0.24);
+  --button-bg: #ffffff;
+  --button-bg-hover: #f7fbf9;
+  --button-primary: #1f7a63;
+  --button-primary-hover: #185f4e;
+  --button-danger: #b42318;
+  --button-danger-soft: #fff5f3;
+  --button-shadow: 0 6px 14px rgba(23, 53, 46, 0.08);
+  --card-radius: 14px;
+  --card-pad: 16px;
+}
+
+button,
+.primary-button,
+.secondary-button,
+.subtle-button,
+.ghost-button,
+.link-button,
+.file-button,
+.danger-button,
+button.danger,
+.nav-tool-button,
+.mode-button,
+.tab,
+.subtab,
+.sort-button,
+.small-action-button,
+.icon-button {
+  box-sizing: border-box;
+  min-height: var(--button-height);
+  border-radius: var(--button-radius);
+  font-size: var(--button-font);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  white-space: nowrap;
+  transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease, box-shadow 140ms ease, transform 80ms ease;
+}
+
+button:not(.mode-button):not(.nav-tool-button):not(.tab):not(.subtab):not(.icon-button):not(.sort-button),
+.file-button,
+.primary-button,
+.secondary-button,
+.subtle-button,
+.ghost-button,
+.link-button,
+.danger-button,
+button.danger {
+  padding: 0 var(--button-pad-x);
+  border: 1px solid var(--button-border);
+  background: var(--button-bg);
+  color: #17352e;
+  box-shadow: none;
+}
+
+button:not(:disabled):hover,
+.file-button:hover {
+  border-color: rgba(31, 122, 99, 0.54);
+  background-color: var(--button-bg-hover);
+}
+
+button:not(:disabled):active,
+.file-button:active {
+  transform: translateY(1px);
+}
+
+.primary-button,
+.auth-card .primary-button,
+#payrollApplyYm,
+#payrollSave,
+#confirmCandidateApply,
+#addMasterItem,
+.external-toolbar .file-button,
+#exportExpenseCsv,
+#payrollExportExcel,
+#confirmFullRestore,
+#downloadFullBackup,
+#saveSettings,
+#saveLinkGroup {
+  border-color: var(--button-primary);
+  background: var(--button-primary);
+  color: #ffffff;
+  box-shadow: var(--button-shadow);
+}
+
+.primary-button:not(:disabled):hover,
+.auth-card .primary-button:not(:disabled):hover,
+#payrollApplyYm:not(:disabled):hover,
+#payrollSave:not(:disabled):hover,
+#confirmCandidateApply:not(:disabled):hover,
+#addMasterItem:not(:disabled):hover,
+.external-toolbar .file-button:hover,
+#exportExpenseCsv:not(:disabled):hover,
+#payrollExportExcel:not(:disabled):hover,
+#confirmFullRestore:not(:disabled):hover,
+#downloadFullBackup:not(:disabled):hover,
+#saveSettings:not(:disabled):hover,
+#saveLinkGroup:not(:disabled):hover {
+  border-color: var(--button-primary-hover);
+  background: var(--button-primary-hover);
+  color: #ffffff;
+}
+
+.secondary-button,
+.subtle-button,
+.ghost-button,
+.link-button,
+#payrollChooseManual,
+#payrollCopyPrevious,
+#payrollConfirm,
+#payrollClear,
+#togglePayrollManageEdit,
+#togglePayrollAnalysis,
+#toggleRowEdit,
+#commitEdit,
+#cancelEdit,
+#toggleHistory,
+#applyPendingCandidate,
+#rejectPendingCandidate,
+#closeCandidateApply,
+#cancelCandidateApply,
+[data-analysis-tab],
+[data-unified-open-expense],
+[data-payroll-load],
+[data-payroll-restore-snapshot],
+[data-candidate-status],
+[data-candidate-apply],
+[data-edit-link-group],
+[data-add-link-member],
+[data-delete-link-group] {
+  border-color: var(--button-border);
+  background: #ffffff;
+  color: #17352e;
+}
+
+button.danger,
+.danger-button,
+.subtle-button.danger,
+#deleteItem,
+[data-payroll-delete],
+#bulkDeleteImportedRows,
+#logoutApp,
+[data-delete-link-group] {
+  border-color: rgba(180, 35, 24, 0.22);
+  background: var(--button-danger-soft);
+  color: var(--button-danger);
+}
+
+#logoutApp {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.11);
+  color: #f8faf8;
+  box-shadow: none;
+}
+
+#logoutApp:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.icon-button,
+.view-icon-toggle button,
+#prevImportMonth,
+#nextImportMonth,
+#closeDetailPanel,
+#closeCandidateApply,
+.modal-close,
+.link-chip button,
+.alias-chip button {
+  width: var(--button-height);
+  min-width: var(--button-height);
+  padding: 0;
+  border-radius: 50%;
+  color: #17352e;
+}
+
+.tab,
+.subtab,
+.income-tabs .tab {
+  min-height: 42px;
+  padding: 0 14px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--muted);
+}
+
+.tab:hover,
+.subtab:hover,
+.income-tabs .tab:hover {
+  background: transparent;
+  color: #17352e;
+  border-bottom-color: rgba(31, 122, 99, 0.28);
+}
+
+.tab.active,
+.subtab.active,
+.income-tabs .tab.active,
+.segmented-control button.active,
+.view-icon-toggle button.active,
+.button-row button.selected,
+.payroll-primary-action.selected {
+  background: transparent;
+  color: #17352e;
+  border-color: transparent;
+  border-bottom-color: var(--button-primary);
+  box-shadow: none;
+}
+
+.button-row,
+.payroll-sub-actions,
+.master-bottom-actions,
+.modal-actions,
+.candidate-actions,
+.external-card-actions,
+.settings-actions,
+.link-group-actions,
+.analysis-card-head {
+  gap: 10px;
+}
+
+.unified-analysis-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.unified-analysis-panel .income-topbar {
+  margin-bottom: 0;
+}
+
+.unified-analysis-panel .analysis-card,
+.unified-analysis-panel .analysis-card-wide,
+.expense-analysis-panel .analysis-card,
+.expense-analysis-panel .analysis-card-wide {
+  border: 1px solid rgba(47, 111, 87, 0.14);
+  border-radius: var(--card-radius);
+  background: #ffffff;
+  padding: var(--card-pad);
+  box-shadow: 0 10px 26px rgba(23, 53, 46, 0.06);
+}
+
+.unified-analysis-panel h4,
+.expense-analysis-panel h4,
+.analysis-card h4 {
+  margin: 0 0 12px;
+  color: #17352e;
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.unified-analysis-panel .income-analysis-toolbar,
+.income-analysis-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.unified-analysis-panel .income-analysis-toolbar label,
+.income-analysis-toolbar label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.unified-analysis-panel select,
+.income-analysis-toolbar select,
+.analysis-card select {
+  min-height: var(--button-height);
+  border: 1px solid var(--button-border);
+  border-radius: var(--button-radius);
+  padding: 0 36px 0 12px;
+  background-color: #fff;
+  color: #17352e;
+  font-size: var(--button-font);
+  font-weight: 800;
+}
+
+.unified-chart-tabs,
+.income-chart-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.unified-analysis-panel .income-chart-box,
+.analysis-card .income-chart-box {
+  border: 1px solid rgba(47, 111, 87, 0.12);
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 10px;
+}
+
+.unified-analysis-panel .analysis-grid,
+.expense-analysis-grid,
+.analysis-grid {
+  gap: 12px;
+}
+
+.analysis-mini-table,
+.analysis-compare-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.analysis-mini-table th,
+.analysis-mini-table td,
+.analysis-compare-table th,
+.analysis-compare-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid rgba(47, 111, 87, 0.12);
+  font-size: 13px;
+}
+
+.review-card-list {
+  display: grid;
+  gap: 10px;
+}
+
+.review-candidate-card,
+.review-top-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  border: 1px solid rgba(47, 111, 87, 0.14);
+  border-radius: 12px;
+  background: #fff;
+  padding: 12px;
+}
+
+.review-rank {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(31, 122, 99, 0.1);
+  color: #1f7a63;
+  font-weight: 900;
+}
+
+.review-candidate-card strong,
+.review-top-item strong {
+  display: block;
+  color: #17352e;
+  font-size: 15px;
+}
+
+.review-candidate-card b,
+.review-top-item b {
+  display: block;
+  margin-top: 4px;
+  color: #17352e;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+.review-candidate-card small,
+.review-candidate-card em,
+.review-top-item span,
+.review-top-item small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  button,
+  .primary-button,
+  .secondary-button,
+  .subtle-button,
+  .ghost-button,
+  .link-button,
+  .file-button,
+  .danger-button,
+  button.danger,
+  .nav-tool-button,
+  .mode-button,
+  .tab,
+  .subtab,
+  .small-action-button {
+    min-height: var(--button-height-mobile);
+    font-size: var(--button-font-mobile);
+  }
+
+  .icon-button,
+  .view-icon-toggle button,
+  #prevImportMonth,
+  #nextImportMonth,
+  #closeDetailPanel,
+  #closeCandidateApply,
+  .modal-close {
+    width: var(--button-height-mobile);
+    min-width: var(--button-height-mobile);
+    min-height: var(--button-height-mobile);
+  }
+
+  .button-row,
+  .payroll-sub-actions,
+  .master-bottom-actions,
+  .modal-actions,
+  .candidate-actions,
+  .settings-actions,
+  .link-group-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .button-row > button,
+  .payroll-sub-actions > button,
+  .master-bottom-actions > button,
+  .modal-actions > button,
+  .candidate-actions > button,
+  .settings-actions > button {
+    flex: 1 1 150px;
+  }
+
+  .unified-analysis-panel {
+    gap: 12px;
+  }
+
+  .unified-analysis-panel .analysis-card,
+  .unified-analysis-panel .analysis-card-wide,
+  .expense-analysis-panel .analysis-card,
+  .expense-analysis-panel .analysis-card-wide {
+    padding: 14px;
+    border-radius: 14px;
+    box-shadow: none;
+  }
+
+  .unified-analysis-panel .income-analysis-toolbar,
+  .income-analysis-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .unified-analysis-panel .income-analysis-toolbar label,
+  .unified-analysis-panel .income-analysis-toolbar select,
+  .income-analysis-toolbar label,
+  .income-analysis-toolbar select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .unified-chart-tabs {
+    display: none;
+  }
+
+  .mobile-chart-select {
+    display: grid;
+  }
+
+  .unified-analysis-panel .analysis-card-head,
+  .analysis-card-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .review-candidate-card,
+  .review-top-item {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .analysis-compare-table {
+    min-width: 720px;
+  }
+}
